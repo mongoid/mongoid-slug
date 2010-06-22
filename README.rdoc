@@ -9,5 +9,9 @@ When included in a Mongoid-based model, this library generates a URL slug/permal
       slug  :title
     end
     
-    >> book.create(:title => "A Thousand Plateaus").to_param
+    >> book = Book.create(:title => "A Thousand Plateaus")
+    >> book.to_param
     "a-thousand-plateaus"
+    >> book.update_attributes(:title => "Anti Oedipus")
+    >> book.to_param
+    "anti-oedipus"
