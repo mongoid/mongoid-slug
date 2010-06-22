@@ -2,7 +2,7 @@ require "rubygems"
 require "bundler"
 Bundler.require(:default)
 
-require File.expand_path("../../lib/mongoid/slug", __FILE__)
+require File.expand_path("../../lib/mongoid_slug", __FILE__)
 Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
 
 Mongoid.configure do |config|
