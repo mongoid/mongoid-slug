@@ -1,0 +1,13 @@
+= Mongoid Slug
+
+Slugify a field in a Mongoid-based model:
+
+    class Book
+      include Mongoid::Document
+      include Mongoid::Slug
+      field :title
+      slug  :title
+    end
+    
+    >> book.create(:title => "A Thousand Plateaus").to_param
+    "a-thousand-plateaus"
