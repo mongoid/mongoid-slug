@@ -1,6 +1,6 @@
 = Mongoid Slug
 
-Slugify a field in a Mongoid-based model:
+When included in a Mongoid-based model, this library generates a URL slug/permalink based on a field.
 
     class Book
       include Mongoid::Document
