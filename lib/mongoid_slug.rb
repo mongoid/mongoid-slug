@@ -7,10 +7,10 @@ module Mongoid::Slug
   end
 
   module ClassMethods #:nodoc:
-    
+
     # Set a field as source of slug
-    def slug(field)
-      class_variable_set(:@@slugged_field, field.to_sym)
+    def slug(*field)
+      class_variable_set(:@@slugged_fields, field)
     end
 
     def find_by_slug(slug)
@@ -25,11 +25,17 @@ module Mongoid::Slug
   private
 
   def slugify
-    self.slug = find_unique_slug if new_record? || self.send((self.class.class_eval('@@slugged_field').to_s + '_changed?').to_sym)
+    self.slug = find_unique_slug if new_record? || slugged_fields_changed?
+  end
+
+  def slugged_fields_changed?
+    self.class.class_eval('@@slugged_fields').any? do |field|
+      self.send(field.to_s + '_changed?')
+    end
   end
 
   def find_unique_slug(suffix='')
-    slug = ("#{slugged_field} #{suffix}").parameterize
+    slug = ("#{slug_base} #{suffix}").parameterize
     if collection.find(:slug => slug).count == 0
       slug
     else
@@ -38,7 +44,7 @@ module Mongoid::Slug
     end
   end
 
-  def slugged_field
-    self.send(self.class.class_eval('@@slugged_field'))
+  def slug_base
+    self.class.class_eval('@@slugged_fields').collect{ |field| self.send(field) }.join(" ")
   end
 end
