@@ -36,7 +36,7 @@ module Mongoid::Slug
 
   def find_unique_slug(suffix='')
     slug = ("#{slug_base} #{suffix}").parameterize
-    if collection.find(:slug => slug).count == 0
+    if (embedded? ? self._parent.collection.find("#{self.class.to_s.downcase.pluralize}.slug" => slug) : collection.find(:slug => slug)).count == 0
       slug
     else
       new_suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"

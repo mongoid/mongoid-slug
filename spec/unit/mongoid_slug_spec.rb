@@ -78,4 +78,18 @@ describe Mongoid::Slug do
       @name.reload.to_param.should eql([@name.first_name, @name.last_name].join(" ").parameterize)
     end
   end
+  
+  describe "finding unique slugs for embedded documents" do
+    before do
+      @person = Person.new(:name => "John Doe")
+      @car1 = Car.new(:model => "Beemer")
+      @car2 = Car.new(:model => "Merc")
+      @person.cars << [@car1, @car2]
+      @person.save
+    end
+    
+    it "should generate unique slug" do
+      @car1.send('find_unique_slug').should == "beemer"
+    end
+  end
 end
