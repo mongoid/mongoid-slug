@@ -3,5 +3,5 @@ class Book
   include Mongoid::Slug
   field :title
   field :authors
-  slug :title
+  slug  :title
 end
