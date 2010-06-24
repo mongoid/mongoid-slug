@@ -2,6 +2,8 @@ class Book
   include Mongoid::Document
   include Mongoid::Slug
   field :title
-  field :authors
+  field :isbn
   slug  :title
+  embeds_one :publisher
+  embeds_many :subjects
 end
