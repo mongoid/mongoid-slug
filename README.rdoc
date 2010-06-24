@@ -1,6 +1,6 @@
 = Mongoid Slug
 
-This gem generates a URL slug/permalink based on a field in a Mongoid model.
+This gem generates a URL slug/permalink based on a field or set of fields in a Mongoid model.
 
     class Book
       include Mongoid::Document
@@ -15,3 +15,5 @@ This gem generates a URL slug/permalink based on a field in a Mongoid model.
     >> book.update_attributes(:title => "Anti Oedipus")
     >> book.to_param
     "anti-oedipus"
+    >> Book.find_by_slug("anti-oedipus")
+    #<Book _id: 4c23b1f7faa4a7479a000009, slug: "anti-oedipus", title: "Anti Oedipus">
