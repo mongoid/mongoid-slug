@@ -1,7 +1,7 @@
-class Pet
+class Subject
   include Mongoid::Document
   include Mongoid::Slug
   field :name
   slug  :name
-  embedded_in :person, :inverse_of => :pet
+  embedded_in :book, :inverse_of => :subjects
 end

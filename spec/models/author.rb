@@ -1,4 +1,4 @@
-class Name
+class Author
   include Mongoid::Document
   include Mongoid::Slug
   field :first_name
