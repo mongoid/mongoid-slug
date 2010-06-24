@@ -14,7 +14,11 @@ module Mongoid::Slug
     end
 
     def find_by_slug(slug)
-      where(:slug => slug).first
+      if embedded?
+        raise 'I have not implemented this method yet for embedded docs. Try: parent.children.where(:slug => "foo") instead'
+      else
+        where(:slug => slug).first
+      end
     end
   end
 
