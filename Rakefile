@@ -17,6 +17,6 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.require_path = 'lib'
   gemspec.email = "code@papercavalier.com"
   gemspec.homepage = "http://github.com/papercavalier/mongoid-slug"
-  gemspec.authors = ["Hakan Ensari"]
+  gemspec.authors = ["Hakan Ensari", "Gerhard Lazu"]
 end
 Jeweler::GemcutterTasks.new
