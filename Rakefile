@@ -5,7 +5,7 @@ task :default => :spec
 
 desc "Run all specs in spec directory"
 RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = "spec/unit/**/*_spec.rb"
+  spec.pattern = "spec/**/*_spec.rb"
 end
   
 Jeweler::Tasks.new do |gemspec|
