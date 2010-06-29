@@ -6,7 +6,7 @@ describe Mongoid::Slug do
     @book = Book.create(:title => "A Thousand Plateaus", :isbn => "9789245242475")
   end
 
-  context "root" do
+  context "root document" do
 
     it "generates slug" do
       @book.to_param.should eql @book.title.parameterize
@@ -31,10 +31,10 @@ describe Mongoid::Slug do
       @book.slug.should_not match /\d$/
     end
 
-    it "does not update slug if slugged field has not changed" do
-      existing_slug = @book.slug
-      @book.update_attributes('isbn' => "9785545858118")
-      @book.slug.should eql existing_slug
+    it "does not update slug if slugged fields have not changed" do
+      former_slug = @book.slug
+      @book.update_attributes(:isbn => "9785545858118")
+      @book.slug.should eql former_slug
     end
 
     context ".find_by_slug" do
