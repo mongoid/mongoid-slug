@@ -121,7 +121,7 @@ describe Mongoid::Slug do
 
   end
 
-  context "slugging composite fields" do
+  context "composite fields" do
     before(:each) do
       @author = Author.create(:first_name => "Gilles", :last_name => "Deleuze")
     end

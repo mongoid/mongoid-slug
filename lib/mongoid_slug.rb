@@ -1,16 +1,16 @@
-# Generates a URL slug/permalink based on a field in a Mongoid model.
+# Generates a URL slug/permalink based on fields in a Mongoid model.
 module Mongoid::Slug
   
-  def self.included(base)
+  def self.included(base) #:nodoc:
     base.extend ClassMethods
     base.class_eval { field :slug; before_save :slugify }
   end
 
   module ClassMethods #:nodoc:
 
-    # Set a field as source of slug
-    def slug(*field)
-      class_variable_set(:@@slugged_fields, field)
+    # Set a field or a number of fields as source of slug
+    def slug(*fields)
+      class_variable_set(:@@slugged, fields)
     end
 
     def find_by_slug(slug)
@@ -29,11 +29,11 @@ module Mongoid::Slug
   private
 
   def slugify
-    self.slug = find_unique_slug if new_record? || slugged_fields_changed?
+    self.slug = find_unique_slug if new_record? || slugged_changed?
   end
 
-  def slugged_fields_changed?
-    self.class.class_eval('@@slugged_fields').any? do |field|
+  def slugged_changed?
+    self.class.class_eval('@@slugged').any? do |field|
       self.send(field.to_s + '_changed?')
     end
   end
@@ -50,6 +50,6 @@ module Mongoid::Slug
   end
 
   def slug_base
-    self.class.class_eval('@@slugged_fields').collect{ |field| self.send(field) }.join(" ")
+    self.class.class_eval('@@slugged').collect{ |field| self.send(field) }.join(" ")
   end
 end
