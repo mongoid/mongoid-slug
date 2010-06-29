@@ -37,6 +37,12 @@ describe Mongoid::Slug do
       @book.slug.should eql former_slug
     end
 
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @book.slug
+      @book.update_attributes(:title => "A thousand plateaus")
+      @book.slug.should eql former_slug
+    end
+
     context ".find_by_slug" do
       it "finds by slug" do
         Book.find_by_slug(@book.slug).should eql @book
@@ -75,9 +81,9 @@ describe Mongoid::Slug do
     end
 
     it "does not update slug if slugged field has not changed" do
-      existing_slug = @subject.slug
+      former_slug = @subject.slug
       @subject.update_attributes(:description => "Lorem ipsum dolor sit amet")
-      @subject.slug.should eql existing_slug
+      @subject.slug.should eql former_slug
     end
 
     context ".find_by_slug" do
@@ -108,9 +114,9 @@ describe Mongoid::Slug do
     end
 
     it "does not update slug if slugged field has not changed" do
-      existing_slug = @publisher.slug
+      former_slug = @publisher.slug
       @publisher.update_attributes(:year => 2001)
-      @publisher.slug.should eql existing_slug
+      @publisher.slug.should eql former_slug
     end
 
   end
