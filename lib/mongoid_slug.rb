@@ -13,12 +13,12 @@ module Mongoid::Slug
       class_variable_set(:@@slugged, fields)
     end
 
+    # This returns an array containing the match rather than
+    # the match itself.
+    #
+    # http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0
     def find_by_slug(slug)
-      if embedded?
-        raise 'I have not implemented this method yet for embedded docs. Try: parent.children.where(:slug => "foo") instead'
-      else
-        where(:slug => slug).first
-      end
+      where(:slug => slug).limit(1)
     end
   end
 

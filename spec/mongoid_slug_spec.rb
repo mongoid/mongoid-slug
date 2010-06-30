@@ -45,7 +45,7 @@ describe Mongoid::Slug do
 
     context ".find_by_slug" do
       it "finds by slug" do
-        Book.find_by_slug(@book.slug).should eql @book
+        Book.find_by_slug(@book.slug).first.should eql @book
       end
     end
 
@@ -87,12 +87,8 @@ describe Mongoid::Slug do
     end
 
     context ".find_by_slug" do
-      it "raises error" do
-        lambda { @book.subjects.find_by_slug(@subject.slug) }.should raise_error
-      end
-
-      it "does find by a regular where" do
-        @book.subjects.where(:slug => @subject.slug).first.should eql @subject
+      it "finds by slug" do
+        @book.subjects.find_by_slug(@subject.slug).first.should eql @subject
       end
     end
 
@@ -153,7 +149,7 @@ describe Mongoid::Slug do
 
     context ".find_by_slug" do
       it "finds by slug" do
-        Author.find_by_slug("gilles-deleuze").should eql @author
+        Author.find_by_slug("gilles-deleuze").first.should eql @author
       end
     end
   end
