@@ -43,10 +43,8 @@ describe Mongoid::Slug do
       @book.slug.should eql former_slug
     end
 
-    context ".find_by_slug" do
-      it "finds by slug" do
-        Book.find_by_slug(@book.slug).first.should eql @book
-      end
+    it "finds by slug" do
+      Book.where(:slug => @book.slug).first.should eql @book
     end
 
   end
@@ -86,10 +84,8 @@ describe Mongoid::Slug do
       @subject.slug.should eql former_slug
     end
 
-    context ".find_by_slug" do
-      it "finds by slug" do
-        @book.subjects.find_by_slug(@subject.slug).first.should eql @subject
-      end
+    it "finds by slug" do
+      @book.subjects.where(:slug => @subject.slug).first.should eql @subject
     end
 
   end
@@ -147,10 +143,8 @@ describe Mongoid::Slug do
       @author.slug.should_not match /\d$/
     end
 
-    context ".find_by_slug" do
-      it "finds by slug" do
-        Author.find_by_slug("gilles-deleuze").first.should eql @author
-      end
+    it "finds by slug" do
+      Author.where(:slug => "gilles-deleuze").first.should eql @author
     end
   end
 end
