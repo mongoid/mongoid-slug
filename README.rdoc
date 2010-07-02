@@ -15,5 +15,5 @@ This gem generates a URL slug/permalink based on fields in a Mongoid model.
     >> book.update_attributes(:title => "Anti Oedipus")
     >> book.to_param
     "anti-oedipus"
-    >> Book.find_by_slug("anti-oedipus").first
+    >> Book.where(:slug => 'anti-oedipus').first
     #<Book _id: 4c23b1f7faa4a7479a000009, slug: "anti-oedipus", title: "Anti Oedipus">
