@@ -10,7 +10,6 @@ module Mongoid::Slug
     # Set a field or a number of fields as source of slug
     def slug(*fields)
       self.slugged = fields
-      field :slug; index :slug, :unique => true; before_save :slugify
     end
 
     # This returns an array containing the match rather than
@@ -19,6 +18,7 @@ module Mongoid::Slug
     # http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0
     def find_by_slug(slug)
       where(:slug => slug).limit(1)
+      field :slug; before_save :generate_slug
     end
   end
 
@@ -28,8 +28,8 @@ module Mongoid::Slug
 
   private
 
-  def slugify
     if new_record? || slugged_changed?
+  def generate_slug
       self.slug = find_unique_slug
     end
   end
