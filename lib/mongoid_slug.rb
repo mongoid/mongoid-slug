@@ -3,21 +3,13 @@ module Mongoid::Slug
   extend ActiveSupport::Concern
 
   included do
-    cattr_accessor :slugged
+    cattr_accessor :slugged_fields
   end
 
   module ClassMethods #:nodoc:
     # Set a field or a number of fields as source of slug
     def slug(*fields)
-      self.slugged = fields
-    end
-
-    # This returns an array containing the match rather than
-    # the match itself.
-    #
-    # http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0
-    def find_by_slug(slug)
-      where(:slug => slug).limit(1)
+      self.slugged_fields = fields
       field :slug; before_save :generate_slug
     end
   end
@@ -28,14 +20,14 @@ module Mongoid::Slug
 
   private
 
-    if new_record? || slugged_changed?
   def generate_slug
+    if new_record? || slugged_fields_changed?
       self.slug = find_unique_slug
     end
   end
 
-  def slugged_changed?
-    self.class.slugged.any? do |field|
+  def slugged_fields_changed?
+    self.class.slugged_fields.any? do |field|
       self.send(field.to_s + '_changed?')
     end
   end
@@ -55,6 +47,6 @@ module Mongoid::Slug
   end
 
   def slug_base
-    self.class.slugged.collect{ |field| self.send(field) }.join(" ")
+    self.class.slugged_fields.collect{ |field| self.send(field) }.join(" ")
   end
 end
