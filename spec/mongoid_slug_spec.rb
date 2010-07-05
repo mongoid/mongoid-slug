@@ -146,5 +146,73 @@ describe Mongoid::Slug do
     it "finds by slug" do
       Author.where(:slug => "gilles-deleuze").first.should eql @author
     end
+
   end
+
+  context "deeply embedded relationships" do
+
+    before(:each) do
+      @foo = Foo.create(:name => "foo")
+      @bar = @foo.bars.create(:name => "bar")
+      @baz = @bar.bazes.create(:name => "baz")
+      @baz = Foo.first.bars.first.bazes.first # Better to be paranoid and reload from db
+    end
+
+    it "generates slug" do
+      @baz.to_param.should eql(@baz.name.parameterize)
+    end
+
+    it "updates slug" do
+      @baz.update_attributes(:name => "lorem")
+      @baz.to_param.should eql "lorem".parameterize
+    end
+
+    it "generates a unique slug" do
+      similar_baz = @bar.bazes.create(:name => @baz.name)
+      similar_baz.to_param.should_not eql @baz.to_param
+    end
+
+    it "appends a counter when slug is not unique" do
+      similar_baz = @bar.bazes.create(:name => @baz.name)
+      similar_baz.slug.should match /\d$/
+    end
+
+    it "does not append a counter when slug is unique" do
+      @baz.slug.should_not match /\d$/
+    end
+
+    it "does not update slug if slugged field has not changed" do
+      former_slug = @baz.slug
+      @baz.update_attributes(:other => "Lorem ipsum dolor sit amet")
+      @baz.slug.should eql former_slug
+    end
+
+    it "finds by slug" do
+      @bar.bazes.where(:slug => @baz.slug).first.should eql @baz
+    end
+
+  end
+
+  describe "#duplicates_of" do
+
+    before(:each) do
+      @foo = Foo.create(:name => "foo")
+      @bar = @foo.bars.create(:name => "bar")
+      @baz = @bar.bazes.create(:name => "baz")
+    end
+
+    it "should find duplicate slug of a root document" do
+      @foo.send(:duplicates_of, @foo.slug).count.should eql 1
+    end
+
+    it "should find duplicate slug of an embedded document" do
+      @bar.send(:duplicates_of, @bar.slug).count.should eql 1
+    end
+
+    it "should find duplicate slug of a deeply-embedded document" do
+      @baz.send(:duplicates_of, @baz.slug).count.should eql 1
+    end
+
+  end
+
 end

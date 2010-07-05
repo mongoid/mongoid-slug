@@ -20,33 +20,40 @@ module Mongoid::Slug
 
   private
 
-  def generate_slug
-    if new_record? || slugged_fields_changed?
-      self.slug = find_unique_slug
-    end
-  end
-
-  def slugged_fields_changed?
-    self.class.slugged_fields.any? do |field|
-      self.send(field.to_s + '_changed?')
+  def duplicates_of(slug, association_chain=[])
+    if embedded?
+      association_chain << association_name
+      _parent.send :duplicates_of, slug, association_chain
+    else
+      association_chain.reverse! << "slug"
+      collection.find(association_chain.join(".") => slug)
     end
   end
 
   def find_unique_slug(suffix='')
     slug = ("#{slug_base} #{suffix}").parameterize
 
-    if (embedded? ?
-        _parent.collection.find("#{association_name}.slug" => slug) :
-        collection.find(:slug => slug)
-      ).reject{ |doc| doc.id == self.id }.empty?
+    if duplicates_of(slug).reject{ |doc| doc.id == self.id }.empty?
       slug
     else
-      new_suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"
-      find_unique_slug(new_suffix)
+      suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"
+      find_unique_slug(suffix)
+    end
+  end
+
+  def generate_slug
+    if new_record? || slugged_fields_changed?
+      self.slug = find_unique_slug
     end
   end
 
   def slug_base
     self.class.slugged_fields.collect{ |field| self.send(field) }.join(" ")
+  end
+
+  def slugged_fields_changed?
+    self.class.slugged_fields.any? do |field|
+      self.send(field.to_s + '_changed?')
+    end
   end
 end
