@@ -10,7 +10,7 @@ module Mongoid::Slug
     # Set a field or a number of fields as source of slug
     def slug(*fields)
       self.slugged_fields = fields
-      field :slug; before_save :generate_slug
+      field :slug; index :slug, :unique => true; before_save :generate_slug
     end
   end
 
