@@ -201,15 +201,15 @@ describe Mongoid::Slug do
       @baz = @bar.bazes.create(:name => "baz")
     end
 
-    it "should find duplicate slug of a root document" do
+    it "finds duplicate slug of a root document" do
       @foo.send(:duplicates_of, @foo.slug).count.should eql 1
     end
 
-    it "should find duplicate slug of an embedded document" do
+    it "finds duplicate slug of an embedded document" do
       @bar.send(:duplicates_of, @bar.slug).count.should eql 1
     end
 
-    it "should find duplicate slug of a deeply-embedded document" do
+    it "finds duplicate slug of a deeply-embedded document" do
       @baz.send(:duplicates_of, @baz.slug).count.should eql 1
     end
 
