@@ -6,4 +6,5 @@ class Book
   slug  :title
   embeds_one :publisher
   embeds_many :subjects
+  references_many :authors
 end

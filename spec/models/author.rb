@@ -4,4 +4,5 @@ class Author
   field :first_name
   field :last_name
   slug  :first_name, :last_name
+  referenced_in :book
 end
