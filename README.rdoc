@@ -7,8 +7,18 @@ This gem generates a URL slug/permalink based on fields in a Mongoid model.
       include Mongoid::Slug
       field :title
       slug  :title
+      embeds_many :authors
     end
-    
+
+    class Author
+      include Mongoid::Document
+      include Mongoid::Slug
+      field :first_name
+      field :last_name
+      slug  :first_name, :last_name
+      embedded_in :book, :inverse_of => :authors
+    end
+
     >> book = Book.create(:title => "A Thousand Plateaus")
     >> book.to_param
     "a-thousand-plateaus"
@@ -17,3 +27,11 @@ This gem generates a URL slug/permalink based on fields in a Mongoid model.
     "anti-oedipus"
     >> Book.where(:slug => 'anti-oedipus').first
     #<Book _id: 4c23b1f7faa4a7479a000009, slug: "anti-oedipus", title: "Anti Oedipus">
+    >> author = book.authors.create(:first_name => "Gilles", :last_name => "Deleuze")
+    >> author.to_param
+    => "gilles-deleuze"
+    >> author.update_attributes(:first => "Félix", :last_name => "Guattari")
+    >> author.to_param
+    => "félix-guattari"
+    >> book.authors.where(:slug => 'felix-guattari).first
+    => #<Author _id: 4c31e362faa4a7050e000003, slug: "félix-guattari", last_name: "Guattari", first_name: "Félix">
