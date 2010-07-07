@@ -20,10 +20,10 @@ module Mongoid::Slug
 
   private
 
-  def duplicates_of(slug, association_chain=[])
+  def duplicate_of(slug, association_chain=[])
     if embedded?
       association_chain << association_name
-      _parent.send :duplicates_of, slug, association_chain
+      _parent.send :duplicate_of, slug, association_chain
     else
       association_chain.reverse! << "slug"
       collection.find(association_chain.join(".") => slug)
@@ -33,7 +33,7 @@ module Mongoid::Slug
   def find_unique_slug(suffix='')
     slug = ("#{slug_base} #{suffix}").parameterize
 
-    if duplicates_of(slug).reject{ |doc| doc.id == self.id }.empty?
+    if duplicate_of(slug).reject{ |doc| doc.id == self.id }.empty?
       slug
     else
       suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"

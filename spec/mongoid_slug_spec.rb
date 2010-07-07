@@ -193,7 +193,7 @@ describe Mongoid::Slug do
 
   end
 
-  describe "#duplicates_of" do
+  context "#duplicate_of" do
 
     before(:each) do
       @foo = Foo.create(:name => "foo")
@@ -202,15 +202,15 @@ describe Mongoid::Slug do
     end
 
     it "finds duplicate slug of a root document" do
-      @foo.send(:duplicates_of, @foo.slug).count.should eql 1
+      @foo.send(:duplicate_of, @foo.slug).count.should eql 1
     end
 
     it "finds duplicate slug of an embedded document" do
-      @bar.send(:duplicates_of, @bar.slug).count.should eql 1
+      @bar.send(:duplicate_of, @bar.slug).count.should eql 1
     end
 
     it "finds duplicate slug of a deeply-embedded document" do
-      @baz.send(:duplicates_of, @baz.slug).count.should eql 1
+      @baz.send(:duplicate_of, @baz.slug).count.should eql 1
     end
 
   end
