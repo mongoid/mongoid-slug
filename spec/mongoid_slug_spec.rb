@@ -193,6 +193,19 @@ describe Mongoid::Slug do
 
   end
 
+  context ":as option" do
+
+    before(:each) do
+      @person = Person.create(:name => "John Doe")
+    end
+
+    it "should set the slug field name" do
+      @person.respond_to?(:permalink).should be_true
+      @person.send(:permalink).should eql "john-doe"
+    end
+
+  end
+
   context "#duplicate_of" do
 
     before(:each) do

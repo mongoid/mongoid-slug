@@ -3,14 +3,18 @@ module Mongoid::Slug
   extend ActiveSupport::Concern
 
   included do
-    cattr_accessor :slugged_fields
+    cattr_accessor :slug_name, :slugged_fields
   end
 
   module ClassMethods #:nodoc:
     # Set a field or a number of fields as source of slug
-    def slug(*fields)
-      self.slugged_fields = fields
-      field :slug; index :slug, :unique => true; before_save :generate_slug
+    def slug(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      self.slug_name = options[:as] || :slug
+      self.slugged_fields = args
+      field slug_name
+      index slug_name, :unique => true
+      before_save :generate_slug
     end
   end
 
@@ -43,7 +47,7 @@ module Mongoid::Slug
 
   def generate_slug
     if new_record? || slugged_fields_changed?
-      self.slug = find_unique_slug
+      self.send("#{slug_name}=", find_unique_slug)
     end
   end
 
