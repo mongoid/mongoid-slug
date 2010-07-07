@@ -12,7 +12,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.name = "mongoid_slug"
   gemspec.summary = "Generates a URL slug in a Mongoid model"
   gemspec.description = "Mongoid Slug generates a URL slug/permalink based on fields in a Mongoid model."
-  gemspec.add_runtime_dependency("mongoid", ["~>2.0.0.beta7"])
+  gemspec.add_runtime_dependency("mongoid", ["~>2.0.0.beta9"])
   gemspec.files = Dir.glob("lib/**/*") + %w(LICENSE README.rdoc)
   gemspec.require_path = 'lib'
   gemspec.email = "code@papercavalier.com"
