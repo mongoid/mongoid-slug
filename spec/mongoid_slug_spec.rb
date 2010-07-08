@@ -204,9 +204,48 @@ describe Mongoid::Slug do
       @person.send(:permalink).should eql "john-doe"
     end
 
+    it "generates slug" do
+      @person.to_param.should eql(@person.name.parameterize)
+    end
+
+    it "updates slug" do
+      @person.update_attributes(:name => "Jane Doe")
+      @person.to_param.should eql "Jane Doe".parameterize
+    end
+
+    it "generates a unique slug" do
+      similar_person = Person.create(:name => @person.name)
+      similar_person.to_param.should_not eql @person.to_param
+    end
+
+    it "appends a counter when slug is not unique" do
+      similar_person = Person.create(:name => @person.name)
+      similar_person.to_param.should match /\d$/
+    end
+
+    it "does not append a counter when slug is unique" do
+      @person.to_param.should_not match /\d$/
+    end
+
+    it "does not update slug if slugged fields have not changed" do
+      former_slug = @person.to_param
+      @person.update_attributes(:age => 31)
+      @person.to_param.should eql former_slug
+    end
+
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @person.to_param
+      @person.update_attributes(:name => "JOHN DOE")
+      @person.to_param.should eql former_slug
+    end
+
+    it "finds by slug" do
+      Person.where(:permalink => @person.to_param).first.should eql @person
+    end
+
   end
 
-  context "#duplicate_of" do
+  context "#duplicates" do
 
     before(:each) do
       @foo = Foo.create(:name => "foo")
