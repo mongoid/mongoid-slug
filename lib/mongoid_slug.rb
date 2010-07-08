@@ -25,20 +25,28 @@ module Mongoid::Slug
 
   private
 
-  def duplicate_of(slug, association_chain=[])
+  def find_(slug, stack=[])
     if embedded?
-      association_chain << association_name
-      _parent.send :duplicate_of, slug, association_chain
+      stack << association_name
+      _parent.send :find_, slug, stack
     else
-      association_chain.reverse! << "slug"
-      collection.find(association_chain.join(".") => slug)
+      stack.reverse!
+      path = (stack + [slug_name]).join(".")
+      found = collection.find(path => slug).to_a
+
+      stack.each do |name|
+        if found.any?
+          found = found.first.send(name)
+        end
+      end
+
+      found
     end
   end
 
   def find_unique_slug(suffix='')
     slug = ("#{slug_base} #{suffix}").parameterize
-
-    if duplicate_of(slug).reject{ |doc| doc.id == self.id }.empty?
+    if find_(slug).to_a.reject{ |doc| doc.id == self.id }.empty?
       slug
     else
       suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"
