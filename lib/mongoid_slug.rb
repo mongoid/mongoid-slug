@@ -19,7 +19,7 @@ module Mongoid::Slug
   end
 
   def to_param
-    slug
+    self.send slug_name
   end
 
   private
