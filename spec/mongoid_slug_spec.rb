@@ -24,27 +24,27 @@ describe Mongoid::Slug do
 
     it "appends a counter when slug is not unique" do
       similar_book = Book.create(:title => @book.title)
-      similar_book.slug.should match /\d$/
+      similar_book.to_param.should match /\d$/
     end
 
     it "does not append a counter when slug is unique" do
-      @book.slug.should_not match /\d$/
+      @book.to_param.should_not match /\d$/
     end
 
     it "does not update slug if slugged fields have not changed" do
-      former_slug = @book.slug
+      former_slug = @book.to_param
       @book.update_attributes(:isbn => "9785545858118")
-      @book.slug.should eql former_slug
+      @book.to_param.should eql former_slug
     end
 
     it "does not update slug if slugged fields have changed but generated slug is the same" do
-      former_slug = @book.slug
+      former_slug = @book.to_param
       @book.update_attributes(:title => "A thousand plateaus")
-      @book.slug.should eql former_slug
+      @book.to_param.should eql former_slug
     end
 
     it "finds by slug" do
-      Book.where(:slug => @book.slug).first.should eql @book
+      Book.where(:slug => @book.to_param).first.should eql @book
     end
 
   end
@@ -71,21 +71,27 @@ describe Mongoid::Slug do
 
     it "appends a counter when slug is not unique" do
       similar_subject = @book.subjects.create(:name => @subject.name)
-      similar_subject.slug.should match /\d$/
+      similar_subject.to_param.should match /\d$/
     end
 
     it "does not append a counter when slug is unique" do
-      @subject.slug.should_not match /\d$/
+      @subject.to_param.should_not match /\d$/
     end
 
-    it "does not update slug if slugged field has not changed" do
-      former_slug = @subject.slug
+    it "does not update slug if slugged fields have not changed" do
+      former_slug = @subject.to_param
       @subject.update_attributes(:description => "Lorem ipsum dolor sit amet")
-      @subject.slug.should eql former_slug
+      @subject.to_param.should eql former_slug
+    end
+
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @subject.to_param
+      @subject.update_attributes(:title => "PSYCHOANALYSIS")
+      @subject.to_param.should eql former_slug
     end
 
     it "finds by slug" do
-      @book.subjects.where(:slug => @subject.slug).first.should eql @subject
+      @book.subjects.where(:slug => @subject.to_param).first.should eql @subject
     end
 
   end
@@ -105,10 +111,16 @@ describe Mongoid::Slug do
       @publisher.to_param.should eql "Harvard UP".parameterize
     end
 
-    it "does not update slug if slugged field has not changed" do
-      former_slug = @publisher.slug
+    it "does not update slug if slugged fields have not changed" do
+      former_slug = @publisher.to_param
       @publisher.update_attributes(:year => 2001)
-      @publisher.slug.should eql former_slug
+      @publisher.to_param.should eql former_slug
+    end
+
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @publisher.to_param
+      @publisher.update_attributes(:name => "oup")
+      @publisher.to_param.should eql former_slug
     end
 
   end
@@ -136,11 +148,17 @@ describe Mongoid::Slug do
     it "appends a counter when slug is not unique" do
       similar_author = Author.create(:first_name => @author.first_name,
                                      :last_name => @author.last_name)
-      similar_author.slug.should match /\d$/
+      similar_author.to_param.should match /\d$/
     end
 
     it "does not append a counter when slug is unique" do
-      @author.slug.should_not match /\d$/
+      @author.to_param.should_not match /\d$/
+    end
+
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @author.to_param
+      @author.update_attributes(:first_name => "gilles", :last_name => "DELEUZE")
+      @author.to_param.should eql former_slug
     end
 
     it "finds by slug" do
@@ -174,21 +192,27 @@ describe Mongoid::Slug do
 
     it "appends a counter when slug is not unique" do
       similar_baz = @bar.bazes.create(:name => @baz.name)
-      similar_baz.slug.should match /\d$/
+      similar_baz.to_param.should match /\d$/
     end
 
     it "does not append a counter when slug is unique" do
-      @baz.slug.should_not match /\d$/
+      @baz.to_param.should_not match /\d$/
     end
 
-    it "does not update slug if slugged field has not changed" do
-      former_slug = @baz.slug
+    it "does not update slug if slugged fields have not changed" do
+      former_slug = @baz.to_param
       @baz.update_attributes(:other => "Lorem ipsum dolor sit amet")
-      @baz.slug.should eql former_slug
+      @baz.to_param.should eql former_slug
+    end
+
+    it "does not update slug if slugged fields have changed but generated slug is the same" do
+      former_slug = @baz.to_param
+      @baz.update_attributes(:name => "BAZ")
+      @baz.to_param.should eql former_slug
     end
 
     it "finds by slug" do
-      @bar.bazes.where(:slug => @baz.slug).first.should eql @baz
+      @bar.bazes.where(:slug => @baz.to_param).first.should eql @baz
     end
 
   end
@@ -245,7 +269,7 @@ describe Mongoid::Slug do
 
   end
 
-  context "#duplicates" do
+  context "#find_" do
 
     before(:each) do
       @foo = Foo.create(:name => "foo")
@@ -254,15 +278,15 @@ describe Mongoid::Slug do
     end
 
     it "finds duplicate slug of a root document" do
-      @foo.send(:duplicate_of, @foo.slug).count.should eql 1
+      @foo.send(:find_, @foo.to_param).count.should eql 1
     end
 
     it "finds duplicate slug of an embedded document" do
-      @bar.send(:duplicate_of, @bar.slug).count.should eql 1
+      @bar.send(:find_, @bar.to_param).count.should eql 1
     end
 
     it "finds duplicate slug of a deeply-embedded document" do
-      @baz.send(:duplicate_of, @baz.slug).count.should eql 1
+      @baz.send(:find_, @baz.to_param).count.should eql 1
     end
 
   end
