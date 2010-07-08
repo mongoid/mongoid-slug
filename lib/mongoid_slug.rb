@@ -12,6 +12,7 @@ module Mongoid::Slug
       options = args.last.is_a?(Hash) ? args.pop : {}
       self.slug_name = options[:as] || :slug
       self.slugged_fields = args
+
       field slug_name
       index slug_name, :unique => true
       before_save :generate_slug
