@@ -36,7 +36,7 @@ module Mongoid::Slug
 
       stack.each do |name|
         if found.any?
-          found = found.first.send(name)
+          found = found.first.send(name).to_a
         end
       end
 
@@ -46,7 +46,7 @@ module Mongoid::Slug
 
   def find_unique_slug(suffix='')
     slug = ("#{slug_base} #{suffix}").parameterize
-    if find_(slug).to_a.reject{ |doc| doc.id == self.id }.empty?
+    if find_(slug).reject{ |doc| doc.id == self.id }.empty?
       slug
     else
       suffix = suffix.blank? ? '1' : "#{suffix.to_i + 1}"
