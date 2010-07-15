@@ -17,6 +17,15 @@ module Mongoid::Slug
       index slug_name, :unique => true
       before_save :generate_slug
     end
+
+    def find_by_slug_or_id(value)
+      found = self.find(value)
+      unless found
+        found = self.find(:first, :conditions => { :slug => value })
+      end
+
+      found
+    end
   end
 
   def to_param
