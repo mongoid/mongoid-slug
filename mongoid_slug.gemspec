@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mongoid_slug}
-  s.version = "0.4.4"
+  s.version = "0.4.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Hakan Ensari", "Gerhard Lazu"]
-  s.date = %q{2010-07-08}
+  s.date = %q{2010-07-24}
   s.description = %q{Mongoid Slug generates a URL slug/permalink based on fields in a Mongoid model.}
   s.email = %q{code@papercavalier.com}
   s.extra_rdoc_files = [
@@ -44,12 +44,12 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<mongoid>, ["~> 2.0.0.beta9"])
+      s.add_runtime_dependency(%q<mongoid>, ["~> 2.0.0.beta"])
     else
-      s.add_dependency(%q<mongoid>, ["~> 2.0.0.beta9"])
+      s.add_dependency(%q<mongoid>, ["~> 2.0.0.beta"])
     end
   else
-    s.add_dependency(%q<mongoid>, ["~> 2.0.0.beta9"])
+    s.add_dependency(%q<mongoid>, ["~> 2.0.0.beta"])
   end
 end
 
