@@ -1,7 +1,7 @@
 source "http://gemcutter.org"
 
-gem "bson_ext", "~> 1.0.1"
+gem "bson_ext", "~> 1.0.4"
 gem "database_cleaner", "~> 0.5.2"
 gem "jeweler", "~> 1.4.0"
-gem "mongoid", "2.0.0.beta9"
-gem "rspec", "2.0.0.beta.16"
+gem "mongoid", "~> 2.0.0.beta"
+gem "rspec", "2.0.0.beta.18"
