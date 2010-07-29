@@ -1,10 +1,12 @@
 require "rubygems"
-require "bundler"
-Bundler.require(:default)
+require "bundler/setup"
+
+require "rspec"
+require "database_cleaner"
+require "mongoid"
 
 Mongoid.configure do |config|
   name = "mongoid_slug_test"
-  host = "localhost"
   config.master = Mongo::Connection.new.db(name)
 end
 
