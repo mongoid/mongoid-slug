@@ -305,7 +305,7 @@ describe Mongoid::Slug do
       similar_sar.to_param.should_not eql @sar.to_param
     end
     
-    it "generates the same slug in diferent parent object" do
+    it "generates the same slug in different parent object" do
       other_sar = @foo2.sars.create(:name => @sar.name)
       other_sar.to_param.should eql @sar.to_param
     end
