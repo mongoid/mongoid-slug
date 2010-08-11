@@ -1,12 +1,12 @@
-= Mongoid Slug
+Mongoid Slug
+============
 
-== Summary
+Mongoid Slug generates a URL slug or permalink based on a field or set of fields in a Mongoid model.
 
-This module, when included in a Mongoid model, generates a URL slug or permalink based on a field or set of fields.
+Examples
+--------
 
-== Examples
-
-Here we have a book model that embeds many authors:
+Here's a book that embeds many authors:
 
     class Book
       include Mongoid::Document
@@ -25,26 +25,18 @@ Here we have a book model that embeds many authors:
       embedded_in :book, :inverse_of => :authors
     end
 
-The finders in our controllers would possibly look like:
+The finders in our controllers should look like:
 
-    class BooksController
-      def show
-        @book = Book.where(:slug => params[:id]).first
-      end
-
-      # and so on
+    def find_book
+      @book = Book.where(:slug => params[:id]).first
     end
 
-    class AuthorsController
-      def show
-        @book = Book.where(:slug => params[:book_id]).first
-        @author = @book.authors.where(:slug => params[:id]).first
-      end
-
-      # and so on
+    def find_book_and_author
+      @book = Book.where(:slug => params[:book_id]).first
+      @author = @book.authors.where(:slug => params[:id]).first
     end
 
-If you are wondering why I did not include a *find_by_slug* helper, {read on}[http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0?pli=1].
+If you are wondering why I did not include a *find_by_slug* helper, [read on](http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0?pli=1).
 
 To demo some more functionality in the console:
 
@@ -65,4 +57,4 @@ To demo some more functionality in the console:
     >> book.authors.where(:slug => 'felix-guattari).first
     => #<Author _id: 4c31e362faa4a7050e000003, slug: "félix-guattari", last_name: "Guattari", first_name: "Félix">
 
-Last but not least, check out the specs and the sample models I used there for more examples.
+`slug` takes `:as` and `:scoped` as arguments. See models in specs for more examples.
