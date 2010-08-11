@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require "spec_helper"
 
 describe Mongoid::Slug do
@@ -289,6 +291,24 @@ describe Mongoid::Slug do
       @baz.send(:find_, @baz.to_param).count.should eql 1
     end
 
+  end
+  
+  context ":scoped option" do
+    before(:each) do
+      @foo = Foo.create(:name => "foo")
+      @sar = @foo.sars.create(:name => "sar")
+      @foo2 = Foo.create(:name => "foo")
+    end
+    
+    it "generates a unique slug inside the same parent object" do
+      similar_sar = @foo.sars.create(:name => @sar.name)
+      similar_sar.to_param.should_not eql @sar.to_param
+    end
+    
+    it "generates the same slug in diferent parent object" do
+      other_sar = @foo2.sars.create(:name => @sar.name)
+      other_sar.to_param.should eql @sar.to_param
+    end
   end
 
 end

@@ -4,4 +4,5 @@ class Foo
   field :name
   slug  :name
   embeds_many :bars
+  embeds_many :sars
 end

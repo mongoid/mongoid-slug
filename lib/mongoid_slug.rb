@@ -3,7 +3,7 @@ module Mongoid::Slug
   extend ActiveSupport::Concern
 
   included do
-    cattr_accessor :slug_name, :slugged_fields
+    cattr_accessor :slug_name, :slugged_fields, :slug_scoped
   end
 
   module ClassMethods #:nodoc:
@@ -11,10 +11,15 @@ module Mongoid::Slug
     def slug(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}
       self.slug_name = options[:as] || :slug
+      self.slug_scoped = options[:scoped] || false
       self.slugged_fields = args
 
       field slug_name
-      index slug_name, :unique => true
+      if slug_scoped
+        index slug_name
+      else
+        index slug_name, :unique => true
+      end
       before_save :generate_slug
     end
   end
@@ -27,19 +32,23 @@ module Mongoid::Slug
 
   def find_(slug, stack=[])
     if embedded?
-      stack << association_name
-      _parent.send :find_, slug, stack
+      if slug_scoped && stack.empty?
+        _parent.send(association_name).where( slug_name => slug ).to_a
+      else
+        stack << association_name
+        _parent.send :find_, slug, stack
+      end
     else
       stack.reverse!
       path = (stack + [slug_name]).join(".")
       found = collection.find(path => slug).to_a
-
+    
       stack.each do |name|
         if found.any?
           found = found.first.send(name).to_a
         end
       end
-
+    
       found
     end
   end
