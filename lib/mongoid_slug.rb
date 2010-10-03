@@ -20,7 +20,11 @@ module Mongoid::Slug
       else
         index slug_name, :unique => true
       end
-      before_save :generate_slug
+      if options[:permanent]
+        before_create :generate_slug
+      else
+        before_save :generate_slug
+      end
     end
   end
 

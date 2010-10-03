@@ -18,6 +18,12 @@ describe Mongoid::Slug do
       @book.update_attributes(:title => "Anti Oedipus")
       @book.to_param.should eql "Anti Oedipus".parameterize
     end
+    
+    it "doesn't update slug if you don't want it to" do
+      @permanent = Permanent.create(:title => "This is a nodding song")
+      @permanent.update_attributes(:title => "This is not a nodding song")
+      @permanent.to_param.should eql "This is a nodding song".parameterize
+    end
 
     it "generates a unique slug" do
       similar_book = Book.create(:title => @book.title)
