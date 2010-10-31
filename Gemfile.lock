@@ -1,9 +1,3 @@
-PATH
-  remote: .
-  specs:
-    mongoid_slug (0.4.7)
-      mongoid (~> 2.0.0.beta.19)
-
 GEM
   remote: http://gemcutter.org/
   specs:
@@ -13,10 +7,7 @@ GEM
       i18n (~> 0.4.1)
     activesupport (3.0.1)
     bson (1.1.1)
-    bson_ext (1.1.1)
     builder (2.1.2)
-    database_cleaner (0.6.0)
-    diff-lcs (1.1.2)
     i18n (0.4.2)
     mongo (1.0.9)
       bson (>= 1.0.5)
@@ -25,16 +16,8 @@ GEM
       mongo (= 1.0.9)
       tzinfo (~> 0.3.22)
       will_paginate (~> 3.0.pre)
-    rspec (2.0.1)
-      rspec-core (~> 2.0.1)
-      rspec-expectations (~> 2.0.1)
-      rspec-mocks (~> 2.0.1)
-    rspec-core (2.0.1)
-    rspec-expectations (2.0.1)
-      diff-lcs (>= 1.1.2)
-    rspec-mocks (2.0.1)
-      rspec-core (~> 2.0.1)
-      rspec-expectations (~> 2.0.1)
+    mongoid_slug (0.4.7)
+      mongoid (~> 2.0.0.beta.19)
     tzinfo (0.3.23)
     will_paginate (3.0.pre2)
 
@@ -42,8 +25,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bson_ext (~> 1.1.1)
-  database_cleaner (~> 0.6.0)
-  mongoid (~> 2.0.0.beta.19)
-  mongoid_slug!
-  rspec (~> 2.0.1)
+  mongoid
+  mongoid_slug

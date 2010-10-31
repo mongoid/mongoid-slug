@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Hakan Ensari", "Gerhard Lazu"]
   s.email       = ["code@papercavalier.com"]
   s.homepage    = "http://github.com/papercavalier/mongoid_slug"
-  s.summary     = "Generates a URL slug in a Mongoid model"
-  s.description = "Mongoid Slug generates a URL slug/permalink based on fields in a Mongoid model."
+  s.summary     = "Generates a URL slug or permalink"
+  s.description = "Generates a URL slug or permalink based on fields in a Mongoid model."
 
   s.rubyforge_project = "mongoid_slug"
 
@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
 
   s.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md)
   s.test_files    = Dir.glob("spec/**/*")
-  s.require_paths = ["lib/mongoid"]
+  s.require_paths = ["lib"]
 end
