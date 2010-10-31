@@ -3,8 +3,15 @@ Mongoid Slug
 
 Mongoid Slug generates a URL slug or permalink based on a field or set of fields in a Mongoid model.
 
-Examples
---------
+Install
+-------
+
+To install mongoid_slug, add it to your Gemfile:
+
+    gem 'mongoid_slug', :require => 'mongoid/slug'
+
+Usage
+-----
 
 Here's a book that embeds many authors:
 
@@ -57,4 +64,4 @@ To demo some more functionality in the console:
     >> book.authors.where(:slug => 'felix-guattari).first
     => #<Author _id: 4c31e362faa4a7050e000003, slug: "félix-guattari", last_name: "Guattari", first_name: "Félix">
 
-`slug` takes `:as` and `:scoped` as arguments. See models in specs for more examples.
+See [sample models in specs]("http://github.com/papercavalier/mongoid-slug/tree/master/spec/models/") for various configuration options.
