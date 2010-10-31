@@ -1,2 +1,2 @@
 rvm --create use ree@mongoid
-rvm wrapper ree@mongoid textmate
+rvm wrapper ree@mongoid
