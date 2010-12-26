@@ -1,4 +1,6 @@
 #encoding: utf-8
+require 'stringex'
+
 module Mongoid #:nodoc:
 
   # Generates a URL slug/permalink based on fields in a Mongoid model
@@ -65,7 +67,7 @@ module Mongoid #:nodoc:
     end
 
     def find_unique_slug(suffix='')
-      slug = ("#{slug_base} #{suffix}").parameterize
+      slug = ("#{slug_base} #{suffix}").to_url
       if find_(slug).reject{ |doc| doc.id == self.id }.empty?
         slug
       else
