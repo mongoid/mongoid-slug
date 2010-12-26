@@ -10,12 +10,19 @@ module Mongoid
     context "when document is root" do
 
       it "generates slug" do
-        book.to_param.should eql book.title.parameterize
+        book.to_param.should eql book.title.to_url
       end
 
       it "updates slug" do
         book.update_attributes(:title => "Anti Oedipus")
-        book.to_param.should eql "Anti Oedipus".parameterize
+        book.to_param.should eql "Anti Oedipus".to_url
+      end
+
+      it "updates slug with non latin characters" do
+        book.update_attributes(:title => "Капитал")
+        book.to_param.should eql "Капитал".to_url
+        book.update_attributes(:title => "Ελλάδα")
+        book.to_param.should eql "Ελλάδα".to_url
       end
 
       it "generates a unique slug" do
@@ -55,12 +62,12 @@ module Mongoid
       let(:subject) { book.subjects.create(:name => "Psychoanalysis") }
 
       it "generates slug" do
-        subject.to_param.should eql(subject.name.parameterize)
+        subject.to_param.should eql(subject.name.to_url)
       end
 
       it "updates slug" do
         subject.update_attributes(:name => "Schizoanalysis")
-        subject.to_param.should eql "Schizoanalysis".parameterize
+        subject.to_param.should eql "Schizoanalysis".to_url
       end
 
       it "generates a unique slug" do
@@ -100,12 +107,12 @@ module Mongoid
       let(:publisher) { book.create_publisher(:name => "OUP") }
 
       it "generates slug" do
-        publisher.to_param.should eql(publisher.name.parameterize)
+        publisher.to_param.should eql(publisher.name.to_url)
       end
 
       it "updates slug" do
         publisher.update_attributes(:name => "Harvard UP")
-        publisher.to_param.should eql "Harvard UP".parameterize
+        publisher.to_param.should eql "Harvard UP".to_url
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -127,12 +134,12 @@ module Mongoid
       let(:author) { Author.create(:first_name => "Gilles", :last_name => "Deleuze") }
 
       it "generates slug" do
-        author.to_param.should eql("Gilles Deleuze".parameterize)
+        author.to_param.should eql("Gilles Deleuze".to_url)
       end
 
       it "updates slug" do
         author.update_attributes(:first_name => "Félix", :last_name => "Guattari")
-        author.to_param.should eql "Félix Guattari".parameterize
+        author.to_param.should eql "Félix Guattari".to_url
       end
 
       it "generates a unique slug" do
@@ -174,12 +181,12 @@ module Mongoid
       end
 
       it "generates slug" do
-        baz.to_param.should eql(baz.name.parameterize)
+        baz.to_param.should eql(baz.name.to_url)
       end
 
       it "updates slug" do
         baz.update_attributes(:name => "lorem")
-        baz.to_param.should eql "lorem".parameterize
+        baz.to_param.should eql "lorem".to_url
       end
 
       it "generates a unique slug" do
@@ -224,12 +231,12 @@ module Mongoid
       end
 
       it "generates slug" do
-        person.to_param.should eql(person.name.parameterize)
+        person.to_param.should eql(person.name.to_url)
       end
 
       it "updates slug" do
         person.update_attributes(:name => "Jane Doe")
-        person.to_param.should eql "Jane Doe".parameterize
+        person.to_param.should eql "Jane Doe".to_url
       end
 
       it "generates a unique slug" do
@@ -308,7 +315,7 @@ module Mongoid
 
       it "doesn't change slug when document is updated" do
         permanent.update_attributes(:title => "This is not a nodding song")
-        permanent.to_param.should eql "This is a nodding song".parameterize
+        permanent.to_param.should eql "This is a nodding song".to_url
       end
 
     end

@@ -3,6 +3,7 @@ require "bundler/setup"
 
 require "database_cleaner"
 require "mongoid"
+require "stringex"
 require "rspec"
 
 Mongoid.configure do |config|
