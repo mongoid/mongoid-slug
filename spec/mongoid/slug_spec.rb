@@ -2,324 +2,198 @@
 require "spec_helper"
 
 module Mongoid
-
   describe Slug do
+    let!(:book) do
+      Book.create(:title => "A Thousand Plateaus")
+    end
 
-    let(:book) { Book.create(:title => "A Thousand Plateaus", :isbn => "9789245242475") }
-
-    context "when document is root" do
-
-      it "generates slug" do
-        book.to_param.should eql book.title.to_url
+    context "when the object is top-level" do
+      it "generates a slug" do
+        book.to_param.should eql "a-thousand-plateaus"
       end
 
-      it "updates slug" do
-        book.update_attributes(:title => "Anti Oedipus")
-        book.to_param.should eql "Anti Oedipus".to_url
+      it "updates the slug" do
+        book.title = "Anti Oedipus"
+        book.save
+        book.to_param.should eql "anti-oedipus"
       end
 
-      it "updates slug with non latin characters" do
-        book.update_attributes(:title => "Капитал")
-        book.to_param.should eql "Капитал".to_url
-        book.update_attributes(:title => "Ελλάδα")
-        book.to_param.should eql "Ελλάδα".to_url
-      end
-
-      it "generates a unique slug" do
-        similar_book = Book.create(:title => book.title)
-        similar_book.to_param.should_not eql book.to_param
-      end
-
-      it "appends a counter when slug is not unique" do
-        similar_book = Book.create(:title => book.title)
-        similar_book.to_param.should match /\d$/
-      end
-
-      it "does not append a counter when slug is unique" do
-        book.to_param.should_not match /\d$/
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = Book.create(:title => book.title)
+        dup.to_param.should eql "a-thousand-plateaus-1"
       end
 
       it "does not update slug if slugged fields have not changed" do
-        former_slug = book.to_param
-        book.update_attributes(:isbn => "9785545858118")
-        book.to_param.should eql former_slug
+        book.save
+        book.to_param.should eql "a-thousand-plateaus"
       end
 
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = book.to_param
-        book.update_attributes(:title => "A thousand plateaus")
-        book.to_param.should eql former_slug
+      it "does not change slug if slugged fields have changed but generated slug is identical" do
+        book.title = "a thousand plateaus"
+        book.save
+        book.to_param.should eql "a-thousand-plateaus"
       end
 
       it "finds by slug" do
-        Book.where(:slug => book.to_param).first.should eql book
+        Book.find_by_slug(book.to_param).should eql book
       end
-
     end
 
-    context "when document is an embedded has-many" do
-
-      let(:subject) { book.subjects.create(:name => "Psychoanalysis") }
-
-      it "generates slug" do
-        subject.to_param.should eql(subject.name.to_url)
+    context "when the object is embedded" do
+      let(:subject) do
+        book.subjects.create(:name => "Psychoanalysis")
       end
 
-      it "updates slug" do
-        subject.update_attributes(:name => "Schizoanalysis")
-        subject.to_param.should eql "Schizoanalysis".to_url
+      it "generates a slug" do
+        subject.to_param.should eql "psychoanalysis"
       end
 
-      it "generates a unique slug" do
-        similar_subject = book.subjects.create(:model => subject.name)
-        similar_subject.to_param.should_not eql subject.to_param
+      it "updates the slug" do
+        subject.name = "Schizoanalysis"
+        subject.save
+        subject.to_param.should eql "schizoanalysis"
       end
 
-      it "appends a counter when slug is not unique" do
-        similar_subject = book.subjects.create(:name => subject.name)
-        similar_subject.to_param.should match /\d$/
-      end
-
-      it "does not append a counter when slug is unique" do
-        subject.to_param.should_not match /\d$/
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = book.subjects.create(:name => subject.name)
+        dup.to_param.should eql 'psychoanalysis-1'
       end
 
       it "does not update slug if slugged fields have not changed" do
-        former_slug = subject.to_param
-        subject.update_attributes(:description => "Lorem ipsum dolor sit amet")
-        subject.to_param.should eql former_slug
+        subject.save
+        subject.to_param.should eql "psychoanalysis"
       end
 
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = subject.to_param
-        subject.update_attributes(:title => "PSYCHOANALYSIS")
-        subject.to_param.should eql former_slug
+      it "does not change slug if slugged fields have changed but generated slug is identical" do
+        subject.name = "PSYCHOANALYSIS"
+        subject.to_param.should eql "psychoanalysis"
       end
 
       it "finds by slug" do
-        book.subjects.where(:slug => subject.to_param).first.should eql subject
+        book.subjects.find_by_slug(subject.to_param).should eql subject
       end
-
     end
 
-    context "when document is an embedded has-one" do
-
-      let(:publisher) { book.create_publisher(:name => "OUP") }
-
-      it "generates slug" do
-        publisher.to_param.should eql(publisher.name.to_url)
+    context "when the object is embedded in another embedded object" do
+      let(:person) do
+        Person.create(:name => "John Doe")
       end
 
-      it "updates slug" do
-        publisher.update_attributes(:name => "Harvard UP")
-        publisher.to_param.should eql "Harvard UP".to_url
+      let(:relationship) do
+        person.relationships.create(:name => "Engagement")
+      end
+
+      let(:partner) do
+        relationship.partners.create(:name => "Jane Smith")
+      end
+
+      it "generates a slug" do
+        partner.to_param.should eql "jane-smith"
+      end
+
+      it "updates the slug" do
+        partner.name = "Jane Doe"
+        partner.save
+        partner.to_param.should eql "jane-doe"
+      end
+
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = relationship.partners.create(:name => partner.name)
+        dup.to_param.should eql "jane-smith-1"
       end
 
       it "does not update slug if slugged fields have not changed" do
-        former_slug = publisher.to_param
-        publisher.update_attributes(:year => 2001)
-        publisher.to_param.should eql former_slug
+        partner.save
+        partner.to_param.should eql "jane-smith"
       end
 
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = publisher.to_param
-        publisher.update_attributes(:name => "oup")
-        publisher.to_param.should eql former_slug
+      it "does not change slug if slugged fields have changed but generated slug is identical" do
+        partner.name = "JANE SMITH"
+        partner.to_param.should eql "jane-smith"
       end
 
+      it "scopes by parent object" do
+        affair = person.relationships.create(:name => "Affair")
+        lover = affair.partners.create(:name => partner.name)
+        lover.to_param.should eql partner.to_param
+      end
+
+      it "finds by slug" do
+        relationship.partners.find_by_slug(partner.to_param).should eql partner
+      end
     end
 
     context "when the slug is composed of multiple fields" do
-
-      let(:author) { Author.create(:first_name => "Gilles", :last_name => "Deleuze") }
-
-      it "generates slug" do
-        author.to_param.should eql("Gilles Deleuze".to_url)
+      let!(:author) do
+        Author.create(
+          :first_name => "Gilles",
+          :last_name  => "Deleuze")
       end
 
-      it "updates slug" do
-        author.update_attributes(:first_name => "Félix", :last_name => "Guattari")
-        author.to_param.should eql "Félix Guattari".to_url
+      it "generates a slug" do
+        author.to_param.should eql "gilles-deleuze"
       end
 
-      it "generates a unique slug" do
-        similar_author = Author.create(:first_name => author.first_name,
-                                       :last_name => author.last_name)
-        similar_author.to_param.should_not eql author.to_param
+      it "updates the slug" do
+        author.first_name = "Félix"
+        author.last_name  = "Guattari"
+        author.save
+        author.to_param.should eql "felix-guattari"
       end
 
-      it "appends a counter when slug is not unique" do
-        similar_author = Author.create(:first_name => author.first_name,
-                                       :last_name => author.last_name)
-        similar_author.to_param.should match /\d$/
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = Author.create(
+          :first_name => author.first_name,
+          :last_name  => author.last_name)
+        dup.to_param.should eql 'gilles-deleuze-1'
       end
 
-      it "does not append a counter when slug is unique" do
-        author.to_param.should_not match /\d$/
-      end
-
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = author.to_param
-        author.update_attributes(:first_name => "gilles", :last_name => "DELEUZE")
-        author.to_param.should eql former_slug
+      it "does not update slug if slugged fields have changed but generated slug is identical" do
+        author.last_name = "DELEUZE"
+        author.save
+        author.to_param.should eql 'gilles-deleuze'
       end
 
       it "finds by slug" do
-        author
-        Author.where(:slug => "gilles-deleuze").first.should eql author
+        Author.find_by_slug("gilles-deleuze").should eql author
       end
-
     end
 
-    context "when the document is embedded in another embedded document" do
-
-      let(:foo) { Foo.create(:name => "foo") }
-      let(:bar) { foo.bars.create(:name => "bar") }
-      let(:baz) do
-        bar.bazes.create(:name => "baz")
-        Foo.first.bars.first.bazes.first # Better to be paranoid and reload from db
+    context "when the field name for the slug is set with the :as option" do
+      let(:person) do
+        Person.create(:name => "John Doe")
       end
-
-      it "generates slug" do
-        baz.to_param.should eql(baz.name.to_url)
-      end
-
-      it "updates slug" do
-        baz.update_attributes(:name => "lorem")
-        baz.to_param.should eql "lorem".to_url
-      end
-
-      it "generates a unique slug" do
-        similar_baz = bar.bazes.create(:name => baz.name)
-        similar_baz.to_param.should_not eql baz.to_param
-      end
-
-      it "appends a counter when slug is not unique" do
-        similar_baz = bar.bazes.create(:name => baz.name)
-        similar_baz.to_param.should match /\d$/
-      end
-
-      it "does not append a counter when slug is unique" do
-        baz.to_param.should_not match /\d$/
-      end
-
-      it "does not update slug if slugged fields have not changed" do
-        former_slug = baz.to_param
-        baz.update_attributes(:other => "Lorem ipsum dolor sit amet")
-        baz.to_param.should eql former_slug
-      end
-
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = baz.to_param
-        baz.update_attributes(:name => "BAZ")
-        baz.to_param.should eql former_slug
-      end
-
-      it "finds by slug" do
-        bar.bazes.where(:slug => baz.to_param).first.should eql baz
-      end
-
-    end
-
-    context "when the slug field name is customized" do
-
-      let(:person) { Person.create(:name => "John Doe") }
 
       it "sets the slug field name" do
-        person.respond_to?(:permalink).should be_true
-        person.send(:permalink).should eql "john-doe"
+        person.should respond_to(:permalink)
+        person.permalink.should eql "john-doe"
       end
-
-      it "generates slug" do
-        person.to_param.should eql(person.name.to_url)
-      end
-
-      it "updates slug" do
-        person.update_attributes(:name => "Jane Doe")
-        person.to_param.should eql "Jane Doe".to_url
-      end
-
-      it "generates a unique slug" do
-        similar_person = Person.create(:name => person.name)
-        similar_person.to_param.should_not eql person.to_param
-      end
-
-      it "appends a counter when slug is not unique" do
-        similar_person = Person.create(:name => person.name)
-        similar_person.to_param.should match /\d$/
-      end
-
-      it "does not append a counter when slug is unique" do
-        person.to_param.should_not match /\d$/
-      end
-
-      it "does not update slug if slugged fields have not changed" do
-        former_slug = person.to_param
-        person.update_attributes(:age => 31)
-        person.to_param.should eql former_slug
-      end
-
-      it "does not update slug if slugged fields have changed but generated slug is the same" do
-        former_slug = person.to_param
-        person.update_attributes(:name => "JOHN DOE")
-        person.to_param.should eql former_slug
-      end
-
-      it "finds by slug" do
-        Person.where(:permalink => person.to_param).first.should eql person
-      end
-
     end
 
-    describe "#find_" do
-
-      let(:foo) { Foo.create(:name => "foo") }
-      let(:bar) { foo.bars.create(:name => "bar") }
-      let(:baz) { bar.bazes.create(:name => "baz") }
-
-      it "finds duplicate slug of a root document" do
-        foo.send(:find_, foo.to_param).count.should eql 1
+    context "when slug is set to be permanent with the :permanent option" do
+      let(:person) do
+        Person.create(:name => "John Doe")
       end
 
-      it "finds duplicate slug of an embedded document" do
-        bar.send(:find_, bar.to_param).count.should eql 1
+      it "does not change the slug when the slugged fields are updated" do
+        person.name = "Jane Doe"
+        person.save
+        person.to_param.should eql "john-doe"
       end
-
-      it "finds duplicate slug of a deeply-embedded document" do
-        baz.send(:find_, baz.to_param).count.should eql 1
-      end
-
-    end
-  
-    context "when slug is scoped" do
-
-      let(:foo) { Foo.create(:name => "foo") }
-      let(:sar) { foo.sars.create(:name => "sar") }
-      let(:foo2) { Foo.create(:name => "foo") }
-    
-      it "generates a unique slug inside the same parent object" do
-        similar_sar = foo.sars.create(:name => sar.name)
-        similar_sar.to_param.should_not eql sar.to_param
-      end
-    
-      it "generates the same slug in different parent object" do
-        other_sar = foo2.sars.create(:name => sar.name)
-        other_sar.to_param.should eql sar.to_param
-      end
-
     end
 
-    context "when slug is permanent" do
+    it "works with non-Latin characters" do
+      book.title = "Капитал"
+      book.save
+      book.to_param.should eql "kapital"
 
-      let(:permanent) { Permanent.create(:title => "This is a nodding song") }
+      book.title = "Ελλάδα"
+      book.save
+      book.to_param.should eql "ellada"
 
-      it "doesn't change slug when document is updated" do
-        permanent.update_attributes(:title => "This is not a nodding song")
-        permanent.to_param.should eql "This is a nodding song".to_url
-      end
-
+      book.title = "中文"
+      book.save
+      book.to_param.should eql 'zhong-wen'
     end
-
   end
-
 end
