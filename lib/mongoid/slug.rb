@@ -35,6 +35,10 @@ module Mongoid #:nodoc:
           before_save :generate_slug
         end
       end
+
+      def find_by_slug(slug)
+        where(slug_name => slug).first rescue nil
+      end
     end
 
     def to_param
