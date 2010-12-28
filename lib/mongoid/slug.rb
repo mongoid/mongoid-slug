@@ -3,7 +3,8 @@ require 'stringex'
 
 module Mongoid #:nodoc:
 
-  # Generates a URL slug or permalink based on one or more fields in a Mongoid model
+  # Generates a URL slug or permalink based on one or more fields in a Mongoid
+  # model.
   module Slug
     extend ActiveSupport::Concern
 
@@ -13,7 +14,12 @@ module Mongoid #:nodoc:
 
     module ClassMethods
 
-      # Set a field or a number of fields as source of slug
+      # Sets one ore more fields as source of slug.
+      #
+      # By default, the name of the field that stores the slug is "slug". Pass an
+      # alternative name with the :as option.
+      #
+      # If you wish the slug to be permanent once created, set :permanent to true.
       def slug(*fields)
         options = fields.extract_options!
 
@@ -29,6 +35,7 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Finds the document with the specified slug or returns nil.
       def find_by_slug(slug)
         where(slug_name => slug).first rescue nil
       end
