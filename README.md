@@ -51,6 +51,6 @@ To demo some more functionality in the console:
     >> author = book.authors.create(:first_name => "Gilles", :last_name => "Deleuze")
     >> author.to_param
     => "gilles-deleuze"
-    >> author.update_attributes(:first => "Félix", :last_name => "Guattari")
+    >> author.update_attributes(:first_name => "Félix", :last_name => "Guattari")
     >> author.to_param
     => "felix-guattari"
