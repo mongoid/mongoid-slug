@@ -1,19 +1,16 @@
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on a field or set of fields in a Mongoid model.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits on top of [stringex](https://github.com/rsl/stringex) and works with non-Latin characters.
 
-Install
--------
+Quick Start
+---------------
 
-To install mongoid_slug, add it to your Gemfile:
+First, add mongoid_slug to your Gemfile:
 
     gem 'mongoid_slug', :require => 'mongoid/slug'
 
-Usage
------
-
-Here's a book that embeds many authors:
+Say you have a book that embeds many authors. You can set up slugs for both resources like this:
 
     class Book
       include Mongoid::Document
@@ -32,36 +29,28 @@ Here's a book that embeds many authors:
       embedded_in :book, :inverse_of => :authors
     end
 
-The finders in our controllers should look like:
+In your controller, you can use the `find_by_slug` helper:
 
     def find_book
-      @book = Book.where(:slug => params[:id]).first
+      Book.find_by_slug(params[:book_id])
     end
 
-    def find_book_and_author
-      @book = Book.where(:slug => params[:book_id]).first
-      @author = @book.authors.where(:slug => params[:id]).first
+    def find_author
+      @book.authors.find_by_slug(params[:id])
     end
-
-If you are wondering why I did not include a *find_by_slug* helper, [read on](http://groups.google.com/group/mongoid/browse_thread/thread/5905589e108d7cc0?pli=1).
 
 To demo some more functionality in the console:
 
     >> book = Book.create(:title => "A Thousand Plateaus")
     >> book.to_param
     "a-thousand-plateaus"
-    >> book.update_attributes(:title => "Anti Oedipus")
+    >> book.title = "Anti Oedipus"
+    >> book.save
     >> book.to_param
     "anti-oedipus"
-    >> Book.where(:slug => 'anti-oedipus').first
-    #<Book _id: 4c23b1f7faa4a7479a000009, slug: "anti-oedipus", title: "Anti Oedipus">
     >> author = book.authors.create(:first_name => "Gilles", :last_name => "Deleuze")
     >> author.to_param
     => "gilles-deleuze"
     >> author.update_attributes(:first => "Félix", :last_name => "Guattari")
     >> author.to_param
-    => "félix-guattari"
-    >> book.authors.where(:slug => 'felix-guattari).first
-    => #<Author _id: 4c31e362faa4a7050e000003, slug: "félix-guattari", last_name: "Guattari", first_name: "Félix">
-
-See [sample models in specs]("http://github.com/papercavalier/mongoid-slug/tree/master/spec/models/") for various configuration options.
+    => "felix-guattari"
