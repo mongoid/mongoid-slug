@@ -2,6 +2,6 @@ class Person
   include Mongoid::Document
   include Mongoid::Slug
   field :name
-  field :age, :type => Integer
-  slug  :name, :as => :permalink
+  slug  :name, :as => :permalink, :permanent => true
+  embeds_many :relationships
 end
