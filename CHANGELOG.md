@@ -1,0 +1,10 @@
+CHANGELOG
+=========
+
+0.5.0
+-----
+
+* Added support for non-Latin languages. Thanks, Konstantin Shabanov.
+* Removed :scoped option. Embedded objects are now scoped by parent by
+  default.
+* Added a .find_by_slug helper.
