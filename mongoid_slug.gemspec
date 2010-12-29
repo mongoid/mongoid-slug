@@ -19,6 +19,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency("bson_ext", "~> 1.1.5")
   s.add_development_dependency("database_cleaner", "~> 0.6.0")
   s.add_development_dependency("rspec", "~> 2.3.0")
+  if RUBY_VERSION.include? '1.9'
+    s.add_development_dependency("ruby-debug19", "~> 0.11.0")
+  end
 
   s.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md)
   s.test_files    = Dir.glob("spec/**/*")
