@@ -58,7 +58,7 @@ To demo some more functionality in the console:
 Scoping by Associations
 -----------------------
 
-Objects that are embedded in a parent document automatically have their slug uniqueness scoped to the parent collection. If you wish to scope by a reference association, you can pass a `:scope` option to the `slug` class method:
+Objects that are embedded in a parent document automatically have their slug uniqueness scoped to the parent. If you wish to scope by a reference association, you can pass a `:scope` option to the `slug` class method:
 
     class Company
       include Mongoid::Document
@@ -75,5 +75,9 @@ Objects that are embedded in a parent document automatically have their slug uni
       referenced_in :company
     end
 
-In this example, if you create an employee without associating it with any company, the slug scope will fall back to the root employees collection.
+In this example, if you create an employee without associating it with any company, the slug scope will fall back to the root employees collection. Currently if you have an irregular association name, for instance:
+
+    references_many :employees, :class_name => 'Person', :foreign_key => :company_id
+
+you **must** specify the `:inverse_of` option on the other side of the assocation.
 

@@ -202,6 +202,25 @@ module Mongoid
           :last_name  => author.last_name)
         dup.to_param.should eql 'gilles-deleuze-1'
       end
+
+      context "with an irregular association name" do
+        let(:character) do
+          # well we've got to make up something... :-)
+          author.characters.create(:name => "Oedipus")
+        end
+
+        let!(:author2) do
+          Author.create(
+            :first_name => "Sophocles",
+            :last_name => "son of Sophilos"
+          )
+        end
+
+        it "scopes by parent object provided that inverse_of is specified" do
+          dup = author2.characters.create(:name => character.name)
+          dup.to_param.should eql character.to_param
+        end
+      end
     end
 
     it "works with non-Latin characters" do

@@ -109,12 +109,11 @@ module Mongoid #:nodoc:
         # Make sure doc is actually associated with something, and that some
         # referenced docs have been persisted to the parent
         #
-        # FIXME: we need better reflection for reference associations, like
+        # TODO: we need better reflection for reference associations, like
         # association_name instead of forcing collection_name here -- maybe
-        # in the forthcoming Mongoid refactorings? This will currently fail when
-        # the other side has a setup like:
-        #    references_many :authors, :class_name => 'User'
-        parent.respond_to?(collection_name) ? parent.send(collection_name) : self.class
+        # in the forthcoming Mongoid refactorings?
+        inverse = metadata.inverse_of || collection_name
+        parent.respond_to?(inverse) ? parent.send(inverse) : self.class
       elsif embedded?
         _parent.send(association_name)
       else
