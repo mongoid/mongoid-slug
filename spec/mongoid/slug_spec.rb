@@ -246,5 +246,42 @@ module Mongoid
         slug  :name, :scoped => true
       end
     end
+
+    context "when :index is set to true" do
+      before do
+        Book.collection.drop_indexes
+        Author.collection.drop_indexes
+      end
+
+      it "indexes slug in top-level objects" do
+        Book.create_indexes
+        Book.collection.index_information.should have_key "slug_1"
+      end
+
+      context "when slug is scoped by a reference association" do
+        it "creates a non-unique index" do
+          Author.create_indexes
+          Author.index_information["slug_1"]["unique"].should be_false
+        end
+      end
+
+      context "when slug is not scoped by a reference association" do
+        it "creates a unique index" do
+          Book.create_indexes
+          Book.index_information["slug_1"]["unique"].should be_true
+        end
+      end
+
+      it "does not index slug in embedded objects" do
+        pending "Would such an option even make sense?"
+      end
+    end
+
+    context "when :index is not set" do
+      it "does not index slug" do
+        Person.create_indexes
+        Person.collection.index_information.should_not have_key "permalink_1"
+      end
+    end
   end
 end

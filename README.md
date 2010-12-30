@@ -81,3 +81,14 @@ In this example, if you create an employee without associating it with any compa
 
 you **must** specify the `:inverse_of` option on the other side of the assocation.
 
+Indexing
+--------
+
+You may optionally pass an `:index` option to generate an index on the slug in top-level objects.
+
+    class Book
+      field :title
+      slug  :title, :index => true
+    end
+
+Indexes on non-scoped slugs will be unique.

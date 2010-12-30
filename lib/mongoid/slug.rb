@@ -20,6 +20,8 @@ module Mongoid #:nodoc:
       # alternative name with the :as option.
       #
       # If you wish the slug to be permanent once created, set :permanent to true.
+      #
+      # To index slug in a top-level object, set :index to true.
       def slug(*fields)
         options = fields.extract_options!
 
@@ -37,6 +39,10 @@ module Mongoid #:nodoc:
         end
 
         field slug_name
+
+        if options[:index]
+          index slug_name, :unique => (slug_scope ? false : true)
+        end
 
         if options[:permanent]
           before_create :generate_slug
