@@ -41,7 +41,7 @@ module Mongoid #:nodoc:
         field slug_name
 
         if options[:index]
-          index slug_name, :unique => (slug_scope ? false : true)
+          index slug_name, :unique => !slug_scope
         end
 
         if options[:permanent]
