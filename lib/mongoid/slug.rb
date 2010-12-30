@@ -9,7 +9,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :slug_name, :slugged_fields
+      cattr_accessor :slug_name, :slugged_fields, :slug_scope
     end
 
     module ClassMethods
@@ -24,7 +24,17 @@ module Mongoid #:nodoc:
         options = fields.extract_options!
 
         self.slug_name      = options[:as] || :slug
+        self.slug_scope     = options[:scope] || nil
         self.slugged_fields = fields
+
+        if options[:scoped]
+          ActiveSupport::Deprecation.warn <<-EOM
+
+            The :scoped => true option is deprecated and now default for embedded
+            child documents. Please use :scope => :association_name if you wish
+            to scope by a reference association.
+          EOM
+        end
 
         field slug_name
 
@@ -86,14 +96,30 @@ module Mongoid #:nodoc:
     end
 
     def unique_slug?(slug)
-      if embedded?
+      uniqueness_scope.where(slug_name => slug).
+        reject { |doc| doc.id == self.id }.
+        empty?
+    end
+
+    def uniqueness_scope
+      if slug_scope
+        metadata = self.class.reflect_on_association(slug_scope)
+        parent = self.send(metadata.name)
+
+        # Make sure doc is actually associated with something, and that some
+        # referenced docs have been persisted to the parent
+        #
+        # FIXME: we need better reflection for reference associations, like
+        # association_name instead of forcing collection_name here -- maybe
+        # in the forthcoming Mongoid refactorings? This will currently fail when
+        # the other side has a setup like:
+        #    references_many :authors, :class_name => 'User'
+        parent.respond_to?(collection_name) ? parent.send(collection_name) : self.class
+      elsif embedded?
         _parent.send(association_name)
       else
         self.class
-      end.
-        where(slug_name => slug).
-        reject { |doc| doc.id == self.id }.
-        empty?
+      end
     end
   end
 end

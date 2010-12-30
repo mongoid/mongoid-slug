@@ -182,6 +182,28 @@ module Mongoid
       end
     end
 
+    context "when slug is scoped by a reference association" do
+      let(:author) do
+        book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze")
+      end
+
+      it "scopes by parent object" do
+        book2 = Book.create(:title => "Anti Oedipus")
+        dup = book2.authors.create(
+          :first_name => author.first_name,
+          :last_name => author.last_name
+        )
+        dup.to_param.should eql author.to_param
+      end
+
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = book.authors.create(
+          :first_name => author.first_name,
+          :last_name  => author.last_name)
+        dup.to_param.should eql 'gilles-deleuze-1'
+      end
+    end
+
     it "works with non-Latin characters" do
       book.title = "Капитал"
       book.save
@@ -194,6 +216,16 @@ module Mongoid
       book.title = "中文"
       book.save
       book.to_param.should eql 'zhong-wen'
+    end
+
+    it "deprecates the :scoped option" do
+      ActiveSupport::Deprecation.should_receive(:warn)
+      class Oldie
+        include Mongoid::Document
+        include Mongoid::Slug
+        field :name
+        slug  :name, :scoped => true
+      end
     end
   end
 end

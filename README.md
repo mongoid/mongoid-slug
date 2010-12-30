@@ -54,3 +54,26 @@ To demo some more functionality in the console:
     >> author.update_attributes(:first_name => "Félix", :last_name => "Guattari")
     >> author.to_param
     => "felix-guattari"
+
+Scoping by Associations
+-----------------------
+
+Objects that are embedded in a parent document automatically have their slug uniqueness scoped to the parent collection. If you wish to scope by a reference association, you can pass a `:scope` option to the `slug` class method:
+
+    class Company
+      include Mongoid::Document
+      field :name
+      references_many :employees
+    end
+
+    class Employee
+      include Mongoid::Document
+      include Mongoid::Slug
+      field :first_name
+      field :last_name
+      slug  :first_name, :last_name, :scope => :company
+      referenced_in :company
+    end
+
+In this example, if you create an employee without associating it with any company, the slug scope will fall back to the root employees collection.
+
