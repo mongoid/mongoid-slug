@@ -1,2 +1,1 @@
-rvm --create use ree@mongoid
-rvm wrapper ree@mongoid
+rvm --create use 1.9.2@mongoid
