@@ -121,7 +121,8 @@ module Mongoid #:nodoc:
         inverse = metadata.inverse_of || collection_name
         parent.respond_to?(inverse) ? parent.send(inverse) : self.class
       elsif embedded?
-        _parent.send(association_name)
+        metadata = reflect_on_all_associations(:embedded_in).first
+        _parent.send(metadata.inverse_of)
       else
         self.class
       end
