@@ -29,15 +29,23 @@ Say you have a book that embeds many authors. You can set up slugs for both reso
       embedded_in :book, :inverse_of => :authors
     end
 
-In your controller, you can use the `find_by_slug` helper:
+In your controller, use the `find_by_slug` helper:
 
-    def find_book
-      Book.find_by_slug(params[:book_id])
+    Book.find_by_slug(params[:book_id])
+    book.authors.find_by_slug(params[:id])
+
+You can customize the name of the field that stores the slug:
+
+    class Person
+      include Mongoid::Document
+      include Mongoid::Slug
+      field :name
+      slug  :name, :as => :permalink
     end
 
-    def find_author
-      @book.authors.find_by_slug(params[:id])
-    end
+The finder now becomes:
+
+    Person.find_by_permalink(params[:id])
 
 To demo some more functionality in the console:
 

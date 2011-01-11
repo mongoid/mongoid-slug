@@ -49,11 +49,12 @@ module Mongoid #:nodoc:
         else
           before_save :generate_slug
         end
-      end
 
-      # Finds the document with the specified slug or returns nil.
-      def find_by_slug(slug)
-        where(slug_name => slug).first rescue nil
+        instance_eval <<-CODE
+          def self.find_by_#{slug_name}(slug)
+            where(slug_name => slug).first rescue nil
+          end
+        CODE
       end
     end
 

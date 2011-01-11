@@ -160,13 +160,17 @@ module Mongoid
     end
 
     context "when the field name for the slug is set with the :as option" do
-      let(:person) do
+      let!(:person) do
         Person.create(:name => "John Doe")
       end
 
       it "sets the slug field name" do
         person.should respond_to(:permalink)
         person.permalink.should eql "john-doe"
+      end
+
+      it "finds by slug" do
+        Person.find_by_permalink("john-doe").should eql person
       end
     end
 
