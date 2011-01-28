@@ -159,12 +159,12 @@ module Mongoid
       end
     end
 
-    context "when the field name for the slug is set with the :as option" do
+    context "when :as is passed as an argument" do
       let!(:person) do
         Person.create(:name => "John Doe")
       end
 
-      it "sets the slug field name" do
+      it "sets an alternative slug field name" do
         person.should respond_to(:permalink)
         person.permalink.should eql "john-doe"
       end
@@ -174,12 +174,12 @@ module Mongoid
       end
     end
 
-    context "when slug is set to be permanent with the :permanent option" do
+    context "when :permanent is passed as an argument" do
       let(:person) do
         Person.create(:name => "John Doe")
       end
 
-      it "does not change the slug when the slugged fields are updated" do
+      it "does not update the slug when the slugged fields change" do
         person.name = "Jane Doe"
         person.save
         person.to_param.should eql "john-doe"
@@ -251,45 +251,43 @@ module Mongoid
       end
     end
 
-    context "when :index is set to true" do
+    context "when :index is passed as an argument" do
       before do
         Book.collection.drop_indexes
         Author.collection.drop_indexes
       end
 
-      it "indexes slug in top-level objects" do
+      it "defines an index on the slug in top-level objects" do
         Book.create_indexes
         Book.collection.index_information.should have_key "slug_1"
       end
 
       context "when slug is scoped by a reference association" do
-        it "creates a non-unique index" do
+        it "defines a non-unique index" do
           Author.create_indexes
           Author.index_information["slug_1"]["unique"].should be_false
         end
       end
 
       context "when slug is not scoped by a reference association" do
-        it "creates a unique index" do
+        it "defines a unique index" do
           Book.create_indexes
           Book.index_information["slug_1"]["unique"].should be_true
         end
       end
 
-      it "does not index slug in embedded objects" do
-        pending "Would such an option even make sense?"
-      end
+      it "has no effect in embedded objects"
     end
 
-    context "when :index is not set" do
-      it "does not index slug" do
+    context "when :index is not passed as an argument" do
+      it "does not define an index on the slug" do
         Person.create_indexes
         Person.collection.index_information.should_not have_key "permalink_1"
       end
     end
-    
-    context "when the object is STI" do
-      it "should take STI and non STI objects as the same slug-type" do
+
+    context "when the object has STI" do
+      it "scopes by the superclass" do
         book = Book.create(:title => "Anti Oedipus")
         comic_book = ComicBook.create(:title => "Anti Oedipus")
         comic_book.slug.should_not eql(book.title)
