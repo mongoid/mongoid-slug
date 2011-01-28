@@ -42,7 +42,7 @@ Finder
 
 In your controller, throw in some minimal magic:
 
-    # GET /books/a-thousand-plateaus/authors/authors/gilles-deleuze
+    # GET /books/a-thousand-plateaus/authors/gilles-deleuze
     author = Book.find_by_slug(params[:book_id]).
                   authors.
                   find_by_name(params[:id])
