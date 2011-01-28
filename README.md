@@ -66,8 +66,6 @@ defining the slug.
 Scope
 -----
 
-Embedded objects that are automatically scoped by their parent.
-
 To scope an object by a reference association, pass `:scope`:
 
     class Company
@@ -88,6 +86,8 @@ any company, the scope will fall back to the root employees collection.
 
 Currently, if you have an irregular association name, you **must**
 specify the `:inverse_of` option on the other side of the assocation.
+
+Embedded objects are automatically scoped by their parent.
 
 Indexes
 -------
