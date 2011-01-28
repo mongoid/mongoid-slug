@@ -1,53 +1,56 @@
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits on top of [stringex](https://github.com/rsl/stringex) and works with non-Latin characters.
+Mongoid Slug generates a URL slug or permalink based on one or more
+fields in a Mongoid model.
+
+It sits idly on top of [stringex](https://github.com/rsl/stringex) and
+works with non-Latin characters.
 
 Quick Start
----------------
+-----------
 
-First, add mongoid_slug to your Gemfile:
+Add mongoid_slug to your Gemfile:
 
     gem 'mongoid_slug', :require => 'mongoid/slug'
 
-Say you have a book that embeds many authors. You can set up slugs for both resources like this:
+Set up slugs in models like this:
 
     class Book
       include Mongoid::Document
       include Mongoid::Slug
+
       field :title
-      slug  :title
       embeds_many :authors
+
+      slug :title
     end
 
     class Author
       include Mongoid::Document
       include Mongoid::Slug
-      field :first_name
-      field :last_name
-      slug  :first_name, :last_name
+
+      field :first
+      field :last
       embedded_in :book, :inverse_of => :authors
+
+      slug :first, :last, :as => :name
     end
 
-In your controller, use the `find_by_slug` helper:
+Finder
+------
 
-    Book.find_by_slug(params[:book_id])
-    book.authors.find_by_slug(params[:id])
+In your controller, throw in some minimal magic:
 
-You can customize the name of the field that stores the slug:
+    # GET /books/a-thousand-plateaus/authors/authors/gilles-deleuze
+    author = Book.find_by_slug(params[:book_id]).
+                  authors.
+                  find_by_name(params[:id])
 
-    class Person
-      include Mongoid::Document
-      include Mongoid::Slug
-      field :name
-      slug  :name, :as => :permalink
-    end
+Permanence
+----------
 
-The finder now becomes:
-
-    Person.find_by_permalink(params[:id])
-
-To demo some more functionality in the console:
+By default, slugs are not permanent:
 
     >> book = Book.create(:title => "A Thousand Plateaus")
     >> book.to_param
@@ -56,47 +59,47 @@ To demo some more functionality in the console:
     >> book.save
     >> book.to_param
     "anti-oedipus"
-    >> author = book.authors.create(:first_name => "Gilles", :last_name => "Deleuze")
-    >> author.to_param
-    => "gilles-deleuze"
-    >> author.update_attributes(:first_name => "Félix", :last_name => "Guattari")
-    >> author.to_param
-    => "felix-guattari"
 
-Scoping by Associations
------------------------
+If you require permanent slugs, pass the `:permanent` option when
+defining the slug.
 
-Objects that are embedded in a parent document automatically have their slug uniqueness scoped to the parent. If you wish to scope by a reference association, you can pass a `:scope` option to the `slug` class method:
+Scope
+-----
+
+Embedded objects that are automatically scoped by their parent.
+
+To scope an object by a reference association, pass `:scope`:
 
     class Company
       include Mongoid::Document
-      field :name
       references_many :employees
     end
 
     class Employee
       include Mongoid::Document
       include Mongoid::Slug
-      field :first_name
-      field :last_name
-      slug  :first_name, :last_name, :scope => :company
+      field :name
+      slug  :name, :scope => :company
       referenced_in :company
     end
 
-In this example, if you create an employee without associating it with any company, the slug scope will fall back to the root employees collection. Currently if you have an irregular association name, for instance:
+In this example, if you create an employee without associating it with
+any company, the scope will fall back to the root employees collection.
 
-    references_many :employees, :class_name => 'Person', :foreign_key => :company_id
+Currently, if you have an irregular association name, you **must**
+specify the `:inverse_of` option on the other side of the assocation.
 
-you **must** specify the `:inverse_of` option on the other side of the assocation.
+Indexes
+-------
 
-Indexing
---------
-
-You may optionally pass an `:index` option to generate an index on the slug in top-level objects.
+You may optionally pass an `:index` option to define an index on top-level
+slugs.
 
     class Book
       field :title
       slug  :title, :index => true
     end
 
-Indexes on non-scoped slugs will be unique.
+Indexes on unscoped slugs will be unique.
+
+This option has no effect if the object is embedded.
