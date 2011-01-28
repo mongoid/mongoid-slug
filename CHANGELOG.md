@@ -1,18 +1,32 @@
 CHANGELOG
 =========
 
+0.6.1
+-----
+
+* Add support for STI models. dmathieu (Damien Mathieu)
+
+0.6.0
+-----
+
+* Fix internals to work with Mongoid RC.
+* Finder is now dynamic.
+
 0.5.1
 -----
 
-* Added support for scoping by a reference association via :scope
-  option. Thanks, Ches.
-* Added :index option. This will create an index on the slug in
-  top-level objects.
+* Add support for scoping by reference association. ches (Ches Martin)
+* Bring indexing back in as an option.
 
 0.5.0
 -----
 
-* Added support for non-Latin languages. Thanks, Konstantin Shabanov.
-* Removed :scoped option. Embedded objects are now scoped by parent by
+* Add support for non-Latin languages. etehtsea (Konstantin Shabanov)
+* Remove :scoped. Embedded objects are now scoped by parent by
   default.
-* Added a .find_by_slug helper.
+* Add finder method.
+
+Earlier tags
+------------
+
+* To be found in the dustbin of git log.
