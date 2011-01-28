@@ -287,5 +287,13 @@ module Mongoid
         Person.collection.index_information.should_not have_key "permalink_1"
       end
     end
+    
+    context "when the object is STI" do
+      it "should take STI and non STI objects as the same slug-type" do
+        book = Book.create(:title => "Anti Oedipus")
+        comic_book = ComicBook.create(:title => "Anti Oedipus")
+        comic_book.slug.should_not eql(book.title)
+      end
+    end
   end
 end

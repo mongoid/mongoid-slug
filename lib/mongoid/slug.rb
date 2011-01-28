@@ -125,7 +125,11 @@ module Mongoid #:nodoc:
         metadata = reflect_on_all_associations(:embedded_in).first
         _parent.send(metadata.inverse_of)
       else
-        self.class
+        appropriate_class = self.class
+        while (appropriate_class.superclass.include?(Mongoid::Document))
+          appropriate_class = appropriate_class.superclass
+        end
+        appropriate_class
       end
     end
   end
