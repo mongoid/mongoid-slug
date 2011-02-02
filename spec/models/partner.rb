@@ -1,7 +1,7 @@
-class Foo
+class Partner
   include Mongoid::Document
   include Mongoid::Slug
   field :name
   slug  :name
-  embeds_many :bars
+  embedded_in :relationship, :inverse_of => :partners
 end

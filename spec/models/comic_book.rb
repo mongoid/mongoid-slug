@@ -1,0 +1,3 @@
+class ComicBook < Book
+  
+end
