@@ -20,9 +20,7 @@ module Mongoid::Slug
 
     def find_by_slug_or_id(value)
       found = self.find(:first, :conditions => { :slug => value })
-      unless found
-        found = self.find(value)
-      end
+      found = self.find(value) unless found
 
       found
     end
