@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :slug_name, :slugged_fields, :slug_scope
+      cattr_accessor :slug_name, :slugged_fields, :slug_scope, :first_valid
     end
 
     module ClassMethods
@@ -26,6 +26,7 @@ module Mongoid #:nodoc:
 
         self.slug_name      = options[:as] || :slug
         self.slug_scope     = options[:scope] || nil
+        self.first_valid    = options[:first_valid] || false
         self.slugged_fields = fields
 
         if options[:scoped]
@@ -54,11 +55,11 @@ module Mongoid #:nodoc:
             where(slug_name => slug).first rescue nil
           end
           
-          def find_by_#{slug_name}_or_id(value)
-            found = find_by_#{slug_name}
-            found = self.find(value) unless found
+          def self.find_by_#{slug_name}_or_id(value)
+            result = find_by_#{slug_name}
+            result = self.find(value) unless found
 
-            found
+            result
           end
         CODE
       end
@@ -97,9 +98,14 @@ module Mongoid #:nodoc:
     end
 
     def slug_base
-      self.class.slugged_fields.map do |field|
+      slug_field_values = self.class.slugged_fields.map do |field|
         self.send(field)
-      end.join(" ")
+      end
+      if first_valid
+        slug_field_values.detect {|v| v.present? }
+      else
+        slug_field_values.join(" ")
+      end
     end
 
     def slugged_fields_changed?
