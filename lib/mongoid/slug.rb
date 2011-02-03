@@ -26,6 +26,7 @@ module Mongoid #:nodoc:
 
         self.slug_name      = options[:as] || :slug
         self.slug_scope     = options[:scope] || nil
+        self.first_valid    = options[:any] || false
         self.slugged_fields = fields
 
         if options[:scoped]
