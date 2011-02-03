@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
 
         self.slug_name      = options[:as] || :slug
         self.slug_scope     = options[:scope] || nil
-        self.first_valid    = options[:first_valid] || false
+        self.first_valid    = options[:any] || false
         self.slugged_fields = fields
 
         if options[:scoped]
@@ -53,13 +53,6 @@ module Mongoid #:nodoc:
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
             where(slug_name => slug).first rescue nil
-          end
-          
-          def self.find_by_#{slug_name}_or_id(value)
-            result = find_by_#{slug_name}(value)
-            result = find(value) unless result
-
-            result
           end
         CODE
       end

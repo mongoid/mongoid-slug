@@ -129,7 +129,7 @@ module Mongoid
           :first_name => "Gilles",
           :last_name  => "Deleuze")
       end
-
+      
       it "generates a slug" do
         author.to_param.should eql "gilles-deleuze"
       end
@@ -156,6 +156,26 @@ module Mongoid
 
       it "finds by slug" do
         Author.find_by_slug("gilles-deleuze").should eql author
+      end
+
+    end
+    
+    context "when :any is passed as an argument" do
+      let!(:article) do
+        Article.create(
+          :brief => "This is the brief",
+          :title => "This is the title")
+      end
+      
+      it "uses the first available field for the slug if any option is used" do
+        article.to_param.should eql 'this-is-the-title'
+        article.title = ""
+        article.save
+        article.to_param.should eql 'this-is-the-brief'
+        
+        article.title = nil
+        article.save
+        article.to_param.should eql 'this-is-the-brief'
       end
     end
 
