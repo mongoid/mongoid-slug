@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.6.2
+-----
+
+* Add #slug! to generate slug for an existing document.
+
 0.6.1
 -----
 

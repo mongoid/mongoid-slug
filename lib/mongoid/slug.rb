@@ -57,6 +57,17 @@ module Mongoid #:nodoc:
       end
     end
 
+    # Regenerates slug.
+    #
+    # This method should come in handy when generating slugs for an existing
+    # collection.
+    def slug!
+      return if new_record?
+
+      self.send(:generate_slug!)
+      save if self.send("#{self.slug_name}_changed?")
+    end
+
     def to_param
       self.send(slug_name)
     end
@@ -79,10 +90,12 @@ module Mongoid #:nodoc:
       end
     end
 
+    def generate_slug!
+      self.send("#{slug_name}=", find_unique_slug)
+    end
+
     def generate_slug
-      if new_record? || slugged_fields_changed?
-        self.send("#{slug_name}=", find_unique_slug)
-      end
+      generate_slug! if new_record? || slugged_fields_changed?
     end
 
     def increment_slug_counter
