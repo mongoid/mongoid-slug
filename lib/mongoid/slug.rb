@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
           end
           
           def self.find_by_#{slug_name}_or_id(value)
-            result = find_by_#{slug_name}
+            result = find_by_#{slug_name}(value)
             result = self.find(value) unless found
 
             result
