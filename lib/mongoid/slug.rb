@@ -65,7 +65,7 @@ module Mongoid #:nodoc:
       return if new_record?
 
       self.send(:generate_slug!)
-      save if self.send("#{self.slug_name}_changed?")
+      save if self.send("#{slug_name}_changed?")
     end
 
     def to_param
