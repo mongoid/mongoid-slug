@@ -239,6 +239,10 @@ module Mongoid
       book.title = "中文"
       book.save
       book.to_param.should eql 'zhong-wen'
+
+      book.title = 'Paul Cézanne'
+      book.save
+      book.to_param.should eql 'paul-cezanne'
     end
 
     it "deprecates the :scoped option" do
