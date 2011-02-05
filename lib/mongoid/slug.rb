@@ -62,8 +62,6 @@ module Mongoid #:nodoc:
     # This method should come in handy when generating slugs for an existing
     # collection.
     def slug!
-      return if new_record?
-
       self.send(:generate_slug!)
       save if self.send("#{slug_name}_changed?")
     end
