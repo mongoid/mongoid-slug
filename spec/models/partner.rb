@@ -3,5 +3,5 @@ class Partner
   include Mongoid::Slug
   field :name
   slug  :name
-  embedded_in :relationship, :inverse_of => :partners
+  embedded_in :relationship
 end

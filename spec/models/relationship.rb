@@ -4,5 +4,5 @@ class Relationship
   field :name
   slug  :name
   embeds_many :partners
-  embedded_in :person, :inverse_of => :relationships
+  embedded_in :person
 end

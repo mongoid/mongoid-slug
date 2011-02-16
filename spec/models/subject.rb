@@ -3,5 +3,5 @@ class Subject
   include Mongoid::Slug
   field :name
   slug  :name
-  embedded_in :book, :inverse_of => :subjects
+  embedded_in :book
 end
