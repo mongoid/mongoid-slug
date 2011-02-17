@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.6.3
+-----
+
+* Mongoid no longer requires that emmbedded_in pass :inverse_of option
+  sporkd (Peter Gumeson)
+
 0.6.2
 -----
 
