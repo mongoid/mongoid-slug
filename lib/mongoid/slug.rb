@@ -26,7 +26,13 @@ module Mongoid #:nodoc:
 
         self.slug_name      = options[:as] || :slug
         self.slug_scope     = options[:scope] || nil
-        self.first_valid    = options[:any] || false
+
+        class_eval <<-CODE
+          def slug_any?
+            #{!!options[:any]}
+          end
+        CODE
+
         self.slugged_fields = fields
 
         if options[:scoped]
@@ -102,9 +108,15 @@ module Mongoid #:nodoc:
     end
 
     def slug_base
-      self.class.slugged_fields.map do |field|
+      values = self.class.slugged_fields.map do |field|
         self.send(field)
-      end.join(" ")
+      end
+
+      if slug_any?
+        values.detect { |value| value.present? }
+      else
+        values.join(' ')
+      end
     end
 
     def slugged_fields_changed?
