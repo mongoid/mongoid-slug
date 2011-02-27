@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.6.4
+-----
+
+* Add :any option to use first present field when multiple fields are
+  slugged (Nader Akhnoukh)
+
 0.6.3
 -----
 
