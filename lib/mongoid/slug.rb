@@ -58,7 +58,7 @@ module Mongoid #:nodoc:
 
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
-            where(slug_name => slug).first rescue nil
+            where(slug_name => slug).first
           end
         CODE
       end

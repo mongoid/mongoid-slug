@@ -343,5 +343,12 @@ module Mongoid
         foo.reload.slug.should eql 'john'
       end
     end
+
+    describe ".find_by_slug" do
+      it "returns nil if no document is found" do
+        Book.create(:title => "A Thousand Plateaus")
+        Book.find_by_slug(:title => "Anti Oedipus").should be_nil
+      end
+    end
   end
 end
