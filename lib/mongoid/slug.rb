@@ -24,8 +24,8 @@ module Mongoid #:nodoc:
       def slug(*fields)
         options = fields.extract_options!
 
-        self.slug_name      = options[:as] || :slug
-        self.slug_scope     = options[:scope] || nil
+        self.slug_name  = options[:as] || :slug
+        self.slug_scope = options[:scope]
 
         class_eval <<-CODE
           def slug_any?
