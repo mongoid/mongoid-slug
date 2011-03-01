@@ -33,7 +33,10 @@ module Mongoid #:nodoc:
           end
         CODE
 
-        self.slugged_fields = fields
+        if block_given?
+        else
+          self.slugged_fields = fields
+        end
 
         if options[:scoped]
           ActiveSupport::Deprecation.warn <<-EOM
@@ -95,20 +98,20 @@ module Mongoid #:nodoc:
       end
     end
 
-    def generate_slug!
+    def generate_slug
       self.send("#{slug_name}=", find_unique_slug)
     end
 
-    def generate_slug
-      generate_slug! if new_record? || slugged_fields_changed?
-    end
+    # def generate_slug
+    #   generate_slug! if new_record? || slugged_fields_changed?
+    # end
 
     def increment_slug_counter
       @slug_counter = (slug_counter.to_i + 1).to_s
     end
 
     def slug_base
-      values = self.class.slugged_fields.map do |field|
+      values = self.slugged_fields.map do |field|
         self.send(field)
       end
 
@@ -120,7 +123,7 @@ module Mongoid #:nodoc:
     end
 
     def slugged_fields_changed?
-      self.class.slugged_fields.any? do |field|
+      self.slugged_fields.any? do |field|
         self.send("#{field}_changed?")
       end
     end
