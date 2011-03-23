@@ -56,9 +56,9 @@ module Mongoid #:nodoc:
           if block_given?
             block
           else
-            lambda { |doc|
+            lambda do |doc|
               slugged_fields.map { |f| doc.send(f) }.join(',')
-            }
+            end
           end
 
         field slug_name
