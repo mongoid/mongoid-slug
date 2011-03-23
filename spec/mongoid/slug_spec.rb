@@ -160,16 +160,17 @@ module Mongoid
 
     end
 
-    context "when :any is passed as an argument" do
-      let!(:article) do
+    context "when given a block" do
+      let(:article) do
         Article.create(
-          :brief => "This is the brief",
-          :title => "This is the title")
+          :brief => 'This is the brief',
+          :title => 'This is the title')
       end
 
-      it "uses the first available field for the slug if any option is used" do
+      it "uses the block to build the slug" do
         article.to_param.should eql 'this-is-the-title'
-        article.title = ""
+
+        article.title = ''
         article.save
         article.to_param.should eql 'this-is-the-brief'
 
@@ -295,16 +296,6 @@ module Mongoid
       book.title = 'Paul Cézanne'
       book.save
       book.to_param.should eql 'paul-cezanne'
-    end
-
-    it "deprecates the :scoped option" do
-      ActiveSupport::Deprecation.should_receive(:warn)
-      class Oldie
-        include Mongoid::Document
-        include Mongoid::Slug
-        field :name
-        slug  :name, :scoped => true
-      end
     end
 
     context "when :index is passed as an argument" do

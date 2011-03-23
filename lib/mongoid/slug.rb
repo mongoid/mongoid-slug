@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :slug_name, :slugged_fields, :slug_scope
+      cattr_accessor :slug_builder, :slugged_fields, :slug_name, :slug_scope
     end
 
     module ClassMethods
@@ -46,27 +46,27 @@ module Mongoid #:nodoc:
       # slug.
       #
       # The block takes a single argument, the document itself.
+      def slug(*fields, &block)
         options = fields.extract_options!
-
-        self.slug_name  = options[:as] || :slug
         self.slug_scope = options[:scope]
+        self.slug_name = options[:as] || :slug
+        self.slugged_fields = fields
 
-        class_eval <<-CODE
-          def slug_any?
-            #{!!options[:any]}
+        self.slug_builder =
+          if block_given?
+            block
+          else
+            lambda { |doc|
+              slugged_fields.map { |f| doc.send(f) }.join(',')
+            }
           end
-        CODE
-
-        if block_given?
-        else
-          self.slugged_fields = fields
-        end
-
 
         field slug_name
 
         if options[:index]
-          index slug_name, :unique => !slug_scope
+
+          # Indices on scoped documents are not unique. All others are.
+          index(slug_name, :unique => !slug_scope)
         end
 
         if options[:permanent]
@@ -90,20 +90,19 @@ module Mongoid #:nodoc:
     #
     # Should come in handy when generating slugs for an existing collection.
     def slug!
-      self.send(:generate_slug!)
-      save if self.send("#{slug_name}_changed?")
+      generate_slug!
+      save
     end
 
+    # Returns the slug.
     def to_param
       self.send(slug_name)
     end
 
     private
 
-    attr_reader :slug_counter
-
     def build_slug
-      ("#{slug_base} #{slug_counter}").to_url
+      ("#{slug_builder.call(self)} #{@slug_counter}").to_url
     end
 
     def find_unique_slug
@@ -117,33 +116,21 @@ module Mongoid #:nodoc:
     end
 
     def generate_slug
+      if new_record? || slugged_fields_changed? || slugged_fields.empty?
+        generate_slug!
+      end
+    end
+
+    def generate_slug!
       self.send("#{slug_name}=", find_unique_slug)
     end
 
-    # def generate_slug
-    #   generate_slug! if new_record? || slugged_fields_changed?
-    # end
-
     def increment_slug_counter
-      @slug_counter = (slug_counter.to_i + 1).to_s
-    end
-
-    def slug_base
-      values = self.slugged_fields.map do |field|
-        self.send(field)
-      end
-
-      if slug_any?
-        values.detect { |value| value.present? }
-      else
-        values.join(' ')
-      end
+      @slug_counter = (@slug_counter.to_i + 1).to_s
     end
 
     def slugged_fields_changed?
-      self.slugged_fields.any? do |field|
-        self.send("#{field}_changed?")
-      end
+      slugged_fields.any? { |f| self.send("#{f}_changed?") }
     end
 
     def unique_slug?(slug)
