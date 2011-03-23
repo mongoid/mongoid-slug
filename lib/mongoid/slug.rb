@@ -2,8 +2,17 @@ require 'stringex'
 
 module Mongoid #:nodoc:
 
-  # Generates a URL slug or permalink based on one or more fields in a Mongoid
-  # model.
+  # The slug module helps you generate a URL slug or permalink based on one or
+  # more fields in a Mongoid model.
+  #
+  #    class Person
+  #      include Mongoid::Document
+  #      include Mongoid::Slug
+  #
+  #      field :name
+  #      slug :name
+  #    end
+  #
   module Slug
     extend ActiveSupport::Concern
 
@@ -15,13 +24,28 @@ module Mongoid #:nodoc:
 
       # Sets one ore more fields as source of slug.
       #
-      # By default, the name of the field that stores the slug is "slug". Pass an
-      # alternative name with the :as option.
+      # Takes a list of one or more fields to slug and an optional options
+      # hash.
       #
-      # If you wish the slug to be permanent once created, set :permanent to true.
+      # The options hash respects the following members:
       #
-      # To index slug in a top-level object, set :index to true.
-      def slug(*fields)
+      # * `:as`, which specifies name of the field that stores the slug.
+      # Defaults to `slug`.
+      #
+      # * `:scope`, which specifies a reference association to scope the slug
+      # by. Embedded documents are by default scoped by their parent.
+      #
+      # * `:permanent`, which specifies whether the slug should be immutable
+      # once created. Defaults to `false`.
+      #
+      # * `:index`, which specifies whether an index should be defined for the
+      # slug. Defaults to `false` and has no effect if the document is em-
+      # bedded.
+      #
+      # Alternatively, this method can be given a block that builds a custom
+      # slug.
+      #
+      # The block takes a single argument, the document itself.
         options = fields.extract_options!
 
         self.slug_name  = options[:as] || :slug
@@ -59,6 +83,9 @@ module Mongoid #:nodoc:
           before_save :generate_slug
         end
 
+        # Build a finder based on the slug name.
+        #
+        # Defaults to `find_by_slug`.
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
             where(slug_name => slug).first
@@ -69,8 +96,7 @@ module Mongoid #:nodoc:
 
     # Regenerates slug.
     #
-    # This method should come in handy when generating slugs for an existing
-    # collection.
+    # Should come in handy when generating slugs for an existing collection.
     def slug!
       self.send(:generate_slug!)
       save if self.send("#{slug_name}_changed?")
