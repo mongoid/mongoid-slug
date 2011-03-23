@@ -1,2 +1,2 @@
-rvm ree@mongoid,1.9.2@mongoid exec bundle install
-rvm ree@mongoid,1.9.2@mongoid rake
+rvm ree@mongoid,1.9.2@mongoid,jruby@mongoid exec bundle install
+rvm ree@mongoid,1.9.2@mongoid,jruby@mongoid rake
