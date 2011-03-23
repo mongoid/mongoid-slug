@@ -62,14 +62,6 @@ module Mongoid #:nodoc:
           self.slugged_fields = fields
         end
 
-        if options[:scoped]
-          ActiveSupport::Deprecation.warn <<-EOM
-
-            The :scoped => true option is deprecated and now default for embedded
-            child documents. Please use :scope => :association_name if you wish
-            to scope by a reference association.
-          EOM
-        end
 
         field slug_name
 
