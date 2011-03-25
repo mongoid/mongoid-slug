@@ -46,8 +46,7 @@ module Mongoid #:nodoc:
       # out of the specified fields.
       #
       # The block takes a single argument, the document itself, and should
-      # return a string that will serve as the base of the slug. Make sure you
-      # build the slug only using the specified fields.
+      # return a string that will serve as the base of the slug.
       #
       # Here, for instance, we slug an array field.
       #
