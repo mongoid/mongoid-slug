@@ -77,8 +77,6 @@ module Mongoid #:nodoc:
         field slug_name
 
         if options[:index]
-
-          # Indices on scoped documents are not unique. All others are.
           index(slug_name, :unique => !slug_scope)
         end
 
