@@ -50,9 +50,14 @@ module Mongoid #:nodoc:
       #
       # Here, for instance, we slug an array field.
       #
-      #     slug :creators do |doc|
-      #       doc.creators.join(' ')
-      #     end
+      #     class Person
+      #      include Mongoid::Document
+      #      include Mongoid::Slug
+      #
+      #      field :names, :type => Array
+      #      slug :names do |doc|
+      #        doc.names.join(' ')
+      #      end
       #
       def slug(*fields, &block)
         options = fields.extract_options!
