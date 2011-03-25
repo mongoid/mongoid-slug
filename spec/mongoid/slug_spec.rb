@@ -160,26 +160,6 @@ module Mongoid
 
     end
 
-    context "when given a block" do
-      let(:article) do
-        Article.create(
-          :brief => 'This is the brief',
-          :title => 'This is the title')
-      end
-
-      it "uses the block to build the slug" do
-        article.to_param.should eql 'this-is-the-title'
-
-        article.title = ''
-        article.save
-        article.to_param.should eql 'this-is-the-brief'
-
-        article.title = nil
-        article.save
-        article.to_param.should eql 'this-is-the-brief'
-      end
-    end
-
     context "when :as is passed as an argument" do
       let!(:person) do
         Person.create(:name => "John Doe")

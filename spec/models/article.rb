@@ -3,7 +3,7 @@ class Article
   include Mongoid::Slug
   field :brief
   field :title
-  slug  do |doc|
-    [:title, :brief].map { |f| doc.send(f) }.reject(&:blank?).first
+  slug  :title, :brief do |doc|
+    [doc.title, doc.brief].reject(&:blank?).first
   end
 end
