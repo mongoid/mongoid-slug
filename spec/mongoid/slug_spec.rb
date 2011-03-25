@@ -318,8 +318,6 @@ module Mongoid
           Book.index_information["slug_1"]["unique"].should be_true
         end
       end
-
-      it "has no effect in embedded objects"
     end
 
     context "when :index is not passed as an argument" do
