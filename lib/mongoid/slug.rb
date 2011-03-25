@@ -116,7 +116,7 @@ module Mongoid #:nodoc:
     end
 
     def generate_slug
-      if new_record? || slugged_fields_changed? || slugged_fields.empty?
+      if new_record? || slugged_fields_changed?
         generate_slug!
       end
     end
