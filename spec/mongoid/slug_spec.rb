@@ -248,7 +248,7 @@ module Mongoid
       end
     end
 
-    context "when :slug is passed a closure" do
+    context "when :slug is given a block" do
       let(:caption) do
         Caption.create(:identity => 'Edward Hopper (American, 1882-1967)',
                        :title    => 'Soir Bleu, 1914',
@@ -256,26 +256,22 @@ module Mongoid
       end
 
       it "generates a slug" do
-        pending
         caption.to_param.should eql 'edward-hopper-soir-bleu-1914'
       end
 
       it "updates the slug" do
-        pending
         caption.title = 'Road in Maine, 1914'
         caption.save
         caption.to_param.should eql "edward-hopper-road-in-maine-1914"
       end
 
       it "does not change slug if slugged fields have changed but generated slug is identical" do
-        pending
         caption.identity = 'Edward Hopper'
         caption.save
         caption.to_param.should eql 'edward-hopper-soir-bleu-1914'
       end
 
       it "finds by slug" do
-        pending
         Caption.find_by_slug(caption.to_param).should eql caption
       end
     end

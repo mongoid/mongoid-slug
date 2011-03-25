@@ -4,7 +4,7 @@ class Caption
   field :identity
   field :title
   field :medium
-  slug lambda { |doc|
+  slug :identity, :title do |doc|
     [doc.identity.gsub(/\s*\([^)]+\)/, ''), doc.title].join(' ')
-  }
+  end
 end
