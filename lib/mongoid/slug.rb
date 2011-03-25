@@ -42,10 +42,19 @@ module Mongoid #:nodoc:
       # slug. Defaults to `false` and has no effect if the document is em-
       # bedded.
       #
-      # Alternatively, this method can be given a block that builds a custom
-      # slug.
+      # Alternatively, this method can be given a block to build a custom slug
+      # out of the specified fields.
       #
-      # The block takes a single argument, the document itself.
+      # The block takes a single argument, the document itself, and should
+      # return a string that will serve as the base of the slug. Make sure you
+      # build the slug only using the specified fields.
+      #
+      # Here, for instance, we slug an array field.
+      #
+      #     slug :creators do |doc|
+      #       doc.creators.join(' ')
+      #     end
+      #
       def slug(*fields, &block)
         options = fields.extract_options!
         self.slug_scope = options[:scope]
