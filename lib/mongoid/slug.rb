@@ -24,8 +24,7 @@ module Mongoid #:nodoc:
 
       # Sets one ore more fields as source of slug.
       #
-      # Takes a list of one or more fields to slug and an optional options
-      # hash.
+      # Takes a list of fields to slug and an optional options hash.
       #
       # The options hash respects the following members:
       #
