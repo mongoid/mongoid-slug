@@ -2,12 +2,9 @@ Mongoid Slug
 ============
 
 Mongoid Slug generates a URL slug or permalink based on one or more
-fields in a Mongoid model.
+fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex) and works with non-Latin characters.
 
-It sits idly on top of [stringex](https://github.com/rsl/stringex) and
-works with non-Latin characters.
-
-![lacan](http://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Nus_borromeu_1.jpg/400px-Nus_borromeu_1.jpg)
+![lacan](http://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Nus_borromeu_1.jpg/360px-Nus_borromeu_1.jpg)
 
 Quick Start
 -----------
