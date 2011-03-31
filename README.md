@@ -7,6 +7,8 @@ fields in a Mongoid model.
 It sits idly on top of [stringex](https://github.com/rsl/stringex) and
 works with non-Latin characters.
 
+![lacan](http://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Nus_borromeu_1.jpg/400px-Nus_borromeu_1.jpg)
+
 Quick Start
 -----------
 
@@ -14,7 +16,7 @@ Add mongoid_slug to your Gemfile:
 
     gem 'mongoid_slug', :require => 'mongoid/slug'
 
-Set up slugs in models like this:
+Set up some slugs:
 
     class Book
       include Mongoid::Document
@@ -37,36 +39,20 @@ Set up slugs in models like this:
       slug :first, :last, :as => :name
     end
 
-Finder
-------
-
-In your controller, throw in some minimal magic:
+In your controller, use available finders:
 
     # GET /books/a-thousand-plateaus/authors/gilles-deleuze
     author = Book.find_by_slug(params[:book_id]).
                   authors.
                   find_by_name(params[:id])
 
-Permanence
-----------
+[Read here](https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb)
+for all available options.
 
-By default, slugs are not permanent:
+Scoping
+-------
 
-    >> book = Book.create(:title => "A Thousand Plateaus")
-    >> book.to_param
-    "a-thousand-plateaus"
-    >> book.title = "Anti Oedipus"
-    >> book.save
-    >> book.to_param
-    "anti-oedipus"
-
-If you require permanent slugs, pass the `:permanent` option when
-defining the slug.
-
-Scope
------
-
-To scope an object by a reference association, pass `:scope`:
+To scope a slug by a reference association, pass `:scope`:
 
     class Company
       include Mongoid::Document
@@ -88,18 +74,3 @@ Currently, if you have an irregular association name, you **must**
 specify the `:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
-
-Indexes
--------
-
-You may optionally pass an `:index` option to define an index on top-level
-slugs.
-
-    class Book
-      field :title
-      slug  :title, :index => true
-    end
-
-Indexes on unscoped slugs will be unique.
-
-This option has no effect if the object is embedded.
