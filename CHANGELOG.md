@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.7.0
+-----
+
+* Slug now can be given an optional block to build a custom slug out of
+  the specified fields.
+
 0.6.4
 -----
 
