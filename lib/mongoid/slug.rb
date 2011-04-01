@@ -111,17 +111,32 @@ module Mongoid #:nodoc:
 
     private
 
-    def build_slug
-      ("#{slug_builder.call(self)} #{@slug_counter}").to_url
-    end
-
     def find_unique_slug
-      slug = build_slug
-      if unique_slug?(slug)
+      slug = slug_builder.call(self).to_url
+
+      # Regular expression that matchs slug, slug-1, slug-2, ... slug-n
+      pattern = /^#{Regexp.escape(slug)}(-(\d+))?$/ 
+      
+      # Normally number of docs that match slug pattern should be very small,
+      # so retrive all their slugs should be very fast
+      counters = uniqueness_scope.
+        where(slug_name => pattern).
+        where(:_id.ne => _id).
+        only(slug_name).
+        map{ |doc|
+          # Extract counters from slugs
+          doc[slug_name].match(pattern).try(:[], 2)
+        }
+      
+      if counters.empty?
         slug
       else
-        increment_slug_counter
-        find_unique_slug
+        # Find unique counter
+        counter = 1
+        while counters.include?(counter)
+          counter += 1
+        end
+        "#{slug}-#{counter}"
       end
     end
 
@@ -135,18 +150,8 @@ module Mongoid #:nodoc:
       self.send("#{slug_name}=", find_unique_slug)
     end
 
-    def increment_slug_counter
-      @slug_counter = (@slug_counter.to_i + 1).to_s
-    end
-
     def slugged_fields_changed?
       slugged_fields.any? { |f| self.send("#{f}_changed?") }
-    end
-
-    def unique_slug?(slug)
-      uniqueness_scope.where(slug_name => slug).
-        reject { |doc| doc.id == self.id }.
-        empty?
     end
 
     def uniqueness_scope
