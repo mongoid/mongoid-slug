@@ -120,7 +120,7 @@ module Mongoid #:nodoc:
       
       # Normally number of docs that match slug pattern should be very small,
       # so retrieve all their slugs should be very fast
-      counters = uniqueness_scope.
+      existing_counters = uniqueness_scope.
         where(slug_name => pattern).
         where(:_id.ne => _id).
         only(slug_name).
@@ -129,15 +129,15 @@ module Mongoid #:nodoc:
           doc[slug_name].match(/-(\d+)$/).try(:[], 1)
         }
       
-      if counters.empty?
+      if existing_counters.empty?
         slug
       else
         # Find unique counter
-        counter = 1
-        while counters.include?(counter.to_s)
-          counter += 1
+        unique_counter = 1
+        while existing_counters.include?(unique_counter.to_s)
+          unique_counter += 1
         end
-        "#{slug}-#{counter}"
+        "#{slug}-#{unique_counter}"
       end
     end
 
