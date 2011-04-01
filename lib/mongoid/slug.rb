@@ -116,16 +116,16 @@ module Mongoid #:nodoc:
 
       # Regular expression that matchs slug, slug-1, slug-2, ... slug-n
       # If slug_name field was indexed, MongoDB will utilize that index to match /^.../ pattern
-      pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/ 
+      pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/
       
-      # Get the document with maximum counter
-      doc = uniqueness_scope.only(slug_name).
-        where(slug_name => pattern).
-        where(:_id.ne => _id).
-        order([slug_name, :desc]).first
+      # Get the maximum counter slug
+      max_counter_slug = uniqueness_scope.only(slug_name).
+        where(slug_name => pattern, :_id.ne => _id).
+        order_by([slug_name, :desc]).first.try(:[], slug_name)
       
-      if doc
-        max_counter = doc[slug_name].match(/-(\d+)/).try(:[], 1).to_i
+      if max_counter_slug
+        max_counter = max_counter_slug.match(/-(\d+)$/).try(:[], 1).to_i
+        # Use max_counter + 1 as unique counter
         slug += "-#{max_counter + 1}"
       end
       
