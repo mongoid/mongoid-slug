@@ -133,7 +133,7 @@ module Mongoid #:nodoc:
       else
         # Find unique counter
         counter = 1
-        while counters.include?(counter)
+        while counters.include?(counter.to_s)
           counter += 1
         end
         "#{slug}-#{counter}"
