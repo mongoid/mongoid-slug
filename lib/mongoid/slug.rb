@@ -62,14 +62,14 @@ module Mongoid #:nodoc:
         options = fields.extract_options!
         self.slug_scope = options[:scope]
         self.slug_name = options[:as] || :slug
-        self.slugged_fields = fields
+        self.slugged_fields = fields.map(&:to_s)
 
         self.slug_builder =
           if block_given?
             block
           else
             lambda do |doc|
-              slugged_fields.map { |f| doc.send(f) }.join(',')
+              slugged_fields.map { |f| doc.read_attribute(f) }.join(',')
             end
           end
 
@@ -106,7 +106,7 @@ module Mongoid #:nodoc:
 
     # Returns the slug.
     def to_param
-      self.send(slug_name)
+      read_attribute(slug_name)
     end
 
     private
@@ -121,7 +121,7 @@ module Mongoid #:nodoc:
       # Get the maximum counter slug
       max_counter_slug = uniqueness_scope.only(slug_name).
         where(slug_name => pattern, :_id.ne => _id).
-        order_by([slug_name, :desc]).first.try(:[], slug_name)
+        order_by([slug_name, :desc]).first.try(:read_attribute, slug_name)
       
       if max_counter_slug
         max_counter = max_counter_slug.match(/-(\d+)$/).try(:[], 1).to_i
@@ -139,11 +139,11 @@ module Mongoid #:nodoc:
     end
 
     def generate_slug!
-      self.send("#{slug_name}=", find_unique_slug)
+      write_attribute(slug_name, find_unique_slug)
     end
 
     def slugged_fields_changed?
-      slugged_fields.any? { |f| self.send("#{f}_changed?") }
+      slugged_fields.any? { |f| attribute_changed?(f) }
     end
 
     def uniqueness_scope
