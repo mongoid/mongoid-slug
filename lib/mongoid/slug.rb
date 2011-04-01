@@ -115,17 +115,18 @@ module Mongoid #:nodoc:
       slug = slug_builder.call(self).to_url
 
       # Regular expression that matchs slug, slug-1, slug-2, ... slug-n
-      pattern = /^#{Regexp.escape(slug)}(-(\d+))?$/ 
+      # If slug_name field was indexed, MongoDB will utilize it to match /^.../ pattern
+      pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/ 
       
       # Normally number of docs that match slug pattern should be very small,
-      # so retrive all their slugs should be very fast
+      # so retrieve all their slugs should be very fast
       counters = uniqueness_scope.
         where(slug_name => pattern).
         where(:_id.ne => _id).
         only(slug_name).
         map{ |doc|
           # Extract counters from slugs
-          doc[slug_name].match(pattern).try(:[], 2)
+          doc[slug_name].match(/-(\d+)$/).try(:[], 1)
         }
       
       if counters.empty?
