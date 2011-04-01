@@ -115,30 +115,21 @@ module Mongoid #:nodoc:
       slug = slug_builder.call(self).to_url
 
       # Regular expression that matchs slug, slug-1, slug-2, ... slug-n
-      # If slug_name field was indexed, MongoDB will utilize it to match /^.../ pattern
+      # If slug_name field was indexed, MongoDB will utilize that index to match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/ 
       
-      # Normally number of docs that match slug pattern should be very small,
-      # so retrieve all their slugs should be very fast
-      existing_counters = uniqueness_scope.
+      # Get the document with maximum counter
+      doc = uniqueness_scope.only(slug_name).
         where(slug_name => pattern).
         where(:_id.ne => _id).
-        only(slug_name).
-        map{ |doc|
-          # Extract counters from slugs
-          doc[slug_name].match(/-(\d+)$/).try(:[], 1)
-        }
+        order([slug_name, :desc]).first
       
-      if existing_counters.empty?
-        slug
-      else
-        # Find unique counter
-        unique_counter = 1
-        while existing_counters.include?(unique_counter.to_s)
-          unique_counter += 1
-        end
-        "#{slug}-#{unique_counter}"
+      if doc
+        max_counter = doc[slug_name].match(/-(\d+)/).try(:[], 1).to_i
+        slug += "-#{max_counter + 1}"
       end
+      
+      slug
     end
 
     def generate_slug

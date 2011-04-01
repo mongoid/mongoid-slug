@@ -153,18 +153,6 @@ module Mongoid
 
         dup.save
         dup2.to_param.should eql 'gilles-deleuze-2'
-
-
-        dup3 = Author.create(
-          :first_name => author.first_name,
-          :last_name  => author.last_name)
-
-        dup2.save
-        dup3.to_param.should eql 'gilles-deleuze-3'
-
-        dup.destroy
-        dup3.slug!
-        dup3.to_param.should eql 'gilles-deleuze-1'
       end
 
       it "does not update slug if slugged fields have changed but generated slug is identical" do
