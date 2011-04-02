@@ -114,8 +114,9 @@ module Mongoid #:nodoc:
     def find_unique_slug
       slug = slug_builder.call(self).to_url
 
-      # Regular expression that matchs slug, slug-1, slug-2, ... slug-n
-      # If slug_name field was indexed, MongoDB will utilize that index to match /^.../ pattern
+      # Regular expression that matches slug, slug-1, slug-2, ... slug-n
+      # If slug_name field was indexed, MongoDB will utilize that index to
+      # match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/
       
       # Get the maximum counter slug
