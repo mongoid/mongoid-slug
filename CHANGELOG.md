@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.7.1
+-----
+* Library no longers hit database multiple times to find unique slug when
+  duplicates exist. (tiendung - Alex N.) 
+
 0.7.0
 -----
 
