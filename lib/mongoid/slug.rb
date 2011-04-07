@@ -126,7 +126,7 @@ module Mongoid #:nodoc:
       # Get the maximum counter slug
       max_counter_slug = uniqueness_scope.only(slug_name).
         where(slug_name => pattern, :_id.ne => _id).
-        order_by([slug_name, :desc]).first.try(:read_attribute, slug_name)
+        desc(slug_name).first.try(:read_attribute, slug_name)
       
       if max_counter_slug
         max_counter = max_counter_slug.match(/-(\d+)$/).try(:[], 1).to_i
