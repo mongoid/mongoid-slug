@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
 
         self.slug_builder =
           if block_given?
-            block
+            yield
           else
             lambda do |doc|
               slugged_fields.map { |f| doc.read_attribute(f) }.join(',')
