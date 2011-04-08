@@ -39,6 +39,12 @@ module Mongoid
       end
     end
 
+    context "when using default_scope on a model" do
+      it "find_unique_slug should work correctly" do
+        Page.create!(:title => "Title", :content => "Content", :order => 1)
+      end
+    end
+
     context "when the object is embedded" do
       let(:subject) do
         book.subjects.create(:name => "Psychoanalysis")
