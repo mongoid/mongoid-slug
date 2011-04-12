@@ -361,12 +361,16 @@ module Mongoid
     end
 
     describe ".find_by_slug!" do
-      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
-        Book.create(:title => "A Thousand Plateaus")
+      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
 
+      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
         lambda {
           Book.find_by_slug!(:title => "Anti Oedipus")
         }.should raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      it "returns the document when it is found" do
+        Book.find_by_slug!(book.slug).should == book
       end
     end
   end
