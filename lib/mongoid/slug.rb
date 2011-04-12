@@ -92,6 +92,10 @@ module Mongoid #:nodoc:
           def self.find_by_#{slug_name}(slug)
             where(slug_name => slug).first
           end
+
+          def self.find_by_#{slug_name}!(slug)
+            where(slug_name => slug).first || raise(Mongoid::Errors::DocumentNotFound.new(self.class, slug))
+          end
         CODE
       end
     end

@@ -354,5 +354,15 @@ module Mongoid
         Book.find_by_slug(:title => "Anti Oedipus").should be_nil
       end
     end
+
+    describe ".find_by_slug!" do
+      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
+        Book.create(:title => "A Thousand Plateaus")
+
+        lambda {
+          Book.find_by_slug!(:title => "Anti Oedipus")
+        }.should raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
   end
 end
