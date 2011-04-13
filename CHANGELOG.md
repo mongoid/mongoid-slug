@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+0.7.2
+-----
+* Add `#find_by_slug!`. (Alex Sharp)
+
 0.7.1
 -----
 * Library no longers hit database multiple times to find unique slug when
