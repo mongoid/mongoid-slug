@@ -117,19 +117,20 @@ module Mongoid #:nodoc:
 
     def find_unique_slug
       slug = slug_builder.call(self).to_url
-
+            
       # Regular expression that matches slug, slug-1, slug-2, ... slug-n
       # If slug_name field was indexed, MongoDB will utilize that index to
       # match /^.../ pattern
-      pattern = /^#{Regexp.escape(slug)}(?:-\d+)?$/
+      pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
       
-      # Get the maximum counter slug
-      max_counter_slug = uniqueness_scope.only(slug_name).
-        where(slug_name => pattern, :_id.ne => _id).
-        desc(slug_name).first.try(:read_attribute, slug_name)
+      existing_slugs = uniqueness_scope.only(slug_name).where(slug_name => pattern, :_id.ne => _id).map{|obj| obj.try(:read_attribute, slug_name)}    
       
-      if max_counter_slug
-        max_counter = max_counter_slug.match(/-(\d+)$/).try(:[], 1).to_i
+      if existing_slugs.count > 0      
+        # sort the existing_slugs in increasing order by comparing the suffix numbers:
+        # slug, slug-1, slug-2, ..., slug-n
+        existing_slugs = existing_slugs.sort{|a, b| (pattern.match(a)[1] || -1).to_i <=> (pattern.match(b)[1] || -1).to_i}
+        max_counter = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
+
         # Use max_counter + 1 as unique counter
         slug += "-#{max_counter + 1}"
       end

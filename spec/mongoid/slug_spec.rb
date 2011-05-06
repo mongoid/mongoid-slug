@@ -19,8 +19,10 @@ module Mongoid
       end
 
       it "generates a unique slug by appending a counter to duplicate text" do
-        dup = Book.create(:title => book.title)
-        dup.to_param.should eql "a-thousand-plateaus-1"
+        15.times{ |x|
+          dup = Book.create(:title => book.title)
+          dup.to_param.should eql "a-thousand-plateaus-#{x+1}"
+        }
       end
 
       it "does not update slug if slugged fields have not changed" do
