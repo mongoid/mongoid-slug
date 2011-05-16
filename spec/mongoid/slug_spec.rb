@@ -297,20 +297,20 @@ module Mongoid
 
       it "defines an index on the slug in top-level objects" do
         Book.create_indexes
-        Book.collection.index_information.should have_key "slug_1"
+        Book.collection.index_information.should have_key "slug_-1_slug_size_-1"
       end
 
       context "when slug is scoped by a reference association" do
         it "defines a non-unique index" do
           Author.create_indexes
-          Author.index_information["slug_1"]["unique"].should be_false
+          Author.index_information["slug_-1_slug_size_-1"]["unique"].should be_false
         end
       end
 
       context "when slug is not scoped by a reference association" do
         it "defines a unique index" do
           Book.create_indexes
-          Book.index_information["slug_1"]["unique"].should be_true
+          Book.index_information["slug_-1_slug_size_-1"]["unique"].should be_true
         end
       end
     end
