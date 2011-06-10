@@ -330,32 +330,6 @@ module Mongoid
       end
     end
 
-    describe "#slug!" do
-      before do
-        class Foo
-          include Mongoid::Document
-          field :name
-        end
-      end
-
-      let!(:foo) do
-        Foo.create(:name => "John")
-      end
-
-      it "regenerates slug" do
-        class Foo
-          include Mongoid::Slug
-          slug :name
-        end
-
-        foo.reload.slug.should be_nil
-
-        foo.slug!
-
-        foo.reload.slug.should eql 'john'
-      end
-    end
-
     describe ".find_by_slug" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
 
