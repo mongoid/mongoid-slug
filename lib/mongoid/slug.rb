@@ -39,7 +39,9 @@ module Mongoid #:nodoc:
       #
       # * `:index`, which specifies whether an index should be defined for the
       # slug. Defaults to `false` and has no effect if the document is em-
-      # bedded.
+      # bedded. Make sure you have a unique index on the slug of root
+      # documents to avoid the (very unlikely) race condition that would ensue
+      # if two documents with identical slugs were to be saved simultaneously.
       #
       # Alternatively, this method can be given a block to build a custom slug
       # out of the specified fields.
@@ -59,9 +61,9 @@ module Mongoid #:nodoc:
       #      end
       #
       def slug(*fields, &block)
-        options = fields.extract_options!
-        self.slug_scope = options[:scope]
-        self.slug_name = options[:as] || :slug
+        options             = fields.extract_options!
+        self.slug_scope     = options[:scope]
+        self.slug_name      = options[:as] || :slug
         self.slugged_fields = fields.map(&:to_s)
 
         self.slug_builder =
@@ -69,7 +71,7 @@ module Mongoid #:nodoc:
             block
           else
             lambda do |doc|
-              slugged_fields.map { |f| doc.read_attribute(f) }.join(',')
+              slugged_fields.map { |f| doc.read_attribute(f) }.join(' ')
             end
           end
 
@@ -94,7 +96,8 @@ module Mongoid #:nodoc:
           end
 
           def self.find_by_#{slug_name}!(slug)
-            where(slug_name => slug).first || raise(Mongoid::Errors::DocumentNotFound.new(self.class, slug))
+            where(slug_name => slug).first ||
+              raise(Mongoid::Errors::DocumentNotFound.new(self.class, slug))
           end
         CODE
       end
@@ -116,6 +119,7 @@ module Mongoid #:nodoc:
     private
 
     def find_unique_slug
+      # TODO: An epic method which calls for refactoring.
       slug = slug_builder.call(self).to_url
             
       # Regular expression that matches slug, slug-1, slug-2, ... slug-n
@@ -123,12 +127,19 @@ module Mongoid #:nodoc:
       # match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
       
-      existing_slugs = uniqueness_scope.only(slug_name).where(slug_name => pattern, :_id.ne => _id).map{|obj| obj.try(:read_attribute, slug_name)}    
+      existing_slugs =
+        uniqueness_scope.
+        only(slug_name).
+        where(slug_name => pattern, :_id.ne => _id).
+        map {|obj| obj.try(:read_attribute, slug_name)}
       
       if existing_slugs.count > 0      
-        # sort the existing_slugs in increasing order by comparing the suffix numbers:
+        # sort the existing_slugs in increasing order by comparing the suffix
+        # numbers:
         # slug, slug-1, slug-2, ..., slug-n
-        existing_slugs = existing_slugs.sort{|a, b| (pattern.match(a)[1] || -1).to_i <=> (pattern.match(b)[1] || -1).to_i}
+        existing_slugs.sort! do |a, b|
+          (pattern.match(a)[1] || -1).to_i <=> (pattern.match(b)[1] || -1).to_i
+        end
         max_counter = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
 
         # Use max_counter + 1 as unique counter
