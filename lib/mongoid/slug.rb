@@ -103,14 +103,6 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Regenerates slug.
-    #
-    # Should come in handy when generating slugs for an existing collection.
-    def slug!
-      generate_slug!
-      save
-    end
-
     # Returns the slug.
     def to_param
       read_attribute(slug_name)
