@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.8.0
+-----
+* Fix bug concerning slugs with double-digit counters. (Jean Bredeche)
+* Remove #slug!. The method is of limited value.
+
 0.7.2
 -----
 * Add `#find_by_slug!`. (Alex Sharp)
