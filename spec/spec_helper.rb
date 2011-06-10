@@ -15,7 +15,7 @@ require File.expand_path("../../lib/mongoid/slug", __FILE__)
 
 Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
 
-Rspec.configure do |c|
+RSpec.configure do |c|
   c.before(:all)  { DatabaseCleaner.strategy = :truncation }
   c.before(:each) { DatabaseCleaner.clean }
 end
