@@ -11,7 +11,7 @@ Quick Start
 
 Add mongoid_slug to your Gemfile:
 
-    gem 'mongoid_slug', :require => 'mongoid/slug'
+    gem 'mongoid_slug'
 
 Set up some slugs:
 
