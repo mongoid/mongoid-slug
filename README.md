@@ -11,10 +11,13 @@ Quick Start
 
 Add mongoid_slug to your Gemfile:
 
+```ruby
     gem 'mongoid_slug'
+```
 
 Set up some slugs:
 
+```ruby
     class Book
       include Mongoid::Document
       include Mongoid::Slug
@@ -35,13 +38,16 @@ Set up some slugs:
 
       slug :first, :last, :as => :name
     end
+```
 
 In your controller, use available finders:
 
+```ruby
     # GET /books/a-thousand-plateaus/authors/gilles-deleuze
     author = Book.find_by_slug(params[:book_id]).
                   authors.
                   find_by_name(params[:id])
+```
 
 [Read here](https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb)
 for all available options.
@@ -51,6 +57,7 @@ Scoping
 
 To scope a slug by a reference association, pass `:scope`:
 
+```ruby
     class Company
       include Mongoid::Document
       references_many :employees
@@ -63,6 +70,7 @@ To scope a slug by a reference association, pass `:scope`:
       slug  :name, :scope => :company
       referenced_in :company
     end
+```
 
 In this example, if you create an employee without associating it with
 any company, the scope will fall back to the root employees collection.
