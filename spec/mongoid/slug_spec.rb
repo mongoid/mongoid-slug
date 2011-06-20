@@ -289,6 +289,28 @@ module Mongoid
       book.to_param.should eql 'paul-cezanne'
     end
 
+    context "special url characters" do
+      # special url chars:
+      # Char Meaning                                                Hexa
+      # +	 Indicates a space (spaces cannot be used in a URL).	%2B
+      # /	 Separates directories and subdirectories.            %2F
+      # ?	 Separates the actual URL and the parameters.	    %3F
+      # %	 Specifies special characters.	                      %25
+      # #	 Indicates bookmarks.	                               %23
+      # &	 Separator between parameters specified in the URL.  %26
+      GIVEN    = ["hi+bye"  , "hi/bye"  , "hi?bye"  , "hi%bye"  , "hi#bye"  , "hi&bye"  ]
+      EXPECTED = ["hi%2Bbye", "hi-slash-bye", "hi-bye", "hi-percent-bye", "hi-number-bye", "hi-and-bye"]
+      CHAR     = ["+"       , "/"       , "?"       , "%"       ,  "#"      , "&"       ] 
+      CHAR.each_with_index do |value, index|
+        it "should scape #{value}" do
+          book.title = GIVEN[index]
+          book.save
+          book.to_param.should eql EXPECTED[index]
+        end
+      end
+      
+    end
+    
     context "when :index is passed as an argument" do
       before do
         Book.collection.drop_indexes

@@ -105,7 +105,7 @@ module Mongoid #:nodoc:
 
     # Returns the slug.
     def to_param
-      read_attribute(slug_name)
+      CGI.escape read_attribute(slug_name)
     end
 
     private
