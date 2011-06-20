@@ -293,13 +293,13 @@ module Mongoid
       # special url chars:
       # Char Meaning                                                Hexa
       # +	 Indicates a space (spaces cannot be used in a URL).	%2B
-      # /	 Separates directories and subdirectories.           	%2F
-      # ?	 Separates the actual URL and the parameters.	        %3F
-      # %	 Specifies special characters.	                        %25
-      # #	 Indicates bookmarks.	                                %23
-      # &	 Separator between parameters specified in the URL.	    %26
+      # /	 Separates directories and subdirectories.            %2F
+      # ?	 Separates the actual URL and the parameters.	    %3F
+      # %	 Specifies special characters.	                      %25
+      # #	 Indicates bookmarks.	                               %23
+      # &	 Separator between parameters specified in the URL.  %26
       GIVEN    = ["hi+bye"  , "hi/bye"  , "hi?bye"  , "hi%bye"  , "hi#bye"  , "hi&bye"  ]
-      EXPECTED = ["hi%2Bbye", "hi%2Fbye", "hi%3Fbye", "hi%25bye", "hi%23bye", "hi%26bye"]
+      EXPECTED = ["hi%2Bbye", "hi-slash-bye", "hi-bye", "hi-percent-bye", "hi-number-bye", "hi-and-bye"]
       CHAR     = ["+"       , "/"       , "?"       , "%"       ,  "#"      , "&"       ] 
       CHAR.each_with_index do |value, index|
         it "should scape #{value}" do
