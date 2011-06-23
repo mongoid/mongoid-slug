@@ -1,3 +1,4 @@
+require 'mongoid'
 require 'stringex'
 
 module Mongoid #:nodoc:

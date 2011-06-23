@@ -271,22 +271,30 @@ module Mongoid
       end
     end
 
-    it "works with non-Latin characters" do
-      book.title = "Капитал"
-      book.save
-      book.to_param.should eql "kapital"
+    context "when slugged field contains non-ASCII characters" do
+      it "slugs Cyrillic characters" do
+        book.title = "Капитал"
+        book.save
+        book.to_param.should eql "kapital"
+      end
 
-      book.title = "Ελλάδα"
-      book.save
-      book.to_param.should eql "ellada"
+      it "slugs Greek characters" do
+        book.title = "Ελλάδα"
+        book.save
+        book.to_param.should eql "ellada"
+      end
 
-      book.title = "中文"
-      book.save
-      book.to_param.should eql 'zhong-wen'
+      it "slugs Chinese characters" do
+        book.title = "中文"
+        book.save
+        book.to_param.should eql 'zhong-wen'
+      end
 
-      book.title = 'Paul Cézanne'
-      book.save
-      book.to_param.should eql 'paul-cezanne'
+      it "slugs non-ASCII Latin characters" do
+        book.title = 'Paul Cézanne'
+        book.save
+        book.to_param.should eql 'paul-cezanne'
+      end
     end
 
     context "when :index is passed as an argument" do
@@ -326,7 +334,7 @@ module Mongoid
       it "scopes by the superclass" do
         book = Book.create(:title => "Anti Oedipus")
         comic_book = ComicBook.create(:title => "Anti Oedipus")
-        comic_book.slug.should_not eql(book.title)
+        comic_book.slug.should_not eql(book.slug)
       end
     end
 

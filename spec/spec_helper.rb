@@ -2,16 +2,14 @@ require "rubygems"
 require "bundler/setup"
 
 require "database_cleaner"
-require "mongoid"
-require "stringex"
 require "rspec"
+
+require File.expand_path("../../lib/mongoid/slug", __FILE__)
 
 Mongoid.configure do |config|
   name = "mongoid_slug_test"
   config.master = Mongo::Connection.new.db(name)
 end
-
-require File.expand_path("../../lib/mongoid/slug", __FILE__)
 
 Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
 
