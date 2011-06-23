@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+0.8.1
+-----
+* No longer necessary to require library in Gemfile (Konstantin Shabanov)
+
 0.8.0
 -----
 * Fix bug concerning slugs with double-digit counters. (Jean Bredeche)
