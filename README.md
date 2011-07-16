@@ -72,6 +72,14 @@ class Employee
 end
 ```
 
+In this example, if you create an employee without associating it with
+any company, the scope will fall back to the root employees collection.
+
+Currently, if you have an irregular association name, you **must**
+specify the `:inverse_of` option on the other side of the assocation.
+
+Embedded objects are automatically scoped by their parent.
+
 Reserved Slugs
 ==============
 
@@ -91,11 +99,3 @@ Reserved slugs will instead start with suffix "-1". For the example above,
 friend = Friend.create(:name => "foo") # first foo friend
 friend.slug # returns "foo-1" instead of "foo" since "foo" is reserved
 ```
-
-In this example, if you create an employee without associating it with
-any company, the scope will fall back to the root employees collection.
-
-Currently, if you have an irregular association name, you **must**
-specify the `:inverse_of` option on the other side of the assocation.
-
-Embedded objects are automatically scoped by their parent.
