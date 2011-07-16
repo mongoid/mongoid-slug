@@ -338,6 +338,25 @@ module Mongoid
       end
     end
 
+    context "when :reserve is passed" do
+      it "does not use the the reserved slugs" do
+        friend1 = Friend.create(:name => "foo")
+        friend1.slug.should_not eql("foo")
+        friend1.slug.should eql("foo-1")
+
+        friend2 = Friend.create(:name => "bar")
+        friend2.slug.should_not eql("bar")
+        friend2.slug.should eql("bar-1")
+      end
+
+      it "should start with concatenation -1" do
+        friend1 = Friend.create(:name => "foo")
+        friend1.slug.should eql("foo-1")
+        friend2 = Friend.create(:name => "foo")
+        friend2.slug.should eql("foo-2")
+      end
+    end
+
     describe ".find_by_slug" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
 
