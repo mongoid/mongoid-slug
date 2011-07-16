@@ -81,7 +81,7 @@ specify the `:inverse_of` option on the other side of the assocation.
 Embedded objects are automatically scoped by their parent.
 
 Reserved Slugs
-==============
+--------------
 
 To reserve slugs so that they will not be used as slugs, pass an array of reserved slugs into `:reserve`:
 
