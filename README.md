@@ -79,3 +79,23 @@ Currently, if you have an irregular association name, you **must**
 specify the `:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
+
+Reserved Slugs
+--------------
+
+To reserve slugs so that they will not be used as slugs, pass an array of reserved slugs into `:reserve`:
+
+```ruby
+class Friend
+  include Mongoid::Document
+  field :name
+  slug  :name, :reserve => ['foo', 'bar']
+end
+```
+
+Reserved slugs will instead start with suffix "-1". For the example above,
+
+```ruby
+friend = Friend.create(:name => "foo") # first foo friend
+friend.slug # returns "foo-1" instead of "foo" since "foo" is reserved
+```

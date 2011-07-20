@@ -18,7 +18,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :slug_builder, :slugged_fields, :slug_name, :slug_scope
+      cattr_accessor :slug_builder, :slugged_fields, :slug_name, :slug_scope, :slug_reserve
     end
 
     module ClassMethods
@@ -34,6 +34,9 @@ module Mongoid #:nodoc:
       #
       # * `:scope`, which specifies a reference association to scope the slug
       # by. Embedded documents are by default scoped by their parent.
+      #
+      # * `:reserve`, which specifiees an array of reserved slugs, Defaults to
+      # [], the empty array.
       #
       # * `:permanent`, which specifies whether the slug should be immutable
       # once created. Defaults to `false`.
@@ -64,9 +67,10 @@ module Mongoid #:nodoc:
       def slug(*fields, &block)
         options             = fields.extract_options!
         self.slug_scope     = options[:scope]
+        self.slug_reserve   = options[:reserve] || []
         self.slug_name      = options[:as] || :slug
         self.slugged_fields = fields.map(&:to_s)
-
+        
         self.slug_builder =
           if block_given?
             block
@@ -129,7 +133,7 @@ module Mongoid #:nodoc:
         only(slug_name).
         where(slug_name => pattern, :_id.ne => _id).
         map {|obj| obj.try(:read_attribute, slug_name)}
-      
+
       if existing_slugs.count > 0      
         # sort the existing_slugs in increasing order by comparing the suffix
         # numbers:
@@ -141,6 +145,9 @@ module Mongoid #:nodoc:
 
         # Use max_counter + 1 as unique counter
         slug += "-#{max_counter + 1}"
+      else
+        # if slug is reserved, concatenate it with "-1"
+        slug += "-1" if slug_reserve.include?(slug)
       end
       
       slug
