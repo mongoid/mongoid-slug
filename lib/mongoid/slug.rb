@@ -106,7 +106,11 @@ module Mongoid #:nodoc:
 
     # Returns the slug.
     def to_param
-      read_attribute(slug_name)
+      read_attribute(slug_name) || begin
+        generate_slug!
+        save
+        read_attribute(slug_name)
+      end
     end
 
     private

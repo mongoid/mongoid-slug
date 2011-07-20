@@ -357,5 +357,17 @@ module Mongoid
         Book.find_by_slug!(book.slug).should == book
       end
     end
+
+    context "when #to_param is called on an existing record with no slug" do
+      before do
+        Book.collection.insert(:title => "Proust and Signs")
+      end
+
+      it "generates the missing slug" do
+        book = Book.first
+        book.to_param
+        book.reload.slug.should eql "proust-and-signs"
+      end
+    end
   end
 end
