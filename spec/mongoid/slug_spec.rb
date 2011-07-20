@@ -3,7 +3,7 @@ require "spec_helper"
 
 module Mongoid
   describe Slug do
-    let!(:book) do
+    let(:book) do
       Book.create(:title => "A Thousand Plateaus")
     end
 
