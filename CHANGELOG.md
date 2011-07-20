@@ -1,21 +1,31 @@
 CHANGELOG
 =========
 
+0.8.2
+-----
+
+* Generate a slug when an existing document does not have one. Should
+  come in handy when adding slug module to models with existing data.
+
 0.8.1
 -----
+
 * No longer necessary to require library in Gemfile (Konstantin Shabanov)
 
 0.8.0
 -----
+
 * Fix bug concerning slugs with double-digit counters. (Jean Bredeche)
 * Remove #slug!. The method is of limited value.
 
 0.7.2
 -----
+
 * Add `#find_by_slug!`. (Alex Sharp)
 
 0.7.1
 -----
+
 * Library no longers hit database multiple times to find unique slug when
   duplicates exist. (tiendung - Alex N.) 
 
