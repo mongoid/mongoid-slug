@@ -1,6 +1,12 @@
 require 'mongoid'
 require 'stringex'
 
+# FIXME: remove once stringex fixes its invalid YAML issue:
+#   https://github.com/rsl/stringex/pull/30
+if YAML.const_defined?(:ENGINE)
+  YAML::ENGINE.yamler = 'syck'
+end
+
 module Mongoid #:nodoc:
 
   # The slug module helps you generate a URL slug or permalink based on one or
