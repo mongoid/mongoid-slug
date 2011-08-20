@@ -5,7 +5,7 @@ Mongoid Slug generates a URL slug or permalink based on one or more
 fields in a Mongoid model. It sits idly on top of [stringex] [1] and
 works with non-Latin characters.
 
-[![travis](https://secure.travis-ci.org/papercavalier/mongoid-slug.png)](http://travis-ci.org/papercavalier/mongoid-slug)
+[![travis](https://secure.travis-ci.org/hakanensari/mongoid-slug.png)](http://travis-ci.org/hakanensari/mongoid-slug)
 
 Quick Start
 -----------
