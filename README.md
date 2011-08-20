@@ -2,7 +2,8 @@ Mongoid Slug
 ============
 
 Mongoid Slug generates a URL slug or permalink based on one or more
-fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex) and works with non-Latin characters.
+fields in a Mongoid model. It sits idly on top of [stringex] [1] and
+works with non-Latin characters.
 
 [![travis](https://secure.travis-ci.org/papercavalier/mongoid-slug.png)](http://travis-ci.org/papercavalier/mongoid-slug)
 
@@ -49,7 +50,7 @@ author = Book.find_by_slug(params[:book_id]).
               find_by_name(params[:id])
 ```
 
-[Read here](https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb)
+[Read here] [2]
 for all available options.
 
 Scoping
@@ -79,3 +80,6 @@ Currently, if you have an irregular association name, you **must**
 specify the `:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
+
+[1]: https://github.com/rsl/stringex/
+[2]: https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb
