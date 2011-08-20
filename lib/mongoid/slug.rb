@@ -98,7 +98,7 @@ module Mongoid #:nodoc:
 
           def self.find_by_#{slug_name}!(slug)
             where(slug_name => slug).first ||
-              raise(Mongoid::Errors::DocumentNotFound.new(self.class, slug))
+              raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
           end
         CODE
       end
@@ -118,18 +118,18 @@ module Mongoid #:nodoc:
     def find_unique_slug
       # TODO: An epic method which calls for refactoring.
       slug = slug_builder.call(self).to_url
-            
+
       # Regular expression that matches slug, slug-1, slug-2, ... slug-n
       # If slug_name field was indexed, MongoDB will utilize that index to
       # match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
-      
+
       existing_slugs =
         uniqueness_scope.
         only(slug_name).
         where(slug_name => pattern, :_id.ne => _id).
-        map {|obj| obj.try(:read_attribute, slug_name)}
-      
+        map { |obj| obj.try(:read_attribute, slug_name) }
+
       if existing_slugs.count > 0      
         # sort the existing_slugs in increasing order by comparing the suffix
         # numbers:
@@ -142,7 +142,7 @@ module Mongoid #:nodoc:
         # Use max_counter + 1 as unique counter
         slug += "-#{max_counter + 1}"
       end
-      
+
       slug
     end
 
