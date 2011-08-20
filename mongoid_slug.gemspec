@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency("mongoid", "~> 2.0")
   s.add_dependency("stringex", "~> 1.3")
-  s.add_development_dependency("database_cleaner", "~> 0.6")
   s.add_development_dependency("rake", "~> 0.9")
   s.add_development_dependency("rspec", "~> 2.6")
 
