@@ -6,3 +6,6 @@ class Book
   embeds_many :subjects
   references_many :authors
 end
+
+class ComicBook < Book
+end
