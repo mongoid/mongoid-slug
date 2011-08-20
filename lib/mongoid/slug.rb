@@ -98,7 +98,7 @@ module Mongoid #:nodoc:
 
           def self.find_by_#{slug_name}!(slug)
             where(slug_name => slug).first ||
-              raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
+              raise(Mongoid::Errors::DocumentNotFound.new(self.class, slug))
           end
         CODE
       end
@@ -114,14 +114,10 @@ module Mongoid #:nodoc:
     end
 
     private
-    
-    def build_initial_slug
-      slug_builder.call(self).to_url
-    end
 
     def find_unique_slug
       # TODO: An epic method which calls for refactoring.
-      slug = build_initial_slug
+      slug = slug_builder.call(self).to_url
             
       # Regular expression that matches slug, slug-1, slug-2, ... slug-n
       # If slug_name field was indexed, MongoDB will utilize that index to
@@ -132,13 +128,16 @@ module Mongoid #:nodoc:
         uniqueness_scope.
         only(slug_name).
         where(slug_name => pattern, :_id.ne => _id).
-        map { |obj| obj.try(:read_attribute, slug_name) }
+        map {|obj| obj.try(:read_attribute, slug_name)}
       
       if existing_slugs.count > 0      
         # sort the existing_slugs in increasing order by comparing the suffix
         # numbers:
         # slug, slug-1, slug-2, ..., slug-n
-        max_counter = existing_slugs.map { |slug| (pattern.match(slug)[1] || 0).to_i }.max
+        existing_slugs.sort! do |a, b|
+          (pattern.match(a)[1] || -1).to_i <=> (pattern.match(b)[1] || -1).to_i
+        end
+        max_counter = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
 
         # Use max_counter + 1 as unique counter
         slug += "-#{max_counter + 1}"
