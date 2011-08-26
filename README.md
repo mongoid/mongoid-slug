@@ -81,5 +81,17 @@ specify the `:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
 
+If the value of `:scope` is not an association, it should be the name of a field within the model itself:
+
+```ruby
+class Employee
+ include Mongoid::Document
+ include Mongoid::Slug
+ field :name
+ field :company_id
+ slug  :name, :scope => :company_id
+end
+```
+
 [1]: https://github.com/rsl/stringex/
 [2]: https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb
