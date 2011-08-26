@@ -236,6 +236,23 @@ module Mongoid
         end
       end
     end
+    
+    context "when slug is scoped by one of the class's own fields" do
+      let!(:magazine) do
+        Magazine.create(:title  => "Big Weekly", :publisher_id => "abc123")
+      end
+
+      it "should scope by local field" do
+        magazine.to_param.should eql 'big-weekly'
+        magazine2 = Magazine.create(:title => "Big Weekly", :publisher_id => "def456")
+        magazine2.to_param.should eql magazine.to_param
+      end
+
+      it "should generate a unique slug by appending a counter to duplicate text" do
+        dup = Magazine.create(:title  => "Big Weekly", :publisher_id => "abc123")
+        dup.to_param.should eql 'big-weekly-1'
+      end
+    end
 
     context "when :slug is given a block" do
       let(:caption) do
