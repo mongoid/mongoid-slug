@@ -123,12 +123,21 @@ module Mongoid #:nodoc:
       # If slug_name field was indexed, MongoDB will utilize that index to
       # match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
-
-      existing_slugs =
-        uniqueness_scope.
-        only(slug_name).
-        where(slug_name => pattern, :_id.ne => _id).
-        map { |obj| obj.try(:read_attribute, slug_name) }
+      
+      if slug_scope && self.class.reflect_on_association(slug_scope).nil?
+        # scope is not an association, so it's scoped to a local field (e.g. an association id in a denormalized db design)
+        existing_slugs =
+          self.class.
+          only(slug_name).
+          where(slug_name => pattern, :_id.ne => _id, slug_scope => self[slug_scope])
+      else
+        existing_slugs =
+          uniqueness_scope.
+          only(slug_name).
+          where(slug_name => pattern, :_id.ne => _id)
+      end
+      
+      existing_slugs = existing_slugs.map { |obj| obj.try(:read_attribute, slug_name) }
 
       if existing_slugs.count > 0      
         # sort the existing_slugs in increasing order by comparing the suffix
