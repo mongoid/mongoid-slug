@@ -123,7 +123,7 @@ module Mongoid #:nodoc:
       # If slug_name field was indexed, MongoDB will utilize that index to
       # match /^.../ pattern
       pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
-      
+
       if slug_scope && self.class.reflect_on_association(slug_scope).nil?
         # scope is not an association, so it's scoped to a local field (e.g.
         # an association id in a denormalized db design)
