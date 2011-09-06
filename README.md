@@ -94,4 +94,4 @@ end
 ```
 
 [1]: https://github.com/rsl/stringex/
-[2]: https://github.com/papercavalier/mongoid-slug/blob/master/lib/mongoid/slug.rb
+[2]: https://github.com/hakanensari/mongoid-slug/blob/master/lib/mongoid/slug.rb
