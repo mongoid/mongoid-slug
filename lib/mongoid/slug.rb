@@ -139,8 +139,8 @@ module Mongoid #:nodoc:
           only(slug_name).
           where(slug_name => pattern, :_id.ne => _id)
       end
-      
-      existing_slugs.map! { |obj| obj.try(:read_attribute, slug_name) }
+
+      existing_slugs = existing_slugs.map { |obj| obj.try(:read_attribute, slug_name) }
 
       if existing_slugs.count > 0      
         # sort the existing_slugs in increasing order by comparing the suffix
