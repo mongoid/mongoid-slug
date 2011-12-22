@@ -386,5 +386,12 @@ module Mongoid
         book.reload.slug.should eql "proust-and-signs"
       end
     end
+    
+    context "when the slugged field is set upon creation" do
+      it "respects the provided slug and does not generate a new one" do
+        book = Book.create(:title => "A Thousand Plateaus", :slug => 'not-what-you-expected')
+        book.to_param.should eql "not-what-you-expected"
+      end
+    end
   end
 end
