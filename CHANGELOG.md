@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.9.0
+* Allow overriding of slug at model creation time. (Brian McManus)
+
 ## 0.8.3
 
 * Bump version of Stringex dependency.
