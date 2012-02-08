@@ -77,7 +77,7 @@ module Mongoid #:nodoc:
             block
           else
             lambda do |doc|
-              slugged_fields.map { |f| doc.read_attribute(f) }.
+              slugged_fields.map { |f| doc.send(f) }.
                              join(' ')
             end
           end
