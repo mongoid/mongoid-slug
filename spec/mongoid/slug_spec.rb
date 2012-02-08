@@ -349,6 +349,13 @@ module Mongoid
       end
     end
 
+    context "when slug defined on alias of field" do
+      it "should use accessor, not alias" do
+        pseudonim  = Alias.create(:author_name => 'Max Stirner')
+        pseudonim.slug.should eql('max-stirner')
+      end
+    end
+
     describe ".find_by_slug" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
 
