@@ -107,6 +107,11 @@ module Mongoid #:nodoc:
               raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
           end
         CODE
+        
+        # Build a scope based on the slug name
+        #
+        # Defaults to `by_slug`
+        scope "by_#{slug_name}".to_sym, ->(slug) { where(slug_name => slug) }
       end
     end
 
