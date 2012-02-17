@@ -21,6 +21,7 @@ module Mongoid #:nodoc:
       cattr_accessor :slug_builder,
                      :slugged_fields,
                      :slug_name,
+                     :slug_history_name,
                      :slug_scope
     end
 
@@ -68,8 +69,11 @@ module Mongoid #:nodoc:
       #
       def slug(*fields, &block)
         options             = fields.extract_options!
+        options[:history] = false if options[:permanent]
+
         self.slug_scope     = options[:scope]
         self.slug_name      = options[:as] || :slug
+        self.slug_history_name = options[:history] ? "#{self.slug_name}_history".to_sym : nil
         self.slugged_fields = fields.map(&:to_s)
 
         self.slug_builder =
@@ -83,9 +87,16 @@ module Mongoid #:nodoc:
           end
 
         field slug_name
+        
+        if slug_history_name
+          field slug_history_name, :type => Array
+        end
 
         if options[:index]
           index(slug_name, :unique => !slug_scope)
+          if slug_history_name
+            index slug_history_name
+          end
         end
 
         if options[:permanent]
@@ -99,11 +110,15 @@ module Mongoid #:nodoc:
         # Defaults to `find_by_slug`.
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
-            where(slug_name => slug).first
+            if slug_history_name
+              any_of({ slug_name => slug }, { slug_history_name => slug })
+            else
+              where(slug_name => slug)
+            end.first
           end
 
           def self.find_by_#{slug_name}!(slug)
-            where(slug_name => slug).first ||
+            self.find_by_#{slug_name}(slug) ||
               raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
           end
         CODE
@@ -111,7 +126,13 @@ module Mongoid #:nodoc:
         # Build a scope based on the slug name
         #
         # Defaults to `by_slug`
-        scope "by_#{slug_name}".to_sym, ->(slug) { where(slug_name => slug) }
+        scope "by_#{slug_name}".to_sym, ->(slug) { 
+          if slug_history_name
+            any_of({ slug_name => slug }, { slug_history_name => slug })
+          else
+            where(slug_name => slug)
+          end
+        }
       end
     end
 
@@ -150,11 +171,53 @@ module Mongoid #:nodoc:
           uniqueness_scope.
           only(slug_name).
           where(slug_name => pattern, :_id.ne => _id)
-      end
+      end    
 
       existing_slugs = existing_slugs.map do |obj|
-        obj.try(:read_attribute, slug_name)
-      end
+        obj.read_attribute(slug_name)
+      end  
+      
+      if slug_history_name
+        if slug_scope &&
+           self.class.reflect_on_association(slug_scope).nil?
+          # scope is not an association, so it's scoped to a local field
+          # (e.g. an association id in a denormalized db design)
+          history_slugged_documents =
+            self.class.
+            only(slug_history_name).
+            where(slug_history_name.all => [pattern],
+                  :_id.ne    => _id,
+                  slug_scope => self[slug_scope])
+        else
+          history_slugged_documents =
+            uniqueness_scope.
+            only(slug_history_name).
+            where(slug_history_name.all => [pattern], 
+                  :_id.ne => _id)
+        end
+
+        existing_history_slugs = []
+        history_slugged_documents.each do |obj|
+          history_slugs = obj.read_attribute(slug_history_name)
+          next if history_slugs.nil?
+          existing_history_slugs.push(*history_slugs.find_all { |slug| slug =~ pattern })
+        end
+        
+        # if the only conflict is in the history of a document in the same scope,
+        # transfer the slug
+        if slug_scope && existing_slugs.count == 0 && existing_history_slugs.count > 0
+          history_slugged_documents.each do |doc|
+            doc_history_slugs = doc.read_attribute(slug_history_name)
+            next if doc_history_slugs.nil?
+            doc_history_slugs -= existing_history_slugs
+            doc.write_attribute(slug_history_name, doc_history_slugs)
+            doc.save
+          end
+          existing_history_slugs = []
+        end
+
+        existing_slugs += existing_history_slugs
+      end   
 
       if existing_slugs.count > 0
         # Sort the existing_slugs in increasing order by comparing the
@@ -183,7 +246,16 @@ module Mongoid #:nodoc:
     end
 
     def generate_slug!
-      write_attribute(slug_name, find_unique_slug)
+      old_slug = read_attribute(slug_name)
+      
+      new_slug = find_unique_slug
+      write_attribute(slug_name, new_slug)
+      
+      if slug_history_name && old_slug != nil && new_slug != old_slug
+        history_slugs = read_attribute(slug_history_name) || []
+        history_slugs << old_slug
+        write_attribute(slug_history_name, history_slugs)
+      end
     end
 
     def slugged_fields_changed?
