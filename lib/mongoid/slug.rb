@@ -175,7 +175,7 @@ module Mongoid #:nodoc:
 
       existing_slugs = existing_slugs.map do |obj|
         obj.read_attribute(slug_name)
-      end  
+      end
       
       if slug_history_name
         if slug_scope &&
@@ -184,14 +184,12 @@ module Mongoid #:nodoc:
           # (e.g. an association id in a denormalized db design)
           history_slugged_documents =
             self.class.
-            only(slug_history_name).
             where(slug_history_name.all => [pattern],
                   :_id.ne    => _id,
                   slug_scope => self[slug_scope])
         else
           history_slugged_documents =
             uniqueness_scope.
-            only(slug_history_name).
             where(slug_history_name.all => [pattern], 
                   :_id.ne => _id)
         end
