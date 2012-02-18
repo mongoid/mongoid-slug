@@ -101,16 +101,16 @@ end
 History
 -------
 
-To specify a document's history should be kept track of, pass `:scope` with a value of `true`.
+To specify a document's history should be kept track of, pass `:history` with a value of `true`.
 
 ```ruby
 class Page
   include Mongoid::Document
   include Mongoid::Slug
   
-  field :name
+  field :title
   
-  slug :name, :history => true
+  slug :title, :history => true
 end
 ```
 
