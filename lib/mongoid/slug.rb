@@ -228,7 +228,7 @@ module Mongoid #:nodoc:
         existing_slugs += existing_history_slugs
       end   
       
-      existing_slugs << slug if slug_reserve.include?(slug)
+      existing_slugs << slug if slug_reserve.any? { |reserved| reserved === slug }
 
       if existing_slugs.count > 0
         # Sort the existing_slugs in increasing order by comparing the

@@ -402,6 +402,10 @@ module Mongoid
         friend2 = Friend.create(:name => "bar")
         friend2.slug.should_not eql("bar")
         friend2.slug.should eql("bar-1")
+
+        friend3 = Friend.create(:name => "en")
+        friend3.slug.should_not eql("en")
+        friend3.slug.should eql("en-1")
       end
 
       it "should start with concatenation -1" do
