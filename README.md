@@ -61,15 +61,18 @@ To scope a slug by a reference association, pass `:scope`:
 ```ruby
 class Company
   include Mongoid::Document
+  
   references_many :employees
 end
 
 class Employee
- include Mongoid::Document
- include Mongoid::Slug
- field :name
- slug  :name, :scope => :company
- referenced_in :company
+  include Mongoid::Document
+  include Mongoid::Slug
+  
+  field :name
+  referenced_in :company
+  
+  slug  :name, :scope => :company
 end
 ```
 
@@ -85,12 +88,42 @@ If the value of `:scope` is not an association, it should be the name of a field
 
 ```ruby
 class Employee
- include Mongoid::Document
- include Mongoid::Slug
- field :name
- field :company_id
- slug  :name, :scope => :company_id
+  include Mongoid::Document
+  include Mongoid::Slug
+  
+  field :name
+  field :company_id
+  
+  slug  :name, :scope => :company_id
 end
+```
+
+History
+-------
+
+To specify a document's history should be kept track of, pass `:history` with a value of `true`.
+
+```ruby
+class Page
+  include Mongoid::Document
+  include Mongoid::Slug
+  
+  field :title
+  
+  slug :title, :history => true
+end
+```
+
+The document will then be returned for any of the saved slugs:
+
+```ruby
+page = Page.new(:title => "Home")
+page.save
+page.title = "Welcome"
+page.save
+
+Page.find_by_slug("welcome") == page  #=> true
+Page.find_by_slug("home") == page     #=> true
 ```
 
 [1]: https://github.com/rsl/stringex/
