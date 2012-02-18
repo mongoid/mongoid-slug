@@ -46,6 +46,12 @@ module Mongoid #:nodoc:
       # 
       # * `:permanent`, which specifies whether the slug should be
       # immutable once created. Defaults to `false`.
+      
+      # * `:history`, which specifies whether a history of used slugs
+      # should be kept. The document will be returned for each of these
+      # slugs, and slugs present in any document's history cannot be used
+      # as a slug for another document. Within a scope, slugs saved
+      # in a document's history can be reused by another document.
       #
       # * `:index`, which specifies whether an index should be defined
       # for the slug. Defaults to `false` and has no effect if the
