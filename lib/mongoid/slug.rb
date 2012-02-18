@@ -22,7 +22,8 @@ module Mongoid #:nodoc:
                      :slugged_fields,
                      :slug_name,
                      :slug_history_name,
-                     :slug_scope
+                     :slug_scope,
+                     :slug_reserve
     end
 
     module ClassMethods
@@ -40,6 +41,9 @@ module Mongoid #:nodoc:
       # the slug by. Embedded documents are by default scoped by their
       # parent.
       #
+      # * `:reserve`, which specifiees an array of reserved slugs.
+      # Defaults to [], the empty array.
+      # 
       # * `:permanent`, which specifies whether the slug should be
       # immutable once created. Defaults to `false`.
       #
@@ -72,10 +76,11 @@ module Mongoid #:nodoc:
         options[:history] = false if options[:permanent]
 
         self.slug_scope     = options[:scope]
+        self.slug_reserve   = options[:reserve] || []
         self.slug_name      = options[:as] || :slug
         self.slug_history_name = options[:history] ? "#{self.slug_name}_history".to_sym : nil
         self.slugged_fields = fields.map(&:to_s)
-
+        
         self.slug_builder =
           if block_given?
             block
@@ -216,6 +221,8 @@ module Mongoid #:nodoc:
 
         existing_slugs += existing_history_slugs
       end   
+      
+      existing_slugs << slug if slug_reserve.include?(slug)
 
       if existing_slugs.count > 0
         # Sort the existing_slugs in increasing order by comparing the
