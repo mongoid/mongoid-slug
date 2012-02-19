@@ -195,6 +195,34 @@ module Mongoid
         person.to_param.should eql "john-doe"
       end
     end
+    
+    context "when :history is passed as an argument" do
+      let(:book) do
+        Book.create(:title => "Book Title")
+      end
+      
+      before(:each) do
+        book.title = "Other Book Title"
+        book.save
+      end
+      
+      it "saves the old slug in the owner's history" do
+        book.slug_history.should include("book-title")
+      end
+      
+      it "returns the document for the old slug" do
+        Book.find_by_slug("book-title").should == book
+      end
+      
+      it "returns the document for the new slug" do
+        Book.find_by_slug("other-book-title").should == book
+      end
+
+      it "generates a unique slug by appending a counter to duplicate text" do
+        dup = Book.create(:title => "Book Title")
+        dup.to_param.should eql 'book-title-1'
+      end
+    end
 
     context "when slug is scoped by a reference association" do
       let(:author) do
@@ -233,6 +261,30 @@ module Mongoid
         it "scopes by parent object provided that inverse_of is specified" do
           dup = author2.characters.create(:name => character.name)
           dup.to_param.should eql character.to_param
+        end
+      end
+      
+      context "when using history and reusing a slug within the scope" do
+        let!(:subject1) do
+          book.subjects.create(:name => "A Subject")
+        end
+        let!(:subject2) do
+          book.subjects.create(:name => "Another Subject")
+        end
+        
+        before(:each) do
+          subject1.name = "Something Else Entirely"
+          subject1.save
+          subject2.name = "A Subject"
+          subject2.save
+        end
+        
+        it "allows using the slug" do
+          subject2.slug.should == "a-subject"
+        end
+        
+        it "removes the slug from the old owner's history" do
+          subject1.slug_history.should_not include("a-subject")
         end
       end
     end
@@ -353,6 +405,18 @@ module Mongoid
       it "should use accessor, not alias" do
         pseudonim  = Alias.create(:author_name => 'Max Stirner')
         pseudonim.slug.should eql('max-stirner')
+      end
+    end
+    
+    describe ".by_slug scope" do
+      let!(:author) { book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze") }
+      
+      it "returns an empty array if no document is found" do
+        book.authors.by_slug("never-heard-of").should == []
+      end
+      
+      it "returns an array containing the document if it is found" do
+        book.authors.by_slug(author.slug).should == [author]
       end
     end
 
