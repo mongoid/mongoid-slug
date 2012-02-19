@@ -132,7 +132,7 @@ module Mongoid #:nodoc:
         # Build a scope based on the slug name
         #
         # Defaults to `by_slug`
-        scope "by_#{slug_name}".to_sym, ->(slug) { 
+        scope "by_#{slug_name}".to_sym, lambda { |slug|
           if slug_history_name
             any_of({ slug_name => slug }, { slug_history_name => slug })
           else
