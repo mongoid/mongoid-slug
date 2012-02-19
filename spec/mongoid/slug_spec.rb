@@ -195,25 +195,25 @@ module Mongoid
         person.to_param.should eql "john-doe"
       end
     end
-    
+
     context "when :history is passed as an argument" do
       let(:book) do
         Book.create(:title => "Book Title")
       end
-      
+
       before(:each) do
         book.title = "Other Book Title"
         book.save
       end
-      
+
       it "saves the old slug in the owner's history" do
         book.slug_history.should include("book-title")
       end
-      
+
       it "returns the document for the old slug" do
         Book.find_by_slug("book-title").should == book
       end
-      
+
       it "returns the document for the new slug" do
         Book.find_by_slug("other-book-title").should == book
       end
@@ -263,7 +263,7 @@ module Mongoid
           dup.to_param.should eql character.to_param
         end
       end
-      
+
       context "when using history and reusing a slug within the scope" do
         let!(:subject1) do
           book.subjects.create(:name => "A Subject")
@@ -271,24 +271,24 @@ module Mongoid
         let!(:subject2) do
           book.subjects.create(:name => "Another Subject")
         end
-        
+
         before(:each) do
           subject1.name = "Something Else Entirely"
           subject1.save
           subject2.name = "A Subject"
           subject2.save
         end
-        
+
         it "allows using the slug" do
           subject2.slug.should == "a-subject"
         end
-        
+
         it "removes the slug from the old owner's history" do
           subject1.slug_history.should_not include("a-subject")
         end
       end
     end
-    
+
     context "when slug is scoped by one of the class's own fields" do
       let!(:magazine) do
         Magazine.create(:title  => "Big Weekly", :publisher_id => "abc123")
@@ -407,14 +407,14 @@ module Mongoid
         pseudonim.slug.should eql('max-stirner')
       end
     end
-    
+
     describe ".by_slug scope" do
       let!(:author) { book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze") }
-      
+
       it "returns an empty array if no document is found" do
         book.authors.by_slug("never-heard-of").should == []
       end
-      
+
       it "returns an array containing the document if it is found" do
         book.authors.by_slug(author.slug).should == [author]
       end
@@ -457,7 +457,7 @@ module Mongoid
         book.reload.slug.should eql "proust-and-signs"
       end
     end
-    
+
     context "when the slugged field is set upon creation" do
       it "respects the provided slug and does not generate a new one" do
         book = Book.create(:title => "A Thousand Plateaus", :slug => 'not-what-you-expected')

@@ -42,7 +42,7 @@ module Mongoid #:nodoc:
       #
       # * `:permanent`, which specifies whether the slug should be
       # immutable once created. Defaults to `false`.
-      
+      #
       # * `:history`, which specifies whether a history of used slugs
       # should be kept. The document will be returned for each of these
       # slugs, and slugs present in any document's history cannot be used
@@ -74,13 +74,13 @@ module Mongoid #:nodoc:
       #      end
       #
       def slug(*fields, &block)
-        options             = fields.extract_options!
+        options           = fields.extract_options!
         options[:history] = false if options[:permanent]
 
-        self.slug_scope     = options[:scope]
-        self.slug_name      = options[:as] || :slug
-        self.slug_history_name = options[:history] ? "#{self.slug_name}_history".to_sym : nil
-        self.slugged_fields = fields.map(&:to_s)
+        self.slug_scope        = options[:scope]
+        self.slug_name         = options[:as] || :slug
+        self.slug_history_name = "#{self.slug_name}_history".to_sym if options[:history]
+        self.slugged_fields    = fields.map(&:to_s)
 
         self.slug_builder =
           if block_given?
@@ -93,7 +93,7 @@ module Mongoid #:nodoc:
           end
 
         field slug_name
-        
+
         if slug_history_name
           field slug_history_name, :type => Array
         end
@@ -128,10 +128,10 @@ module Mongoid #:nodoc:
               raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
           end
         CODE
-        
-        # Build a scope based on the slug name
+
+        # Build a scope based on the slug name.
         #
-        # Defaults to `by_slug`
+        # Defaults to `by_slug`.
         scope "by_#{slug_name}".to_sym, lambda { |slug|
           if slug_history_name
             any_of({ slug_name => slug }, { slug_history_name => slug })
