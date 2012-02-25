@@ -128,3 +128,23 @@ Page.find_by_slug("home") == page     #=> true
 
 [1]: https://github.com/rsl/stringex/
 [2]: https://github.com/hakanensari/mongoid-slug/blob/master/lib/mongoid/slug.rb
+
+Reserved Slugs
+--------------
+
+To reserve slugs so that they will not be used as slugs, pass an array of reserved slugs into `:reserve`:
+
+```ruby
+class Friend
+  include Mongoid::Document
+  field :name
+  slug  :name, :reserve => ['foo', 'bar']
+end
+```
+
+Reserved slugs will instead start with suffix "-1". For the example above,
+
+```ruby
+friend = Friend.create(:name => "foo") # first foo friend
+friend.slug # returns "foo-1" instead of "foo" since "foo" is reserved
+```
