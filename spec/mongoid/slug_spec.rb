@@ -392,6 +392,29 @@ module Mongoid
         Person.collection.index_information.should_not have_key "permalink_1"
       end
     end
+    
+    context "when :reserve is passed" do
+      it "does not use the the reserved slugs" do
+        friend1 = Friend.create(:name => "foo")
+        friend1.slug.should_not eql("foo")
+        friend1.slug.should eql("foo-1")
+
+        friend2 = Friend.create(:name => "bar")
+        friend2.slug.should_not eql("bar")
+        friend2.slug.should eql("bar-1")
+
+        friend3 = Friend.create(:name => "en")
+        friend3.slug.should_not eql("en")
+        friend3.slug.should eql("en-1")
+      end
+
+      it "should start with concatenation -1" do
+        friend1 = Friend.create(:name => "foo")
+        friend1.slug.should eql("foo-1")
+        friend2 = Friend.create(:name => "foo")
+        friend2.slug.should eql("foo-2")
+      end
+    end
 
     context "when the object has STI" do
       it "scopes by the superclass" do
