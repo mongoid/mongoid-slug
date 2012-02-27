@@ -480,6 +480,35 @@ module Mongoid
       end
     end
 
+    describe "::unique_slug_for" do
+      it "returns the unique slug" do
+        Book.unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus")
+      end
+
+      it "returns the unique slug with a counter if necessary" do
+        Book.create(:title => "A Thousand Plateaus")
+        Book.unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus-1")
+      end
+
+      it "returns the unique slug as if it were the provided object" do
+        book = Book.create(:title => "A Thousand Plateaus")
+        Book.unique_slug_for("A Thousand Plateaus", :model => book).should eq("a-thousand-plateaus")
+      end
+    end
+
+    describe "#unique_slug_for" do
+      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
+
+      it "returns the unique slug" do
+        book.unique_slug_for("Anti Oedipus").should eq("anti-oedipus")
+      end
+
+      it "returns the unique slug with a counter if necessary" do
+        Book.create(:title => "Anti Oedipus")
+        book.unique_slug_for("Anti Oedipus").should eq("anti-oedipus-1")
+      end
+    end
+
     context "when the slugged field is set manually" do
       context "when it set to a non-empty string" do
         it "respects the provided slug" do
