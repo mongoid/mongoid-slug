@@ -58,7 +58,7 @@ module Mongoid
 
       it "generates a unique slug by appending a counter to duplicate text" do
         dup = book.subjects.create(:name => subject.name)
-        dup.to_param.should eql 'psychoanalysis-1'
+        dup.to_param.should eql "psychoanalysis-1"
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -147,26 +147,25 @@ module Mongoid
         dup = Author.create(
           :first_name => author.first_name,
           :last_name  => author.last_name)
-        dup.to_param.should eql 'gilles-deleuze-1'
+        dup.to_param.should eql "gilles-deleuze-1"
 
         dup2 = Author.create(
           :first_name => author.first_name,
           :last_name  => author.last_name)
 
         dup.save
-        dup2.to_param.should eql 'gilles-deleuze-2'
+        dup2.to_param.should eql "gilles-deleuze-2"
       end
 
       it "does not update slug if slugged fields have changed but generated slug is identical" do
         author.last_name = "DELEUZE"
         author.save
-        author.to_param.should eql 'gilles-deleuze'
+        author.to_param.should eql "gilles-deleuze"
       end
 
       it "finds by slug" do
         Author.find_by_slug("gilles-deleuze").should eql author
       end
-
     end
 
     context "when :as is passed as an argument" do
@@ -220,7 +219,7 @@ module Mongoid
 
       it "generates a unique slug by appending a counter to duplicate text" do
         dup = Book.create(:title => "Book Title")
-        dup.to_param.should eql 'book-title-1'
+        dup.to_param.should eql "book-title-1"
       end
     end
 
@@ -242,7 +241,7 @@ module Mongoid
         dup = book.authors.create(
           :first_name => author.first_name,
           :last_name  => author.last_name)
-        dup.to_param.should eql 'gilles-deleuze-1'
+        dup.to_param.should eql "gilles-deleuze-1"
       end
 
       context "with an irregular association name" do
@@ -295,38 +294,38 @@ module Mongoid
       end
 
       it "should scope by local field" do
-        magazine.to_param.should eql 'big-weekly'
+        magazine.to_param.should eql "big-weekly"
         magazine2 = Magazine.create(:title => "Big Weekly", :publisher_id => "def456")
         magazine2.to_param.should eql magazine.to_param
       end
 
       it "should generate a unique slug by appending a counter to duplicate text" do
         dup = Magazine.create(:title  => "Big Weekly", :publisher_id => "abc123")
-        dup.to_param.should eql 'big-weekly-1'
+        dup.to_param.should eql "big-weekly-1"
       end
     end
 
-    context "when :slug is given a block" do
+    context "when #slug is given a block" do
       let(:caption) do
-        Caption.create(:identity => 'Edward Hopper (American, 1882-1967)',
-                       :title    => 'Soir Bleu, 1914',
-                       :medium   => 'Oil on Canvas')
+        Caption.create(:identity => "Edward Hopper (American, 1882-1967)",
+                       :title    => "Soir Bleu, 1914",
+                       :medium   => "Oil on Canvas")
       end
 
       it "generates a slug" do
-        caption.to_param.should eql 'edward-hopper-soir-bleu-1914'
+        caption.to_param.should eql "edward-hopper-soir-bleu-1914"
       end
 
       it "updates the slug" do
-        caption.title = 'Road in Maine, 1914'
+        caption.title = "Road in Maine, 1914"
         caption.save
         caption.to_param.should eql "edward-hopper-road-in-maine-1914"
       end
 
       it "does not change slug if slugged fields have changed but generated slug is identical" do
-        caption.identity = 'Edward Hopper'
+        caption.identity = "Edward Hopper"
         caption.save
-        caption.to_param.should eql 'edward-hopper-soir-bleu-1914'
+        caption.to_param.should eql "edward-hopper-soir-bleu-1914"
       end
 
       it "finds by slug" do
@@ -350,13 +349,13 @@ module Mongoid
       it "slugs Chinese characters" do
         book.title = "中文"
         book.save
-        book.to_param.should eql 'zhong-wen'
+        book.to_param.should eql "zhong-wen"
       end
 
       it "slugs non-ASCII Latin characters" do
-        book.title = 'Paul Cézanne'
+        book.title = "Paul Cézanne"
         book.save
-        book.to_param.should eql 'paul-cezanne'
+        book.to_param.should eql "paul-cezanne"
       end
     end
 
@@ -426,8 +425,8 @@ module Mongoid
 
     context "when slug defined on alias of field" do
       it "should use accessor, not alias" do
-        pseudonim  = Alias.create(:author_name => 'Max Stirner')
-        pseudonim.slug.should eql('max-stirner')
+        pseudonim  = Alias.create(:author_name => "Max Stirner")
+        pseudonim.slug.should eql("max-stirner")
       end
     end
 
@@ -481,15 +480,32 @@ module Mongoid
       end
     end
 
-    context "when the slugged field is set upon creation" do
-      it "respects the provided slug and does not generate a new one if it is set to a non-empty string" do
-        book = Book.create(:title => "A Thousand Plateaus", :slug => 'not-what-you-expected')
-        book.to_param.should eql "not-what-you-expected"
+    context "when the slugged field is set manually" do
+      context "when it set to a non-empty string" do
+        it "respects the provided slug" do
+          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book.to_param.should eql "not-what-you-expected"
+        end
+        
+        it "ensures uniqueness" do
+          book1 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book2 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book2.to_param.should eql "not-what-you-expected-1"
+        end
+        
+        it "updates the slug when a new one is passed in" do
+          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book.slug = "not-it-either"
+          book.save
+          book.to_param.should eql "not-it-either"
+        end
       end
 
-      it "generate a new slug if it is set to an empty string" do
-        book = Book.create(:title => "A Thousand Plateaus", :slug => '')
-        book.to_param.should eql "a-thousand-plateaus"
+      context "when it is set to an empty string" do
+        it "generate a new one" do
+          book = Book.create(:title => "A Thousand Plateaus", :slug => "")
+          book.to_param.should eql "a-thousand-plateaus"
+        end
       end
     end
   end

@@ -160,7 +160,14 @@ module Mongoid #:nodoc:
 
     def find_unique_slug
       # TODO: An epic method which calls for refactoring.
-      slug = slug_builder.call(self).to_url
+
+      # Generate a slug only if the slug was not set or changed manually.
+      if (new_record? && read_attribute(slug_name).present?) ||
+         (!new_record? && slug_field_changed?)
+        slug = read_attribute(slug_name)
+      else
+        slug = slug_builder.call(self).to_url
+      end
 
       # Regular expression that matches slug, slug-1, ... slug-n
       # If slug_name field was indexed, MongoDB will utilize that
@@ -187,7 +194,7 @@ module Mongoid #:nodoc:
       existing_slugs = existing_slugs.map do |obj|
         obj.read_attribute(slug_name)
       end
-      
+
       if slug_history_name
         if slug_scope &&
            self.class.reflect_on_association(slug_scope).nil?
@@ -211,8 +218,8 @@ module Mongoid #:nodoc:
           next if history_slugs.nil?
           existing_history_slugs.push(*history_slugs.find_all { |slug| slug =~ pattern })
         end
-        
-        # if the only conflict is in the history of a document in the same scope,
+
+        # If the only conflict is in the history of a document in the same scope,
         # transfer the slug
         if slug_scope && existing_slugs.count == 0 && existing_history_slugs.count > 0
           history_slugged_documents.each do |doc|
@@ -227,7 +234,7 @@ module Mongoid #:nodoc:
 
         existing_slugs += existing_history_slugs
       end   
-      
+
       existing_slugs << slug if slug_reserve.any? { |reserved| reserved === slug }
 
       if existing_slugs.count > 0
@@ -247,11 +254,7 @@ module Mongoid #:nodoc:
     end
 
     def generate_slug
-      # Generate a slug for new records only if the slug was not set.
-      # If we're not a new record generate a slug if our slugged fields
-      # changed on us.
-      if (new_record? && read_attribute(slug_name).blank?) ||
-         (!new_record? && slugged_fields_changed?)
+      if new_record? || slug_field_changed? || slugged_fields_changed?
         generate_slug!
       end
     end
@@ -267,10 +270,6 @@ module Mongoid #:nodoc:
         history_slugs << old_slug
         write_attribute(slug_history_name, history_slugs)
       end
-    end
-
-    def slugged_fields_changed?
-      slugged_fields.any? { |f| attribute_changed?(f) }
     end
 
     def uniqueness_scope
@@ -296,6 +295,14 @@ module Mongoid #:nodoc:
         end
         appropriate_class
       end
+    end
+
+    def slug_field_changed?
+      attribute_changed?(slug_name)
+    end
+
+    def slugged_fields_changed?
+      slugged_fields.any? { |f| attribute_changed?(f) }
     end
   end
 end
