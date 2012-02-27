@@ -482,9 +482,14 @@ module Mongoid
     end
 
     context "when the slugged field is set upon creation" do
-      it "respects the provided slug and does not generate a new one" do
+      it "respects the provided slug and does not generate a new one if it is set to a non-empty string" do
         book = Book.create(:title => "A Thousand Plateaus", :slug => 'not-what-you-expected')
         book.to_param.should eql "not-what-you-expected"
+      end
+
+      it "generate a new slug if it is set to an empty string" do
+        book = Book.create(:title => "A Thousand Plateaus", :slug => '')
+        book.to_param.should eql "a-thousand-plateaus"
       end
     end
   end

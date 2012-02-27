@@ -250,7 +250,7 @@ module Mongoid #:nodoc:
       # Generate a slug for new records only if the slug was not set.
       # If we're not a new record generate a slug if our slugged fields
       # changed on us.
-      if (new_record? && !read_attribute(slug_name)) ||
+      if (new_record? && read_attribute(slug_name).blank?) ||
          (!new_record? && slugged_fields_changed?)
         generate_slug!
       end
