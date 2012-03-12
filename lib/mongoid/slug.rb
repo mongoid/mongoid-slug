@@ -122,9 +122,9 @@ module Mongoid #:nodoc:
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
             if slug_history_name
-              any_of({ slug_name => slug }, { slug_history_name => slug })
+              all_objects.any_of({ slug_name => slug }, { slug_history_name => slug })
             else
-              where(slug_name => slug)
+              all_objects.where(slug_name => slug)
             end.first
           end
 
@@ -139,11 +139,13 @@ module Mongoid #:nodoc:
         # Defaults to `by_slug`.
         scope "by_#{slug_name}".to_sym, lambda { |slug|
           if slug_history_name
-            any_of({ slug_name => slug }, { slug_history_name => slug })
+            all_objects.any_of({ slug_name => slug }, { slug_history_name => slug })
           else
-            where(slug_name => slug)
+            all_objects.where(slug_name => slug)
           end
         }
+
+        scope :all_objects, where(:deleted_at.ne => nil).and(:deleted_at => nil)
       end
     end
 
@@ -173,6 +175,7 @@ module Mongoid #:nodoc:
         # (e.g. an association id in a denormalized db design)
         existing_slugs =
           self.class.
+          all_objects.
           only(slug_name).
           where(slug_name  => pattern,
                 :_id.ne    => _id,
@@ -180,6 +183,7 @@ module Mongoid #:nodoc:
       else
         existing_slugs =
           uniqueness_scope.
+          all_objects.
           only(slug_name).
           where(slug_name => pattern, :_id.ne => _id)
       end    
@@ -195,12 +199,14 @@ module Mongoid #:nodoc:
           # (e.g. an association id in a denormalized db design)
           history_slugged_documents =
             self.class.
+            all_objects.
             where(slug_history_name.all => [pattern],
                   :_id.ne    => _id,
                   slug_scope => self[slug_scope])
         else
           history_slugged_documents =
             uniqueness_scope.
+            all_objects.
             where(slug_history_name.all => [pattern], 
                   :_id.ne => _id)
         end
