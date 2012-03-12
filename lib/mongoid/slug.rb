@@ -122,9 +122,9 @@ module Mongoid #:nodoc:
         instance_eval <<-CODE
           def self.find_by_#{slug_name}(slug)
             if slug_history_name
-              any_of({ slug_name => slug }, { slug_history_name => slug })
+              ignore_paranoia.any_of({ slug_name => slug }, { slug_history_name => slug })
             else
-              where(slug_name => slug)
+              ignore_paranoia.where(slug_name => slug)
             end.first
           end
 
@@ -139,11 +139,15 @@ module Mongoid #:nodoc:
         # Defaults to `by_slug`.
         scope "by_#{slug_name}".to_sym, lambda { |slug|
           if slug_history_name
-            any_of({ slug_name => slug }, { slug_history_name => slug })
+            ignore_paranoia.any_of({ slug_name => slug }, { slug_history_name => slug })
           else
-            where(slug_name => slug)
+            ignore_paranoia.where(slug_name => slug)
           end
         }
+
+        def self.ignore_paranoia
+          all.tap {|criteria| criteria.selector.delete(:deleted_at)}
+        end
       end
     end
 
@@ -173,6 +177,7 @@ module Mongoid #:nodoc:
         # (e.g. an association id in a denormalized db design)
         existing_slugs =
           self.class.
+          ignore_paranoia.
           only(slug_name).
           where(slug_name  => pattern,
                 :_id.ne    => _id,
@@ -180,6 +185,7 @@ module Mongoid #:nodoc:
       else
         existing_slugs =
           uniqueness_scope.
+          ignore_paranoia.
           only(slug_name).
           where(slug_name => pattern, :_id.ne => _id)
       end    
@@ -195,12 +201,14 @@ module Mongoid #:nodoc:
           # (e.g. an association id in a denormalized db design)
           history_slugged_documents =
             self.class.
+            ignore_paranoia.
             where(slug_history_name.all => [pattern],
                   :_id.ne    => _id,
                   slug_scope => self[slug_scope])
         else
           history_slugged_documents =
             uniqueness_scope.
+            ignore_paranoia.
             where(slug_history_name.all => [pattern], 
                   :_id.ne => _id)
         end
