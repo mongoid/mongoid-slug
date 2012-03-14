@@ -221,6 +221,12 @@ module Mongoid
         dup = Book.create(:title => "Book Title")
         dup.to_param.should eql "book-title-1"
       end
+
+      it "ensures no duplicate values are stored in history" do
+        book.update_attributes :title => 'Book Title'
+        book.update_attributes :title => 'Foo'
+        book.slug_history.find_all { |slug| slug == 'book-title' }.size.should eql 1
+      end
     end
 
     context "when slug is scoped by a reference association" do
