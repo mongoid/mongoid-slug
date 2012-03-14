@@ -1,12 +1,13 @@
-require "rubygems"
-require "bundler/setup"
+require 'rubygems'
+require 'bundler/setup'
 
-require "rspec"
+require 'pry'
+require 'rspec'
 
-require File.expand_path("../../lib/mongoid/slug", __FILE__)
+require File.expand_path('../../lib/mongoid/slug', __FILE__)
 
 Mongoid.configure do |config|
-  name = "mongoid_slug_test"
+  name = 'mongoid_slug_test'
   config.master = Mongo::Connection.new.db(name)
 end
 
