@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.10.0
+* Add .find_unique_slug_for and #find_unique_slug_for methods DouweM (Douwe Maan)
+* Ensure uniqueness of slug set manually DouweM (Douwe Maan)
+* Add support for reserved slugs siong1987 (Teng Siong Ong) DouweM (Douwe Maan)
+* Add support for keeping a history of slugs DouweM (Douwe Maan)
+* Add by_slug(slug) scope DouweM (Douwe Maan)
+* Allow set slug on aliased field eagleas (Alexander Oryol)
+
 ## 0.9.0
 * Allow overriding of slug at model creation time. (Brian McManus)
 
