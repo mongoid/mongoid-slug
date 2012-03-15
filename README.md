@@ -1,22 +1,25 @@
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on one or more
-fields in a Mongoid model. It sits idly on top of [stringex] [1] and
-works with non-Latin characters.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a
+Mongoid model. It sits idly on top of [stringex] [1], supporting non-Latin
+characters.
 
-[![travis](https://secure.travis-ci.org/hakanensari/mongoid-slug.png)](http://travis-ci.org/hakanensari/mongoid-slug)
+[![travis] [2]] [3]
 
-Quick Start
------------
+Installation
+------------
 
-Add mongoid_slug to your Gemfile:
+Add to your Gemfile:
 
 ```ruby
 gem 'mongoid_slug'
 ```
 
-Set up some slugs:
+Usage
+-----
+
+Set up a slug:
 
 ```ruby
 class Book
@@ -24,34 +27,18 @@ class Book
   include Mongoid::Slug
 
   field :title
-  embeds_many :authors
-
   slug :title
 end
-
-class Author
-  include Mongoid::Document
-  include Mongoid::Slug
-
-  field :first
-  field :last
-  embedded_in :book, :inverse_of => :authors
-
-  slug :first, :last, :as => :name
-end
 ```
 
-In your controller, use available finders:
+Find a record by its slug:
 
 ```ruby
-# GET /books/a-thousand-plateaus/authors/gilles-deleuze
-author = Book.find_by_slug(params[:book_id]).
-              authors.
-              find_by_name(params[:id])
+# GET /books/a-thousand-plateaus
+book = Book.find_by_slug params[:book_id]
 ```
 
-[Read here] [2]
-for all available options.
+[Read here] [3] for all available options.
 
 Scoping
 -------
@@ -76,15 +63,15 @@ class Employee
 end
 ```
 
-In this example, if you create an employee without associating it with
-any company, the scope will fall back to the root employees collection.
+In this example, if you create an employee without associating it with any
+company, the scope will fall back to the root employees collection.
 
-Currently, if you have an irregular association name, you **must**
-specify the `:inverse_of` option on the other side of the assocation.
+Currently, if you have an irregular association name, you **must** specify the
+`:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
 
-If the value of `:scope` is not an association, it should be the name of a field within the model itself:
+The value of `:scope` can alternatively be a field within the model itself:
 
 ```ruby
 class Employee
@@ -101,7 +88,8 @@ end
 History
 -------
 
-To specify a document's history should be kept track of, pass `:history` with a value of `true`.
+To specify that the history of a document should be kept track of, pass
+`:history` with a value of `true`.
 
 ```ruby
 class Page
@@ -110,41 +98,39 @@ class Page
   
   field :title
   
-  slug :title, :history => true
+  slug :title, history: true
 end
 ```
 
 The document will then be returned for any of the saved slugs:
 
 ```ruby
-page = Page.new(:title => "Home")
+page = Page.new title: "Home"
 page.save
-page.title = "Welcome"
-page.save
+page.update_attributes title: "Welcome"
 
-Page.find_by_slug("welcome") == page  #=> true
-Page.find_by_slug("home") == page     #=> true
+Page.find_by_slug("welcome") == Page.find_by_slug("home") #=> true
 ```
-
-[1]: https://github.com/rsl/stringex/
-[2]: https://github.com/hakanensari/mongoid-slug/blob/master/lib/mongoid/slug.rb
 
 Reserved Slugs
 --------------
 
-To reserve slugs so that they will not be used as slugs, pass an array of reserved slugs into `:reserve`:
+Pass words you do not want to be slugged using the `reserve` option:
 
 ```ruby
 class Friend
   include Mongoid::Document
+
   field :name
-  slug  :name, :reserve => ['foo', 'bar']
+  slug :name, reserve: ['admin', 'root']
 end
+
+friend = Friend.create name: 'admin'
+Friend.find_by_slug('admin') # => nil
+friend.slug # => 'admin-1'
 ```
 
-Reserved slugs will instead start with suffix "-1". For the example above,
-
-```ruby
-friend = Friend.create(:name => "foo") # first foo friend
-friend.slug # returns "foo-1" instead of "foo" since "foo" is reserved
-```
+[1]: https://github.com/rsl/stringex/
+[2]: https://secure.travis-ci.org/hakanensari/mongoid-slug.png
+[3]: http://travis-ci.org/hakanensari/mongoid-slug
+[4]: https://github.com/hakanensari/mongoid-slug/blob/master/lib/mongoid/slug.rb
