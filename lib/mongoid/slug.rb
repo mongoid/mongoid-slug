@@ -1,122 +1,93 @@
 require 'mongoid'
 require 'stringex'
 
-module Mongoid #:nodoc:
-
-  # The slug module helps you generate a URL slug or permalink based on
-  # one or more fields in a Mongoid model.
-  #
-  #    class Person
-  #      include Mongoid::Document
-  #      include Mongoid::Slug
-  #
-  #      field :name
-  #      slug :name
-  #    end
-  #
+module Mongoid
+  # The Slug module helps you generate a URL slug or permalink based on one or 
+  # more fields in a Mongoid model.
   module Slug
     extend ActiveSupport::Concern
 
     included do
       cattr_accessor :slug_builder,
-                     :slugged_fields,
                      :slug_name,
                      :slug_history_name,
                      :slug_scope,
-                     :slug_reserve
+                     :reserved_words_in_slug,
+                     :slugged_attributes
     end
 
     module ClassMethods
-
-      # Sets one ore more fields as source of slug.
+      # @overload slug(*fields)
+      #   Sets one ore more fields as source of slug.
+      #   @param [Array] fields One or more fields the slug should be based on.
+      #   @yield If given, the block is used to build a custom slug.
       #
-      # Takes a list of fields to slug and an optional options hash.
+      # @overload slug(*fields, options) 
+      #   Sets one ore more fields as source of slug.
+      #   @param [Array] fields One or more fields the slug should be based on.
+      #   @param [Hash] options
+      #   @param options [String] :as The name of the field that stores the
+      #   slug. Defaults to `slug`.
+      #   @param options [Boolean] :history Whether a history of changes to
+      #   the slug should be retained. When searched by slug, the document now
+      #   matches both past and present slugs.
+      #   @param options [Boolean] :index Whether an index should be defined
+      #   on the slug field. Defaults to `false` and has no effect if the
+      #   document is embedded.
+      #   Make sure you have a unique index on the slugs of root documents to
+      #   avoid race conditions.
+      #   @param options [Boolean] :permanent Whether the slug should be
+      #   immutable. Defaults to `false`.
+      #   @param options [Array] :reserve` A list of reserved slugs
+      #   @param options :scope [Symbol] a reference association or field to
+      #   scope the slug by. Embedded documents are, by default, scoped by
+      #   their parent.
+      #   @yield If given, a block is used to build a slug.
       #
-      # The options hash respects the following members:
+      # @example A custom builder
+      #   class Person
+      #     include Mongoid::Document
+      #     include Mongoid::Slug
       #
-      # * `:as`, which specifies name of the field that stores the
-      # slug. Defaults to `slug`.
-      #
-      # * `:scope`, which specifies a reference association or field to 
-      # scope the slug by. Embedded documents are by default scoped by 
-      # their parent.
-      #
-      # * `:reserve`, which specifiees an array of reserved slugs.
-      # Defaults to [], the empty array.
-      # 
-      # * `:permanent`, which specifies whether the slug should be
-      # immutable once created. Defaults to `false`.
-      #
-      # * `:history`, which specifies whether a history of used slugs
-      # should be kept. The document will be returned for each of these
-      # slugs, and slugs present in any document's history cannot be used
-      # as a slug for another document. Within a scope, slugs saved
-      # in a document's history can be reused by another document.
-      #
-      # * `:index`, which specifies whether an index should be defined
-      # for the slug. Defaults to `false` and has no effect if the
-      # document is embedded. Make sure you have a unique index on the
-      # slug of root documents to avoid the (very unlikely) race
-      # condition that would ensue if two documents with identical
-      # slugs were to be saved simultaneously.
-      #
-      # Alternatively, this method can be given a block to build a
-      # custom slug out of the specified fields.
-      #
-      # The block takes a single argument, the document itself, and
-      # should return a string that will serve as the base of the slug.
-      #
-      # Here, for instance, we slug an array field.
-      #
-      #     class Person
-      #      include Mongoid::Document
-      #      include Mongoid::Slug
-      #
-      #      field :names, :type => Array
-      #      slug :names do |doc|
-      #        doc.names.join(' ')
-      #      end
+      #     field :names, :type => Array
+      #     slug :names do |doc|
+      #       doc.names.join(' ')
+      #     end
+      #   end
       #
       def slug(*fields, &block)
-        options           = fields.extract_options!
+        options = fields.extract_options!
         options[:history] = false if options[:permanent]
 
-        self.slug_scope         = options[:scope]
-        self.slug_reserve       = options[:reserve] || []
-        self.slug_name          = options[:as] || :slug
-        self.slug_history_name  = "#{self.slug_name}_history".to_sym if options[:history]
-        self.slugged_fields     = fields.map(&:to_s)
+        self.slug_scope             = options[:scope]
+        self.reserved_words_in_slug = options[:reserve] || []
+        self.slug_name              = options[:as] || :slug
+        self.slugged_attributes     = fields.map(&:to_s)
+        if options[:history] && !options[:permanent]
+          self.slug_history_name    = "#{self.slug_name}_history".to_sym
+        end
 
-        self.slug_builder =
-          if block_given?
-            block
-          else
-            lambda do |doc|
-              slugged_fields.map { |f| doc.send(f) }.
-                             join(' ')
-            end
-          end
+        default_builder = lambda do |doc|
+          slugged_attributes.map { |f| doc.send f }.join ' '
+        end
+        self.slug_builder = block_given? ? block : default_builder
 
         field slug_name
 
         if slug_history_name
-          field slug_history_name, :type => Array
+          field slug_history_name, :type => Array, :default => []
         end
 
         if options[:index]
-          index(slug_name, :unique => !slug_scope)
-          if slug_history_name
-            index slug_history_name
-          end
+          index slug_name, :unique => !slug_scope
+          index slug_history_name if slug_history_name
         end
 
-        if options[:permanent]
-          before_create :generate_slug
-        else
-          before_save :generate_slug
+        set_callback options[:permanent] ? :create : :save, :before do |doc|
+          doc.build_slug if doc.slug_should_be_rebuilt?
         end
 
-        # Build a finder based on the slug name.
+        # Build a finder for slug.
         #
         # Defaults to `find_by_slug`.
         instance_eval <<-CODE
@@ -130,7 +101,7 @@ module Mongoid #:nodoc:
 
           def self.find_by_#{slug_name}!(slug)
             self.find_by_#{slug_name}(slug) ||
-              raise(Mongoid::Errors::DocumentNotFound.new(self, slug))
+              raise(Mongoid::Errors::DocumentNotFound.new self, slug)
           end
         CODE
 
@@ -146,19 +117,21 @@ module Mongoid #:nodoc:
         }
       end
       
-      # Returns the unique slug that would be used, were this string to be
-      # used to generate the slug.
-      # 
-      # Takes a string and an optional hash of options
-      # 
-      # The options hash respects the following members:
-      # 
-      # * `:scope`, which specifies the scope that should be used to generate
-      # the slug, if the class creates scoped slugs. Defaults to `nil`.
-      # * `:model`, which specifies the model that the slug should be 
-      # generated for. This option overrides `:scope` as the scope can now 
+      # Finds a unique slug, were specified string used to generate a slug.
+      #
+      # Returned slug will the same as the specified string when there are no
+      # duplicates.
+      #
+      # @param [String] desired_slug
+      # @param [Hash] options
+      # @param options [Symbol] :scope The scope that should be used to
+      # generate the slug, if the class creates scoped slugs. Defaults to
+      # `nil`.
+      # @param options [Constant] :model The model that the slug should be 
+      # generated for. This option overrides `:scope`, as the scope can now 
       # be extracted from the model. Defaults to `nil`.
-      def unique_slug_for(slug_to_be, options = {})
+      # @return [String] A unique slug
+      def find_unique_slug_for(desired_slug, options = {})
         if slug_scope && self.reflect_on_association(slug_scope).nil?
           scope_object    = uniqueness_scope(options[:model])
           scope_attribute = options[:scope] || options[:model].try(:read_attribute, slug_scope)
@@ -169,7 +142,7 @@ module Mongoid #:nodoc:
         
         excluded_id = options[:model]._id if options[:model]
         
-        slug = slug_to_be.to_url
+        slug = desired_slug.to_url
         
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
@@ -182,9 +155,9 @@ module Mongoid #:nodoc:
           # (e.g. an association id in a denormalized db design)
 
           where_hash = {}
-          where_hash[slug_name]   = pattern
-          where_hash[:_id.ne]     = excluded_id if excluded_id
-          where_hash[slug_scope]  = scope_attribute
+          where_hash[slug_name]  = pattern
+          where_hash[:_id.ne]    = excluded_id if excluded_id
+          where_hash[slug_scope] = scope_attribute
 
           existing_slugs =
             deepest_document_superclass.
@@ -192,8 +165,8 @@ module Mongoid #:nodoc:
             where(where_hash)
         else
           where_hash = {}
-          where_hash[slug_name]   = pattern
-          where_hash[:_id.ne]     = excluded_id if excluded_id
+          where_hash[slug_name] = pattern
+          where_hash[:_id.ne]   = excluded_id if excluded_id
 
           existing_slugs =
             scope_object.
@@ -202,7 +175,7 @@ module Mongoid #:nodoc:
         end    
 
         existing_slugs = existing_slugs.map do |doc|
-          doc.read_attribute(slug_name)
+          doc.slug
         end
 
         if slug_history_name
@@ -252,7 +225,9 @@ module Mongoid #:nodoc:
           existing_slugs += existing_history_slugs
         end   
 
-        existing_slugs << slug if slug_reserve.any? { |reserved| reserved === slug }
+        if reserved_words_in_slug.any? { |word| word === slug }
+          existing_slugs << slug
+        end
 
         if existing_slugs.count > 0
           # Sort the existing_slugs in increasing order by comparing the
@@ -303,62 +278,76 @@ module Mongoid #:nodoc:
       end
     end
 
-    # Returns the slug.
-    def to_param
-      read_attribute(slug_name) || begin
-        generate_slug!
-        save
-        read_attribute(slug_name)
+    # Builds a new slug.
+    #
+    # @return [true]
+    def build_slug
+      old = slug
+      write_attribute slug_name, find_unique_slug
+      
+      # @note I find it odd that we can't use `slug_was`, `slug_changed?`, or
+      # `read_attribute (slug_history_name)` here.
+
+      if slug_history_name && old && old != slug
+        self.send(slug_history_name).<<(old).uniq!
       end
-    end
-    
-    # Returns the unique slug that would be used, were this string to be
-    # used to generate the slug.
-    def unique_slug_for(slug_to_be)
-      self.class.unique_slug_for(slug_to_be, :model => self)
+
+      true
     end
 
+    # Finds a unique slug, were specified string used to generate a slug.
+    #
+    # Returned slug will the same as the specified string when there are no
+    # duplicates.
+    #
+    # @param [String] Desired slug
+    # @return [String] A unique slug
+    def find_unique_slug_for(desired_slug)
+      self.class.find_unique_slug_for desired_slug, :model => self
+    end
+
+    # @return [Boolean] Whether the slug requires to be rebuilt
+    def slug_should_be_rebuilt?
+      new_record? or slug_changed? or slugged_attributes_changed?
+    end
+
+    unless self.respond_to? :slug
+      def slug
+        read_attribute slug_name
+      end
+
+      def slug_changed?
+        attribute_changed? slug_name
+      end
+
+      def slug_was
+        attribute_was slug_name
+      end
+    end
+
+    def slugged_attributes_changed?
+      slugged_attributes.any? { |f| attribute_changed? f }
+    end
+
+    # @return [String] A string which Action Pack uses for constructing an URL
+    # to this record.
+    def to_param
+      unless slug
+        build_slug
+        save
+      end
+
+      slug
+    end
+    
     private
 
     def find_unique_slug
-      # TODO: An epic method which calls for refactoring.
-
-      # Generate a slug only if the slug was not set or changed manually.
-      if (new_record? && read_attribute(slug_name).present?) ||
-         (!new_record? && slug_field_changed?)
-        slug_to_be = read_attribute(slug_name)
-      else
-        slug_to_be = slug_builder.call(self)
-      end
-
-      unique_slug_for(slug_to_be)
+      find_unique_slug_for user_defined_slug || slug_builder.call(self)
     end
 
-    def generate_slug
-      if new_record? || slug_field_changed? || slugged_fields_changed?
-        generate_slug!
-      end
-    end
-
-    def generate_slug!
-      old_slug = read_attribute(slug_name)
-      
-      new_slug = find_unique_slug
-      write_attribute(slug_name, new_slug)
-      
-      if slug_history_name && old_slug != nil && new_slug != old_slug
-        history_slugs = read_attribute(slug_history_name) || []
-        history_slugs << old_slug
-        write_attribute(slug_history_name, history_slugs)
-      end
-    end
-
-    def slug_field_changed?
-      attribute_changed?(slug_name)
-    end
-
-    def slugged_fields_changed?
-      slugged_fields.any? { |f| attribute_changed?(f) }
+    def user_defined_slug
+      slug if new_record? and slug.present? or slug_changed?
     end
   end
 end
