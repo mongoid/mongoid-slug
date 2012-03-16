@@ -79,7 +79,11 @@ module Mongoid
         end
 
         if options[:index]
-          index slug_name, :unique => !slug_scope
+          if slug_scope
+            index [[slug_name, Mongo::ASCENDING], [slug_scope, Mongo::ASCENDING]], :unique => true
+          else
+            index slug_name, :unique => true
+          end
           index slug_history_name if slug_history_name
         end
 
