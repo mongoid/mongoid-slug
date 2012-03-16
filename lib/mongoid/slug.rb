@@ -162,21 +162,33 @@ module Mongoid
           where_hash[slug_name]  = pattern
           where_hash[:_id.ne]    = excluded_id if excluded_id
           where_hash[slug_scope] = scope_attribute
-
-          existing_slugs =
-            deepest_document_superclass.
-            only(slug_name).
-            where(where_hash)
+          
+          root_class = deepest_document_superclass
         else
           where_hash = {}
           where_hash[slug_name] = pattern
           where_hash[:_id.ne]   = excluded_id if excluded_id
 
-          existing_slugs =
-            scope_object.
-            only(slug_name).
-            where(where_hash)
-        end    
+          root_class = scope_object
+        end 
+        
+        if options[:model]
+          # If we were provided a model we can bail early if the model's slug
+          # is the same as the desired slug.
+          # We can't simply check if options[:model].slug == desired_slug
+          # because that would always be true when you do something like:
+          # Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          # even if there is already another book with "not-what-you-expected".
+          model_with_slug = root_class.where(slug_name => desired_slug).first
+          if model_with_slug && model_with_slug._id == excluded_id
+            return desired_slug
+          end
+        end
+        
+        existing_slugs =
+          root_class.
+          only(slug_name).
+          where(where_hash)
 
         existing_slugs = existing_slugs.map do |doc|
           doc.slug
