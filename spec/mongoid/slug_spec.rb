@@ -491,7 +491,7 @@ module Mongoid
       end
     end
 
-    describe ".for_unique_slug_for" do
+    describe ".find_unique_slug_for" do
       it "returns the unique slug" do
         Book.find_unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus")
       end
@@ -504,6 +504,13 @@ module Mongoid
       it "returns the unique slug as if it were the provided object" do
         book = Book.create(:title => "A Thousand Plateaus")
         Book.find_unique_slug_for("A Thousand Plateaus", :model => book).should eq("a-thousand-plateaus")
+      end
+      
+      it "returns the unique slug as if it where the provided object even if there are other similar slugs" do
+        book = Book.create(:title => "A Thousand Plateaus")
+        Book.create(:title => "A Thousand Plateaus") # This generates a slug of 'a-thousand-plateaus-2' correctly.
+        # This should still give us back 'a-thousand-plateaus'
+        Book.find_unique_slug_for(book.slug, :model => book).should eq("a-thousand-plateaus")
       end
     end
 
