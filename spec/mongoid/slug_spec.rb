@@ -371,22 +371,27 @@ module Mongoid
         Author.collection.drop_indexes
       end
 
-      it "defines an index on the slug in top-level objects" do
-        Book.create_indexes
-        Book.collection.index_information.should have_key "slug_1"
-      end
-
-      context "when slug is scoped by a reference association" do
-        it "defines a non-unique index" do
-          Author.create_indexes
-          Author.index_information["slug_1"]["unique"].should be_false
-        end
-      end
-
       context "when slug is not scoped by a reference association" do
+        it "defines an index on the slug" do
+          Book.create_indexes
+          Book.collection.index_information.should have_key "slug_1"
+        end
+
         it "defines a unique index" do
           Book.create_indexes
           Book.index_information["slug_1"]["unique"].should be_true
+        end
+      end
+
+      context "when slug is scoped by a reference association" do
+        it "defines an index on the slug and the scope" do
+          Author.create_indexes
+          Author.collection.index_information.should have_key "slug_1_book_1"
+        end
+
+        it "defines a unique index" do
+          Author.create_indexes
+          Author.index_information["slug_1_book_1"]["unique"].should be_true
         end
       end
     end
