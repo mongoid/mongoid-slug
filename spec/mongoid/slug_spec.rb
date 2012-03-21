@@ -585,15 +585,87 @@ module Mongoid
 
     describe ".find" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
+      let!(:book2) { Book.create(:title => "Difference and Repetition") }
+      let!(:friend) { Friend.create(:name => "Jim Bob") }
+      let!(:friend2) { Friend.create(:name => "Billy Bob") }
 
-      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
-        lambda {
-          Book.find(:title => "Anti Oedipus")
-        }.should raise_error(Mongoid::Errors::DocumentNotFound)
+      context "using slugs" do
+
+        it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
+          lambda {
+            Book.find(:title => "Anti Oedipus")
+          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+
+        it "raises a Mongoid::Errors::DocumentNotFound error if trying to find a slug that looks like an id" do
+          tricksy = "4f69cd6dfe75bd0cce000003"
+          friend.name = tricksy
+          friend.save!
+          lambda {
+            Friend.find(tricksy)
+          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+
+        context "given a single document" do
+          it "returns the document without using history" do
+            Friend.find(friend.slug).should == friend
+          end
+
+          it "returns the document by it's history" do
+            book.title = "new title"
+            book.save!
+            Book.find("a-thousand-plateaus").should == book
+          end
+
+          it "returns the document by it's present slug even with history" do
+            book.title = "new title"
+            book.save!
+            Book.find(book.slug).should == book
+          end
+        end
+
+        context "given multiple docuemnts" do
+          it "returns the documents without using history" do
+            Friend.find([friend.slug, friend2.slug]).should == [friend, friend2]
+          end
+          it "returns the docuemnts by their histories" do
+            book.title = "new title"
+            book.save!
+            book2.title = "other title"
+            book2.save!
+            Book.find(["a-thousand-plateaus", "difference-and-repetition"]).should == [book, book2]
+          end
+          it "returns the documents when one is using a history and the other isn't" do
+            book.title = "new title"
+            book.save!
+            book2.title = "other title"
+            book2.save!
+            Book.find([book.slug, "difference-and-repetition"]).should == [book, book2]
+          end
+          it "returns the documents by their present slugs when using histories" do
+            Book.find([book.slug, book2.slug]).should == [book, book2]
+          end
+        end
       end
+      context "using ids" do
 
-      it "returns the document when it is found" do
-        Book.find(book.slug).should == book
+        it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
+          lambda {
+            Book.find(friend.id)
+          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+
+        context "given a single document" do
+          it "returns the document" do
+            Friend.find(friend.id).should == friend
+          end
+        end
+
+        context "given multiple docuemnts" do
+          it "returns the documents" do
+            Book.find([book.id, book2.id]).should == [book, book2]
+          end
+        end
       end
     end
 

@@ -4,6 +4,8 @@ module Mongoid::Criterion::Optional
   def for_ids(*ids)
     ids.flatten!
     begin
+      # note that there is a small possibility that a client could create a slug that
+      # resembles a BSON::ObjectId
       BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(BSON::ObjectId)
       # id
       if ids.size > 1
@@ -15,9 +17,12 @@ module Mongoid::Criterion::Optional
       # slug
       if ids.size > 1
         if @klass.slug_history_name
-          any_in({ @klass.slug_name => ids }, { @klass.slug_history_name => ids })
+          puts "slug history"
+#          any_of({ @klass.slug_name => ids }, { @klass.slug_history_name => ids })
+#          any_in(@klass.slug_name => ids).also_in(@klass.slug_history_name => ids)
+#          any_in(@klass.slug_name => ids).any_in(@klass.slug_history_name => ids)
         else
-          any_of({ @klass.slug_name => ids }, { @klass.slug_history_name => ids })
+          where(@klass.slug_name.to_sym.in => ids)
         end
       else
         if @klass.slug_history_name
@@ -29,5 +34,3 @@ module Mongoid::Criterion::Optional
     end
   end
 end
-
-puts "LOADED"
