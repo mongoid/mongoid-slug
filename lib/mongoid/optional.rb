@@ -1,6 +1,5 @@
 module Mongoid::Criterion::Optional
   # Override Mongoid's finder to use slug or id
-  alias :for_ids! :for_ids
   def for_ids(*ids)
     ids.flatten!
     begin
