@@ -474,6 +474,23 @@ module Mongoid
       end
     end
 
+    describe "#slug_changed?" do
+      before do
+        Book.create(:title => "A Thousand Plateaus")
+      end
+
+      let(:book) { Book.first }
+
+      it "is initially unchanged" do
+        book.slug_changed?.should be_false
+      end
+
+      it "tracks changes" do
+        book.slug = "Anti Oedipus"
+        book.slug_changed?.should be_true
+      end
+    end
+
     context "when #to_param is called on an existing record with no slug" do
       before do
         Book.collection.insert(:title => "Proust and Signs")
