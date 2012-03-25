@@ -1,4 +1,4 @@
- module Mongoid::Criterion::Optional
+module Mongoid::Criterion::ForSlug
   # Override Mongoid's finder to use slug or id
   def for_ids(*ids)
     ids.flatten!
@@ -6,11 +6,7 @@
     # resembles a BSON::ObjectId
     BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(BSON::ObjectId)
     # id
-    if ids.size > 1
-      any_in(:_id => ids)
-    else
-      where(:_id => ids.first)
-    end
+    super(*ids) # Fallback to original Mongoid::Criterion::Optional
   rescue BSON::InvalidObjectId
     # slug
     if ids.size > 1
@@ -28,3 +24,4 @@
     end
   end
 end
+Mongoid::Criteria.send :include, Mongoid::Criterion::ForSlug
