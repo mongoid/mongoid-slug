@@ -1,4 +1,4 @@
-module Mongoid::Criterion::ForSlug
+module Mongoid::Slug::Criterion
   # Override Mongoid's finder to use slug or id
   def for_ids(*ids)
     ids.flatten!
@@ -24,4 +24,4 @@ module Mongoid::Criterion::ForSlug
     end
   end
 end
-Mongoid::Criteria.send :include, Mongoid::Criterion::ForSlug
+Mongoid::Criteria.send :include, Mongoid::Slug::Criterion
