@@ -6,7 +6,7 @@ module Mongoid::Criterion::ForSlug
     # resembles a BSON::ObjectId
     BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(BSON::ObjectId)
     # id
-    super(*ids) # Fallback to original Mongoid::Criterion::Optional
+    super # Fallback to original Mongoid::Criterion::Optional
   rescue BSON::InvalidObjectId
     # slug
     if ids.size > 1
