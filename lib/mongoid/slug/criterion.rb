@@ -1,11 +1,10 @@
 module Mongoid::Slug::Criterion
   # Override Mongoid's finder to use slug or id
   def for_ids(*ids)
-    ids.flatten!
     # note that there is a small possibility that a client could create a slug that
     # resembles a BSON::ObjectId
-    BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(BSON::ObjectId)
-    # id
+    id = ids.flatten.first
+    BSON::ObjectId.from_string(id) unless id.is_a?(BSON::ObjectId)
     super # Fallback to original Mongoid::Criterion::Optional
   rescue BSON::InvalidObjectId
     # slug
