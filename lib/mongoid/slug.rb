@@ -1,8 +1,5 @@
-require 'mongoid'
-require 'stringex'
-
 module Mongoid
-  # The Slug module helps you generate a URL slug or permalink based on one or 
+  # The Slug module helps you generate a URL slug or permalink based on one or
   # more fields in a Mongoid model.
   module Slug
     extend ActiveSupport::Concern
@@ -22,7 +19,7 @@ module Mongoid
       #   @param [Array] fields One or more fields the slug should be based on.
       #   @yield If given, the block is used to build a custom slug.
       #
-      # @overload slug(*fields, options) 
+      # @overload slug(*fields, options)
       #   Sets one ore more fields as source of slug.
       #   @param [Array] fields One or more fields the slug should be based on.
       #   @param [Hash] options
@@ -120,7 +117,7 @@ module Mongoid
           end
         }
       end
-      
+
       # Finds a unique slug, were specified string used to generate a slug.
       #
       # Returned slug will the same as the specified string when there are no
@@ -131,8 +128,8 @@ module Mongoid
       # @param options [Symbol] :scope The scope that should be used to
       # generate the slug, if the class creates scoped slugs. Defaults to
       # `nil`.
-      # @param options [Constant] :model The model that the slug should be 
-      # generated for. This option overrides `:scope`, as the scope can now 
+      # @param options [Constant] :model The model that the slug should be
+      # generated for. This option overrides `:scope`, as the scope can now
       # be extracted from the model. Defaults to `nil`.
       # @return [String] A unique slug
       def find_unique_slug_for(desired_slug, options = {})
@@ -143,11 +140,11 @@ module Mongoid
           scope_object = options[:scope] || uniqueness_scope(options[:model])
           scope_attribute = nil
         end
-        
+
         excluded_id = options[:model]._id if options[:model]
-        
+
         slug = desired_slug.to_url
-        
+
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
         # index to match /^.../ pattern.
@@ -176,7 +173,7 @@ module Mongoid
             scope_object.
             only(slug_name).
             where(where_hash)
-        end    
+        end
 
         existing_slugs = existing_slugs.map do |doc|
           doc.slug
@@ -227,7 +224,7 @@ module Mongoid
           end
 
           existing_slugs += existing_history_slugs
-        end   
+        end
 
         if reserved_words_in_slug.any? { |word| word === slug }
           existing_slugs << slug
@@ -248,10 +245,10 @@ module Mongoid
 
         slug
       end
-      
+
       private
-      
-      def uniqueness_scope(model = nil)  
+
+      def uniqueness_scope(model = nil)
         if model
           if slug_scope && (metadata = self.reflect_on_association(slug_scope))
             parent = model.send(metadata.name)
@@ -272,7 +269,7 @@ module Mongoid
         end
         deepest_document_superclass
       end
-      
+
       def deepest_document_superclass
         appropriate_class = self
         while appropriate_class.superclass.include?(Mongoid::Document)
@@ -288,7 +285,7 @@ module Mongoid
     def build_slug
       old = slug
       write_attribute slug_name, find_unique_slug
-      
+
       # @note I find it odd that we can't use `slug_was`, `slug_changed?`, or
       # `read_attribute (slug_history_name)` here.
 
@@ -343,7 +340,7 @@ module Mongoid
 
       slug
     end
-    
+
     private
 
     def find_unique_slug

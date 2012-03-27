@@ -4,7 +4,7 @@ require 'bundler/setup'
 require 'pry'
 require 'rspec'
 
-require File.expand_path('../../lib/mongoid/slug', __FILE__)
+require File.expand_path('../../lib/mongoid_slug', __FILE__)
 
 Mongoid.configure do |config|
   name = 'mongoid_slug_test'
