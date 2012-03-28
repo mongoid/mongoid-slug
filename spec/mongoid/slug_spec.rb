@@ -681,7 +681,7 @@ module Mongoid
       end
     end
 
-    describe ".for_unique_slug_for" do
+    describe ".find_unique_slug_for" do
       it "returns the unique slug" do
         Book.find_unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus")
       end
