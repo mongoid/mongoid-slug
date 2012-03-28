@@ -130,6 +130,29 @@ Friend.find_by_slug('admin') # => nil
 friend.slug # => 'admin-1'
 ```
 
+Control When Slugs Are Generated
+--------------------------------
+
+To control when a slug is generated, override the `generate_slug?` method in your model.
+
+For example, to generate slugs only for active projects:
+
+```ruby
+class Project
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :name,    :type => String
+  field :active,  :type => Boolean, :default => false
+
+  slug :name
+
+  def generate_slug?
+    active?
+  end
+end
+```
+
 [1]: https://github.com/rsl/stringex/
 [2]: https://secure.travis-ci.org/hakanensari/mongoid-slug.png
 [3]: http://travis-ci.org/hakanensari/mongoid-slug
