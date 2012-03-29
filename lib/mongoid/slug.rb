@@ -72,16 +72,8 @@ module Mongoid
         field slug_name
 
         unless slug_name == :slug
-          define_method :slug do
-            read_attribute slug_name.to_s
-          end
-
-          define_method :slug_changed? do
-            attribute_changed? slug_name.to_s
-          end
-
-          define_method :slug_was do
-            attribute_was slug_name.to_s
+          ['', '_was', '_changed?'].each do |suffix|
+            alias_method 'slug' + suffix, slug_name.to_s + suffix
           end
         end
 
