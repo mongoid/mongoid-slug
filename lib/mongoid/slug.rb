@@ -71,6 +71,20 @@ module Mongoid
 
         field slug_name
 
+        unless slug_name == :slug
+          define_method :slug do
+            read_attribute slug_name.to_s
+          end
+
+          define_method :slug_changed? do
+            attribute_changed? slug_name.to_s
+          end
+
+          define_method :slug_was do
+            attribute_was slug_name.to_s
+          end
+        end
+
         if slug_history_name
           field slug_history_name, :type => Array, :default => []
         end
@@ -283,14 +297,11 @@ module Mongoid
     #
     # @return [true]
     def build_slug
-      old = slug
       write_attribute slug_name, find_unique_slug
 
-      # @note I find it odd that we can't use `slug_was`, `slug_changed?`, or
-      # `read_attribute (slug_history_name)` here.
-
-      if slug_history_name && old && old != slug
-        self.send(slug_history_name).<<(old).uniq!
+      # @note Why can't I use `read_attribute (slug_history_name)` here?
+      if slug_history_name && slug_was && slug_changed?
+        self.send(slug_history_name).<<(slug_was).uniq!
       end
 
       true
@@ -312,22 +323,8 @@ module Mongoid
       new_record? or slug_changed? or slugged_attributes_changed?
     end
 
-    unless self.respond_to? :slug
-      def slug
-        read_attribute slug_name
-      end
-
-      def slug_changed?
-        attribute_changed? slug_name.to_s
-      end
-
-      def slug_was
-        attribute_was slug_name
-      end
-    end
-
     def slugged_attributes_changed?
-      slugged_attributes.any? { |f| attribute_changed? f }
+      slugged_attributes.any? { |f| attribute_changed? f.to_s }
     end
 
     # @return [String] A string which Action Pack uses for constructing an URL

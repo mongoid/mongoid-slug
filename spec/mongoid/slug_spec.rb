@@ -268,6 +268,18 @@ module Mongoid
       it "finds by slug" do
         Person.find_by_permalink("john-doe").should eql person
       end
+
+      it 'defines #slug' do
+        person.should respond_to :slug
+      end
+
+      it 'defines #slug_changed?' do
+        person.should respond_to :slug_changed?
+      end
+
+      it 'defines #slug_was' do
+        person.should respond_to :slug_was
+      end
     end
 
     context "when :permanent is passed as an argument" do
