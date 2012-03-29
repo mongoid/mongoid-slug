@@ -669,15 +669,34 @@ module Mongoid
       end
     end
 
-    context "when #to_param is called on an existing record with no slug" do
+    describe "#to_param" do
+      context "when called on an existing record with no slug" do
+        before do
+          Book.collection.insert(:title => "Proust and Signs")
+        end
+
+        it "generates the missing slug" do
+          book = Book.first
+          book.to_param
+          book.reload.slug.should eql "proust-and-signs"
+        end
+      end
+    end
+
+    describe "#slug_changed?" do
       before do
-        Book.collection.insert(:title => "Proust and Signs")
+        Book.create(:title => "A Thousand Plateaus")
       end
 
-      it "generates the missing slug" do
-        book = Book.first
-        book.to_param
-        book.reload.slug.should eql "proust-and-signs"
+      let(:book) { Book.first }
+
+      it "is initially unchanged" do
+        book.slug_changed?.should be_false
+      end
+
+      it "tracks changes" do
+        book.slug = "Anti Oedipus"
+        book.slug_changed?.should be_true
       end
     end
 

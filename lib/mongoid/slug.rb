@@ -318,7 +318,7 @@ module Mongoid
       end
 
       def slug_changed?
-        attribute_changed? slug_name
+        attribute_changed? slug_name.to_s
       end
 
       def slug_was
@@ -348,7 +348,7 @@ module Mongoid
     end
 
     def user_defined_slug
-      slug if new_record? and slug.present? or slug_changed?
+      slug if (new_record? and slug.present?) or (persisted? and slug_changed?)
     end
   end
 end
