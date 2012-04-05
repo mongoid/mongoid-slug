@@ -232,6 +232,8 @@ module Mongoid
           existing_slugs += existing_history_slugs
         end
 
+        # IF OBJECTID, ADD TO EXISTING SLUGS
+
         if reserved_words_in_slug.any? { |word| word === slug }
           existing_slugs << slug
         end

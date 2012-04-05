@@ -25,6 +25,11 @@ module Mongoid
         }
       end
 
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = Book.create(:title => "4ea0389f0364313d79104fb3")
+        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
+      end
+
       it "does not update slug if slugged fields have not changed" do
         book.save
         book.to_param.should eql "a-thousand-plateaus"
@@ -85,6 +90,11 @@ module Mongoid
       it "generates a unique slug by appending a counter to duplicate text" do
         dup = book.subjects.create(:name => subject.name)
         dup.to_param.should eql "psychoanalysis-1"
+      end
+
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = book.subjects.create(:name => "4ea0389f0364313d79104fb3")
+        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -155,6 +165,11 @@ module Mongoid
       it "generates a unique slug by appending a counter to duplicate text" do
         dup = relationship.partners.create(:name => partner.name)
         dup.to_param.should eql "jane-smith-1"
+      end
+
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = relationship.partners.create(:name => "4ea0389f0364313d79104fb3")
+        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -236,6 +251,13 @@ module Mongoid
         dup.save
         dup2.to_param.should eql "gilles-deleuze-2"
       end
+
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = Author.create(:first_name => "4ea0389f0364",
+                            :last_name => "313d79104fb3")
+        bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
+      end
+
 
       it "does not update slug if slugged fields have changed but generated slug is identical" do
         author.last_name = "DELEUZE"
@@ -321,6 +343,11 @@ module Mongoid
         dup.to_param.should eql "book-title-1"
       end
 
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = Book.create(:title => "4ea0389f0364313d79104fb3")
+        bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
+      end
+
       it "ensures no duplicate values are stored in history" do
         book.update_attributes :title => 'Book Title'
         book.update_attributes :title => 'Foo'
@@ -358,6 +385,12 @@ module Mongoid
           :first_name => author.first_name,
           :last_name  => author.last_name)
         dup.to_param.should eql "gilles-deleuze-1"
+      end
+
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = book.authors.create(:first_name => "4ea0389f0364",
+                                  :last_name => "313d79104fb3")
+        bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
       end
 
       context "with an irregular association name" do
@@ -419,6 +452,12 @@ module Mongoid
         dup = Magazine.create(:title  => "Big Weekly", :publisher_id => "abc123")
         dup.to_param.should eql "big-weekly-1"
       end
+
+      it "does not allow a BSON::ObjectId as use for a slug" do
+        bad = Magazine.create(:title  => "4ea0389f0364313d79104fb3", :publisher_id => "abc123")
+        bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
+      end
+
     end
 
     context "when #slug is given a block" do
@@ -600,6 +639,7 @@ module Mongoid
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
       let!(:friend2) { Friend.create(:name => "Billy Bob") }
+      let!(:animal) { Animal.create(:name => "Cardu", :nickname => "Car") }
 
       context "using slugs" do
 
@@ -677,6 +717,16 @@ module Mongoid
           it "returns the documents" do
             Book.find([book.id, book2.id]).should == [book, book2]
           end
+        end
+      end
+      context "when a key is in use" do
+        it "raises a document not found since you should be finding on the slug" do
+          lambda {
+            Animal.find(animal.id)
+          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+        it "is still ok with the use of slug" do
+          Animal.find(animal.slug).should == animal
         end
       end
     end
