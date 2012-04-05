@@ -232,6 +232,9 @@ module Mongoid
           existing_slugs += existing_history_slugs
         end
 
+        # Do not allow BSON::ObjectIds as slugs
+        existing_slugs << slug if BSON::ObjectId.legal?(slug)
+
         if reserved_words_in_slug.any? { |word| word === slug }
           existing_slugs << slug
         end
