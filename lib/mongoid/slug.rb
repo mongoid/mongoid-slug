@@ -54,13 +54,12 @@ module Mongoid
       #
       def slug(*fields, &block)
         options = fields.extract_options!
-        options[:history] = false if options[:permanent]
 
         self.slug_scope             = options[:scope]
         self.reserved_words_in_slug = options[:reserve] || []
         self.slug_name              = options[:as] || :slug
         self.slugged_attributes     = fields.map(&:to_s)
-        if options[:history] && !options[:permanent]
+        if options[:history]
           self.slug_history_name    = "#{self.slug_name}_history".to_sym
         end
 
