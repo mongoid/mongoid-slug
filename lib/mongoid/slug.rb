@@ -71,9 +71,7 @@ module Mongoid
         field slug_name
 
         unless slug_name == :slug
-          ['', '_was', '_changed?'].each do |suffix|
-            alias_method 'slug' + suffix, slug_name.to_s + suffix
-          end
+          alias_attribute :slug, slug_name
         end
 
         if slug_history_name
