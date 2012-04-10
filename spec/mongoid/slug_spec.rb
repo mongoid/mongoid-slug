@@ -36,6 +36,33 @@ module Mongoid
         book.to_param.should eql "a-thousand-plateaus"
       end
 
+      context "when #generate_slug? returns false" do
+        let(:book) do
+          b = Book.new(:title => "A Thousand Plateaus")
+
+          b.instance_eval do
+            def generate_slug?
+              false
+            end
+          end
+
+          b.save
+          b
+        end
+
+        it "does not set slug" do
+          book.slug.should be nil
+        end
+
+        it "does not update slug" do
+          original_slug = "the-original-slug"
+          book.slug = original_slug
+          book.title = "Anti Oedipus"
+          book.save
+          book.slug.should == original_slug
+        end
+      end
+
       it "finds by slug" do
         Book.find_by_slug(book.to_param).should eql book
       end

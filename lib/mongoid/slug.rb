@@ -312,11 +312,36 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? or slug_changed? or slugged_attributes_changed?
+      (new_record? || slug_changed? || slugged_attributes_changed?) && generate_slug?
     end
 
     def slugged_attributes_changed?
       slugged_attributes.any? { |f| attribute_changed? f.to_s }
+    end
+
+    # Determines whether or not a slug should be generated.
+    #
+    # Override this method in your model to control when a slug is generated.
+    #
+    # @return [Boolean] Whether or not the slug should be generated.
+    #
+    # @example Generate a slug for active projects.
+    #   class Project
+    #     include Mongoid::Document
+    #     include Mongoid::Slug
+    #
+    #     field :name,    :type => String
+    #     field :active,  :type => Boolean, :default => false
+    #
+    #     slug :name
+    #
+    #     def generate_slug?
+    #       active?
+    #     end
+    #   end
+    #
+    def generate_slug?
+      true
     end
 
     # @return [String] A string which Action Pack uses for constructing an URL
