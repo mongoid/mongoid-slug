@@ -90,10 +90,9 @@ module Mongoid
           index slug_history_name if slug_history_name
         end
 
-        if options[:permanent]
-          set_callback :create, :before, :build_slug
-        else
-          set_callback :save, :before, :build_slug, :if => :slug_should_be_rebuilt?
+        set_callback :create, :before, :build_slug
+        unless options[:permanent]
+          set_callback :update, :before, :build_slug, :if => :slug_should_be_rebuilt?
         end
 
         # Build a finder for slug.
@@ -314,7 +313,7 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? or slug_changed? or slugged_attributes_changed?
+      slug_changed? || slugged_attributes_changed?
     end
 
     def slugged_attributes_changed?
