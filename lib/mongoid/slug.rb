@@ -90,8 +90,11 @@ module Mongoid
           index slug_history_name if slug_history_name
         end
 
-        set_callback options[:permanent] ? :create : :save, :before,
-          :build_slug, :if => :slug_should_be_rebuilt?
+        if options[:permanent]
+          set_callback :create, :before, :build_slug
+        else
+          set_callback :save, :before, :build_slug, :if => :slug_should_be_rebuilt?
+        end
 
         # Build a finder for slug.
         #
