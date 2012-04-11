@@ -313,11 +313,7 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      slug_changed? || slugged_attributes_changed?
-    end
-
-    def slugged_attributes_changed?
-      slugged_attributes.any? { |f| attribute_changed? f.to_s }
+      slug_changed? || slugged_attributes.any? { |f| attribute_changed? f.to_s }
     end
 
     # @return [String] A string which Action Pack uses for constructing an URL
