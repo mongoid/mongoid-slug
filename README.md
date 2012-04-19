@@ -38,7 +38,7 @@ Find a record by its slug:
 book = Book.find_by_slug params[:book_id]
 ```
 
-[Read here] [3] for all available options.
+[Read here] [4] for all available options.
 
 Scoping
 -------
