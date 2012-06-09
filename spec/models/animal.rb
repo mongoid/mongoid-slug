@@ -3,6 +3,12 @@ class Animal
   include Mongoid::Slug
   field :name
   field :nickname
-  key :name, :nickname
+
+  def composite_key
+    name + nickname
+  end
+
+  field :_id, type: String, default: ->{ composite_key }
+
   slug  :name
 end
