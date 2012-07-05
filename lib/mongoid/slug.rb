@@ -230,7 +230,7 @@ module Mongoid
         end
 
         # Do not allow BSON::ObjectIds as slugs
-        existing_slugs << slug if BSON::ObjectId.legal?(slug)
+        existing_slugs << slug if Moped::BSON::ObjectId.legal?(slug)
 
         if reserved_words_in_slug.any? { |word| word === slug }
           existing_slugs << slug

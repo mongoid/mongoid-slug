@@ -10,9 +10,9 @@ module Mongoid::Slug::Criterion
       # note that there is a small possibility that a client could create a slug that
       # resembles a BSON::ObjectId
       ids.flatten!
-      BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(BSON::ObjectId)
+      Moped::BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(Moped::BSON::ObjectId)
       super # Fallback to original Mongoid::Criterion::Optional
-    rescue BSON::InvalidObjectId
+    rescue Moped::BSON::InvalidObjectId
       # slug
       if ids.size > 1
         if @klass.slug_history_name
