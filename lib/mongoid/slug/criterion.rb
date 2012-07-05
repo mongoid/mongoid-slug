@@ -5,10 +5,10 @@ module Mongoid::Slug::Criterion
 
     # We definitely don't want to rescue at the same level we call super above -
     # that would risk applying our slug behavior to non-slug objects, in the case
-    # where their id conversion fails and super raises BSON::InvalidObjectId
+    # where their id conversion fails and super raises Moped::BSON::InvalidObjectId
     begin
       # note that there is a small possibility that a client could create a slug that
-      # resembles a BSON::ObjectId
+      # resembles a Moped::BSON::ObjectId
       ids.flatten!
       Moped::BSON::ObjectId.from_string(ids.first) unless ids.first.is_a?(Moped::BSON::ObjectId)
       super # Fallback to original Mongoid::Criterion::Optional
