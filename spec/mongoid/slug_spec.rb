@@ -284,7 +284,7 @@ module Mongoid
 
       it "sets an alternative slug field name" do
         person.should respond_to(:permalink)
-        person.permalink.should eql "john-doe"
+        person.permalink.should eql ["john-doe"]
       end
 
       it "finds by slug" do
@@ -327,7 +327,7 @@ module Mongoid
       end
 
       it "saves the old slug in the owner's history" do
-        book.slug_history.should include("book-title")
+        book.slug.should include("book-title")
       end
 
       it "returns the document for the old slug" do
@@ -351,7 +351,7 @@ module Mongoid
       it "ensures no duplicate values are stored in history" do
         book.update_attributes :title => 'Book Title'
         book.update_attributes :title => 'Foo'
-        book.slug_history.find_all { |slug| slug == 'book-title' }.size.should eql 1
+        book.slug.find_all { |slug| slug == 'book-title' }.size.should eql 1
       end
 
       context "using find" do
@@ -428,11 +428,11 @@ module Mongoid
         end
 
         it "allows using the slug" do
-          subject2.slug.should == "a-subject"
+          subject2.slug.should include("a-subject")
         end
 
         it "removes the slug from the old owner's history" do
-          subject1.slug_history.should_not include("a-subject")
+          subject1.slug.should_not include("a-subject")
         end
       end
     end
@@ -562,22 +562,22 @@ module Mongoid
       it "does not use the the reserved slugs" do
         friend1 = Friend.create(:name => "foo")
         friend1.slug.should_not eql("foo")
-        friend1.slug.should eql("foo-1")
+        friend1.slug.should include("foo-1")
 
         friend2 = Friend.create(:name => "bar")
         friend2.slug.should_not eql("bar")
-        friend2.slug.should eql("bar-1")
+        friend2.slug.should include("bar-1")
 
         friend3 = Friend.create(:name => "en")
         friend3.slug.should_not eql("en")
-        friend3.slug.should eql("en-1")
+        friend3.slug.should include("en-1")
       end
 
       it "should start with concatenation -1" do
         friend1 = Friend.create(:name => "foo")
-        friend1.slug.should eql("foo-1")
+        friend1.slug.should include("foo-1")
         friend2 = Friend.create(:name => "foo")
-        friend2.slug.should eql("foo-2")
+        friend2.slug.should include("foo-2")
       end
     end
 
@@ -592,7 +592,7 @@ module Mongoid
     context "when slug defined on alias of field" do
       it "should use accessor, not alias" do
         pseudonim  = Alias.create(:author_name => "Max Stirner")
-        pseudonim.slug.should eql("max-stirner")
+        pseudonim.slug.should include("max-stirner")
       end
     end
 
@@ -616,7 +616,7 @@ module Mongoid
       end
 
       it "returns the document if it is found" do
-        Book.find_by_slug(book.slug).should == book
+        Book.find_by_slug(book.slug.last).should == book
       end
     end
 
@@ -630,7 +630,7 @@ module Mongoid
       end
 
       it "returns the document when it is found" do
-        Book.find_by_slug!(book.slug).should == book
+        Book.find_by_slug!(book.slug.last).should == book
       end
     end
 
@@ -660,7 +660,7 @@ module Mongoid
 
         context "given a single document" do
           it "returns the document without using history" do
-            Friend.find_by_slug(friend.slug).should == friend
+            Friend.find_by_slug(friend.slug.last).should == friend
           end
 
           it "returns the document by it's history" do
@@ -672,7 +672,7 @@ module Mongoid
           it "returns the document by it's present slug even with history" do
             book.title = "new title"
             book.save!
-            Book.find_by_slug(book.slug).should == book
+            Book.find_by_slug(book.slug.last).should == book
           end
         end
 
@@ -685,14 +685,14 @@ module Mongoid
             book.save!
             book2.title = "other title"
             book2.save!
-            Book.find_by_slug([book.slug_history.first, book2.slug_history.first]).should == [book, book2]
+            Book.find_by_slug([book.slug.first, book2.slug.first]).should == [book, book2]
           end
           it "returns the documents when one is using a history and the other isn't" do
             book.title = "new title"
             book.save!
             book2.title = "other title"
             book2.save!
-            Book.find_by_slug([book.slug, book2.slug_history.first]).should == [book, book2]
+            Book.find_by_slug([book.slug, book2.slug.first]).should == [book, book2]
           end
           it "returns the documents by their present slugs when using histories" do
             Book.find_by_slug([book.slug, book2.slug]).should == [book, book2]
@@ -726,7 +726,7 @@ module Mongoid
           }.should raise_error(Mongoid::Errors::DocumentNotFound)
         end
         it "is still ok with the use of slug" do
-          Animal.find_by_slug(animal.slug).should == animal
+          Animal.find_by_slug(animal.slug.last).should == animal
         end
       end
     end
@@ -740,7 +740,7 @@ module Mongoid
         it "generates the missing slug" do
           book = Book.first
           book.to_param
-          book.reload.slug.should eql "proust-and-signs"
+          book.reload.slug.should include("proust-and-signs")
         end
       end
     end
@@ -757,7 +757,7 @@ module Mongoid
       end
 
       it "tracks changes" do
-        book.slug = "Anti Oedipus"
+        book.slug = ["Anti Oedipus"]
         book.slug_changed?.should be_true
       end
     end
@@ -794,19 +794,19 @@ module Mongoid
     context "when the slugged field is set manually" do
       context "when it set to a non-empty string" do
         it "respects the provided slug" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book = Book.create(:title => "A Thousand Plateaus", :slug => ["not-what-you-expected"])
           book.to_param.should eql "not-what-you-expected"
         end
 
         it "ensures uniqueness" do
-          book1 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
-          book2 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book1 = Book.create(:title => "A Thousand Plateaus", :slug => ["not-what-you-expected"])
+          book2 = Book.create(:title => "A Thousand Plateaus", :slug => ["not-what-you-expected"])
           book2.to_param.should eql "not-what-you-expected-1"
         end
 
         it "updates the slug when a new one is passed in" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
-          book.slug = "not-it-either"
+          book = Book.create(:title => "A Thousand Plateaus", :slug => ["not-what-you-expected"])
+          book.slug = ["not-it-either"]
           book.save
           book.to_param.should eql "not-it-either"
         end
@@ -814,7 +814,7 @@ module Mongoid
 
       context "when it is set to an empty string" do
         it "generate a new one" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "")
+          book = Book.create(:title => "A Thousand Plateaus")
           book.to_param.should eql "a-thousand-plateaus"
         end
       end
