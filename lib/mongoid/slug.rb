@@ -70,21 +70,25 @@ module Mongoid
 
         field slug_name
 
-        unless slug_name == :slug
+        unless self.slug_name == :slug
           alias_attribute :slug, slug_name
         end
 
-        if slug_history_name
+        if self.slug_history_name
           field slug_history_name, :type => Array, :default => []
         end
 
         if options[:index]
+
           if slug_scope
-            index [[slug_name, Mongo::ASCENDING], [slug_scope, Mongo::ASCENDING]], :unique => true
+            _uniq_validation = {self.slug_name => 1, self.slug_scope => 1}
+
           else
-            index slug_name, :unique => true
+            _uniq_validation = {self.slug_name => 1}
           end
-          index slug_history_name if slug_history_name
+
+          index(_uniq_validation, {:unique => true})
+          index({self.slug_history_name => 1}) if self.slug_history_name
         end
 
         set_callback options[:permanent] ? :create : :save, :before do |doc|
@@ -94,18 +98,20 @@ module Mongoid
         # Build a finder for slug.
         #
         # Defaults to `find_by_slug`.
+
+
         instance_eval <<-CODE
-          def self.find_by_#{slug_name}(slug)
-            if slug_history_name
-              any_of({ slug_name => slug }, { slug_history_name => slug })
+          def self.find_by_#{self.slug_name}(_slug)
+            if _slug.instance_of?(Array)
+              any_of({ :#{self.slug_name}.in => _slug } #{ self.slug_history_name ? ", { :"+ self.slug_history_name.to_s+".in => _slug }" : ''} )
             else
-              where(slug_name => slug)
-            end.first
+              any_of({ :#{self.slug_name} => _slug } #{ self.slug_history_name ? ", { :"+ self.slug_history_name.to_s+" => _slug }" : ''} ).first
+            end
           end
 
-          def self.find_by_#{slug_name}!(slug)
-            self.find_by_#{slug_name}(slug) ||
-              raise(Mongoid::Errors::DocumentNotFound.new self, slug)
+          def self.find_by_#{self.slug_name}!(_slug)
+            self.find_by_#{slug_name}(_slug) ||
+              raise(Mongoid::Errors::DocumentNotFound.new self, _slug)
           end
         CODE
 
@@ -229,8 +235,8 @@ module Mongoid
           existing_slugs += existing_history_slugs
         end
 
-        # Do not allow BSON::ObjectIds as slugs
-        existing_slugs << slug if BSON::ObjectId.legal?(slug)
+        # Do not allow Moped::BSON::ObjectIds as slugs
+        existing_slugs << slug if Moped::BSON::ObjectId.legal?(slug)
 
         if reserved_words_in_slug.any? { |word| word === slug }
           existing_slugs << slug

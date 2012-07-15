@@ -4,8 +4,8 @@ class Author
   field :first_name
   field :last_name
   slug  :first_name, :last_name, :scope => :book, :index => true
-  referenced_in :book
-  references_many :characters,
-                  :class_name => 'Person',
-                  :foreign_key => :author_id
+  belongs_to :book
+  has_many :characters,
+           :class_name => 'Person',
+           :foreign_key => :author_id
 end
