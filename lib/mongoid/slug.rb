@@ -6,11 +6,26 @@ module Mongoid
 
     included do
       cattr_accessor :slug_builder,
-                     :slug_name,
-                     :slug_history_name,
                      :slug_scope,
                      :reserved_words_in_slug,
                      :slugged_attributes
+
+      #array that stores all slugs
+      #  - last entry equals last slug
+      #  - [0..length - 1] is history slugs
+      field :_slugs, :type => Array, :default => []
+
+
+
+      #-- alias the _slugs with slugs
+      alias_attribute :slugs, :_slugs
+
+      # Build a scope based on the slug name.
+      #
+      # Defaults to `by_slug`.
+      scope :by_slug, lambda { |slug|
+        where(:_slugs => slug)
+      }
     end
 
     module ClassMethods
@@ -56,69 +71,30 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope             = options[:scope]
-        self.reserved_words_in_slug = options[:reserve] || []
-        self.slug_name              = options[:as] || :slug
+        self.reserved_words_in_slug = options[:reserve] || [:new, :edit]
         self.slugged_attributes     = fields.map(&:to_s)
-        if options[:history]
-          self.slug_history_name    = "#{self.slug_name}_history".to_sym
+
+        #-- always index the slug field. Reasoning: Mongoid indexes
+        #   the id field and a slug is just an alternative id.
+
+        if slug_scope
+          index({:_slugs => 1, self.slug_scope => 1}, {:unique => true})
+        else
+          index({:_slugs => 1}, {:unique => true})
         end
 
+        #-- Why is it necessary to customize the slug builder?
         default_builder = lambda do |doc|
           slugged_attributes.map { |f| doc.send f }.join ' '
         end
+
         self.slug_builder = block_given? ? block : default_builder
 
-        field slug_name
-
-        unless slug_name == :slug
-          alias_attribute :slug, slug_name
-        end
-
-        if slug_history_name
-          field slug_history_name, :type => Array, :default => []
-        end
-
-        if options[:index]
-          if slug_scope
-            index [[slug_name, Mongo::ASCENDING], [slug_scope, Mongo::ASCENDING]], :unique => true
-          else
-            index slug_name, :unique => true
-          end
-          index slug_history_name if slug_history_name
-        end
-
+        #-- a slug can be permanent or not
         set_callback options[:permanent] ? :create : :save, :before do |doc|
           doc.build_slug if doc.slug_should_be_rebuilt?
         end
 
-        # Build a finder for slug.
-        #
-        # Defaults to `find_by_slug`.
-        instance_eval <<-CODE
-          def self.find_by_#{slug_name}(slug)
-            if slug_history_name
-              any_of({ slug_name => slug }, { slug_history_name => slug })
-            else
-              where(slug_name => slug)
-            end.first
-          end
-
-          def self.find_by_#{slug_name}!(slug)
-            self.find_by_#{slug_name}(slug) ||
-              raise(Mongoid::Errors::DocumentNotFound.new self, slug)
-          end
-        CODE
-
-        # Build a scope based on the slug name.
-        #
-        # Defaults to `by_slug`.
-        scope "by_#{slug_name}".to_sym, lambda { |slug|
-          if slug_history_name
-            any_of({ slug_name => slug }, { slug_history_name => slug })
-          else
-            where(slug_name => slug)
-          end
-        }
       end
 
       # Finds a unique slug, were specified string used to generate a slug.
@@ -146,12 +122,12 @@ module Mongoid
 
         excluded_id = options[:model]._id if options[:model]
 
-        slug = desired_slug.to_url
+        _slug = desired_slug.to_url
 
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
         # index to match /^.../ pattern.
-        pattern = /^#{Regexp.escape(slug)}(?:-(\d+))?$/
+        pattern = /^#{Regexp.escape(_slug)}(?:-(\d+))?$/
 
         if slug_scope &&
            self.reflect_on_association(slug_scope).nil?
@@ -159,81 +135,49 @@ module Mongoid
           # (e.g. an association id in a denormalized db design)
 
           where_hash = {}
-          where_hash[slug_name]  = pattern
-          where_hash[:_id.ne]    = excluded_id if excluded_id
-          where_hash[slug_scope] = scope_attribute
+          where_hash[:_slugs.all] = [pattern]
+          where_hash[:_id.ne]               = excluded_id if excluded_id
+          where_hash[slug_scope]            = scope_attribute
 
-          existing_slugs =
+          history_slugged_documents =
             deepest_document_superclass.
-            only(slug_name).
             where(where_hash)
         else
           where_hash = {}
-          where_hash[slug_name] = pattern
-          where_hash[:_id.ne]   = excluded_id if excluded_id
+          where_hash[:_slugs.all] = [pattern]
+          where_hash[:_id.ne]               = excluded_id if excluded_id
 
-          existing_slugs =
+          history_slugged_documents =
             scope_object.
-            only(slug_name).
             where(where_hash)
         end
 
-        existing_slugs = existing_slugs.map do |doc|
-          doc.slug
+        existing_slugs = []
+        existing_history_slugs = []
+        last_entered_slug = []
+        history_slugged_documents.each do |doc|
+          history_slugs = doc._slugs
+          next if history_slugs.nil?
+          existing_slugs.push(*history_slugs.find_all { |cur_slug| cur_slug =~ pattern })
+          last_entered_slug.push(*history_slugs.last) if history_slugs.last =~ pattern
+          existing_history_slugs.push(*history_slugs.first(history_slugs.length() -1).find_all { |cur_slug| cur_slug =~ pattern })
         end
 
-        if slug_history_name
-          if slug_scope &&
-             self.reflect_on_association(slug_scope).nil?
-            # scope is not an association, so it's scoped to a local field
-            # (e.g. an association id in a denormalized db design)
-
-            where_hash = {}
-            where_hash[slug_history_name.all] = [pattern]
-            where_hash[:_id.ne]               = excluded_id if excluded_id
-            where_hash[slug_scope]            = scope_attribute
-
-            history_slugged_documents =
-              deepest_document_superclass.
-              where(where_hash)
-          else
-            where_hash = {}
-            where_hash[slug_history_name.all] = [pattern]
-            where_hash[:_id.ne]               = excluded_id if excluded_id
-
-            history_slugged_documents =
-              scope_object.
-              where(where_hash)
-          end
-
-          existing_history_slugs = []
+        # If the only conflict is in the history of a document in the same scope,
+        # transfer the slug
+        if slug_scope && last_entered_slug.count == 0 && existing_history_slugs.count > 0
           history_slugged_documents.each do |doc|
-            history_slugs = doc.read_attribute(slug_history_name)
-            next if history_slugs.nil?
-            existing_history_slugs.push(*history_slugs.find_all { |slug| slug =~ pattern })
+            doc._slugs -= existing_history_slugs
+            doc.save
           end
-
-          # If the only conflict is in the history of a document in the same scope,
-          # transfer the slug
-          if slug_scope && existing_slugs.count == 0 && existing_history_slugs.count > 0
-            history_slugged_documents.each do |doc|
-              doc_history_slugs = doc.read_attribute(slug_history_name)
-              next if doc_history_slugs.nil?
-              doc_history_slugs -= existing_history_slugs
-              doc.write_attribute(slug_history_name, doc_history_slugs)
-              doc.save
-            end
-            existing_history_slugs = []
-          end
-
-          existing_slugs += existing_history_slugs
+          existing_slugs = []
         end
 
-        # Do not allow BSON::ObjectIds as slugs
-        existing_slugs << slug if BSON::ObjectId.legal?(slug)
+        # Do not allow Moped::BSON::ObjectIds as slugs
+        existing_slugs << _slug if Moped::BSON::ObjectId.legal?(_slug)
 
-        if reserved_words_in_slug.any? { |word| word === slug }
-          existing_slugs << slug
+        if reserved_words_in_slug.any? { |word| word === _slug }
+          existing_slugs << _slug
         end
 
         if existing_slugs.count > 0
@@ -246,10 +190,28 @@ module Mongoid
           end
           max = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
 
-          slug += "-#{max + 1}"
+          _slug += "-#{max + 1}"
         end
 
-        slug
+        _slug
+      end
+
+      # Build a finder for slug.
+      #
+      # Defaults to `find_by_slug`.
+
+
+      def find_by_slug(_slug)
+        if _slug.instance_of?(Array)
+          where( :_slugs.in => _slug )
+        else
+          where( :_slugs => _slug ).first
+        end
+      end
+
+      def find_by_slug!(_slug)
+        find_by_slug(_slug) ||
+            raise(Mongoid::Errors::DocumentNotFound.new self, _slug)
       end
 
       private
@@ -283,21 +245,22 @@ module Mongoid
         end
         appropriate_class
       end
+
+
+
     end
 
     # Builds a new slug.
     #
     # @return [true]
     def build_slug
-      write_attribute slug_name, find_unique_slug
-
-      # @note Why can't I use `read_attribute (slug_history_name)` here?
-      if slug_history_name && slug_was && slug_changed?
-        self.send(slug_history_name).<<(slug_was).uniq!
-      end
+      _new_slug = find_unique_slug
+      self._slugs.delete(_new_slug)
+      self._slugs << _new_slug
 
       true
     end
+
 
     # Finds a unique slug, were specified string used to generate a slug.
     #
@@ -312,7 +275,7 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? or slug_changed? or slugged_attributes_changed?
+      new_record? or _slugs_changed? or slugged_attributes_changed?
     end
 
     def slugged_attributes_changed?
@@ -322,12 +285,12 @@ module Mongoid
     # @return [String] A string which Action Pack uses for constructing an URL
     # to this record.
     def to_param
-      unless slug
+      unless _slugs.last
         build_slug
         save
       end
 
-      slug
+      _slugs.last
     end
 
     private
@@ -337,7 +300,7 @@ module Mongoid
     end
 
     def user_defined_slug
-      slug if (new_record? and slug.present?) or (persisted? and slug_changed?)
+      _slugs.last if (new_record? and _slugs.present?) or (persisted? and _slugs_changed?)
     end
   end
 end
