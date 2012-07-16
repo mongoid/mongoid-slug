@@ -19,6 +19,13 @@ module Mongoid
 
       #-- alias the _slugs with slugs
       alias_attribute :slugs, :_slugs
+
+      # Build a scope based on the slug name.
+      #
+      # Defaults to `by_slug`.
+      scope :by_slug, lambda { |slug|
+        where(:_slugs => slug)
+      }
     end
 
     module ClassMethods
@@ -83,20 +90,11 @@ module Mongoid
 
         self.slug_builder = block_given? ? block : default_builder
 
-
         #-- a slug can be permanent or not
         set_callback options[:permanent] ? :create : :save, :before do |doc|
           doc.build_slug if doc.slug_should_be_rebuilt?
         end
 
-
-
-        # Build a scope based on the slug name.
-        #
-        # Defaults to `by_slug`.
-        scope :by_slug, lambda { |slug|
-          where(:_slugs => slug)
-        }
       end
 
       # Finds a unique slug, were specified string used to generate a slug.
