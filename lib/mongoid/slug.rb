@@ -64,7 +64,7 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope             = options[:scope]
-        self.reserved_words_in_slug = options[:reserve] || []
+        self.reserved_words_in_slug = options[:reserve] || [:new, :edit]
         self.slugged_attributes     = fields.map(&:to_s)
 
         #-- always index the slug field. Reasoning: Mongoid indexes
