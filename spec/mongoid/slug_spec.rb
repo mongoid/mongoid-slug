@@ -25,9 +25,9 @@ module Mongoid
         }
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = Book.create(:title => "4ea0389f0364313d79104fb3")
-        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
+        bad.slugs.should_not include("4ea0389f0364313d79104fb3")
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -41,15 +41,7 @@ module Mongoid
         book.to_param.should eql "a-thousand-plateaus"
       end
 
-      it "finds by slug" do
-        Book.find_by_slug(book.to_param).should eql book
-      end
-
       context "using find" do
-        it "finds by slug" do
-          Book.find(book.to_param).should eql book
-        end
-
         it "finds by id as string" do
           Book.find(book.id.to_s).should eql book
         end
@@ -58,11 +50,11 @@ module Mongoid
           Book.find([book.id.to_s]).should eql [book]
         end
 
-        it "finds by id as BSON::ObjectId" do
+        it "finds by id as Moped::BSON::ObjectId" do
           Book.find(book.id).should eql book
         end
 
-        it "finds by id as an array of BSON::ObjectIds" do
+        it "finds by id as an array of Moped::BSON::ObjectIds" do
           Book.find([book.id]).should eql [book]
         end
 
@@ -92,9 +84,9 @@ module Mongoid
         dup.to_param.should eql "psychoanalysis-1"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = book.subjects.create(:name => "4ea0389f0364313d79104fb3")
-        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
+        bad.slugs.should_not eql "4ea0389f0364313d79104fb3"
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -107,15 +99,7 @@ module Mongoid
         subject.to_param.should eql "psychoanalysis"
       end
 
-      it "finds by slug" do
-        book.subjects.find_by_slug(subject.to_param).should eql subject
-      end
-
       context "using find" do
-        it "finds by slug" do
-          book.subjects.find(subject.to_param).should eql subject
-        end
-
         it "finds by id as string" do
           book.subjects.find(subject.id.to_s).should eql subject
         end
@@ -124,11 +108,11 @@ module Mongoid
           book.subjects.find([subject.id.to_s]).should eql [subject]
         end
 
-        it "finds by id as BSON::ObjectId" do
+        it "finds by id as Moped::BSON::ObjectId" do
           book.subjects.find(subject.id).should eql subject
         end
 
-        it "finds by id as an array of BSON::ObjectIds" do
+        it "finds by id as an array of Moped::BSON::ObjectIds" do
           book.subjects.find([subject.id]).should eql [subject]
         end
 
@@ -167,9 +151,9 @@ module Mongoid
         dup.to_param.should eql "jane-smith-1"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = relationship.partners.create(:name => "4ea0389f0364313d79104fb3")
-        bad.slug.should_not eql "4ea0389f0364313d79104fb3"
+        bad.slugs.should_not eql "4ea0389f0364313d79104fb3"
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -188,15 +172,7 @@ module Mongoid
         lover.to_param.should eql partner.to_param
       end
 
-      it "finds by slug" do
-        relationship.partners.find_by_slug(partner.to_param).should eql partner
-      end
-
       context "using find" do
-        it "finds by slug" do
-          relationship.partners.find(partner.to_param).should eql partner
-        end
-
         it "finds by id as string" do
           relationship.partners.find(partner.id.to_s).should eql partner
         end
@@ -205,11 +181,11 @@ module Mongoid
           relationship.partners.find([partner.id.to_s]).should eql [partner]
         end
 
-        it "finds by id as BSON::ObjectId" do
+        it "finds by id as Moped::BSON::ObjectId" do
           relationship.partners.find(partner.id).should eql partner
         end
 
-        it "finds by id as an array of BSON::ObjectIds" do
+        it "finds by id as an array of Moped::BSON::ObjectIds" do
           relationship.partners.find([partner.id]).should eql [partner]
         end
 
@@ -252,7 +228,7 @@ module Mongoid
         dup2.to_param.should eql "gilles-deleuze-2"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = Author.create(:first_name => "4ea0389f0364",
                             :last_name => "313d79104fb3")
         bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
@@ -264,17 +240,6 @@ module Mongoid
         author.save
         author.to_param.should eql "gilles-deleuze"
       end
-
-      it "finds by slug" do
-        Author.find_by_slug("gilles-deleuze").should eql author
-      end
-
-      context "using find" do
-        it "finds by slug" do
-          Author.find("gilles-deleuze").should eql author
-        end
-      end
-
     end
 
     context "when :as is passed as an argument" do
@@ -283,24 +248,20 @@ module Mongoid
       end
 
       it "sets an alternative slug field name" do
-        person.should respond_to(:permalink)
-        person.permalink.should eql "john-doe"
-      end
-
-      it "finds by slug" do
-        Person.find_by_permalink("john-doe").should eql person
+        person.should respond_to(:_slugs)
+        person.slugs.should eql ["john-doe"]
       end
 
       it 'defines #slug' do
-        person.should respond_to :slug
+        person.should respond_to :slugs
       end
 
       it 'defines #slug_changed?' do
-        person.should respond_to :slug_changed?
+        person.should respond_to :_slugs_changed?
       end
 
       it 'defines #slug_was' do
-        person.should respond_to :slug_was
+        person.should respond_to :_slugs_was
       end
     end
 
@@ -327,15 +288,7 @@ module Mongoid
       end
 
       it "saves the old slug in the owner's history" do
-        book.slug_history.should include("book-title")
-      end
-
-      it "returns the document for the old slug" do
-        Book.find_by_slug("book-title").should == book
-      end
-
-      it "returns the document for the new slug" do
-        Book.find_by_slug("other-book-title").should == book
+        book.slugs.should include("book-title")
       end
 
       it "generates a unique slug by appending a counter to duplicate text" do
@@ -343,7 +296,7 @@ module Mongoid
         dup.to_param.should eql "book-title-1"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = Book.create(:title => "4ea0389f0364313d79104fb3")
         bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
       end
@@ -351,19 +304,8 @@ module Mongoid
       it "ensures no duplicate values are stored in history" do
         book.update_attributes :title => 'Book Title'
         book.update_attributes :title => 'Foo'
-        book.slug_history.find_all { |slug| slug == 'book-title' }.size.should eql 1
+        book.slugs.find_all { |slug| slug == 'book-title' }.size.should eql 1
       end
-
-      context "using find" do
-        it "returns the document for the old slug" do
-          Book.find("book-title").should == book
-        end
-
-        it "returns the document for the new slug" do
-          Book.find("other-book-title").should == book
-        end
-      end
-
     end
 
     context "when slug is scoped by a reference association" do
@@ -387,7 +329,7 @@ module Mongoid
         dup.to_param.should eql "gilles-deleuze-1"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = book.authors.create(:first_name => "4ea0389f0364",
                                   :last_name => "313d79104fb3")
         bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
@@ -428,11 +370,11 @@ module Mongoid
         end
 
         it "allows using the slug" do
-          subject2.slug.should == "a-subject"
+          subject2.slugs.should include("a-subject")
         end
 
         it "removes the slug from the old owner's history" do
-          subject1.slug_history.should_not include("a-subject")
+          subject1.slugs.should_not include("a-subject")
         end
       end
     end
@@ -453,7 +395,7 @@ module Mongoid
         dup.to_param.should eql "big-weekly-1"
       end
 
-      it "does not allow a BSON::ObjectId as use for a slug" do
+      it "does not allow a Moped::BSON::ObjectId as use for a slug" do
         bad = Magazine.create(:title  => "4ea0389f0364313d79104fb3", :publisher_id => "abc123")
         bad.to_param.should_not eql "4ea0389f0364313d79104fb3"
       end
@@ -462,7 +404,7 @@ module Mongoid
 
     context "when #slug is given a block" do
       let(:caption) do
-        Caption.create(:identity => "Edward Hopper (American, 1882-1967)",
+        Caption.create(:my_identity => "Edward Hopper (American, 1882-1967)",
                        :title    => "Soir Bleu, 1914",
                        :medium   => "Oil on Canvas")
       end
@@ -478,19 +420,9 @@ module Mongoid
       end
 
       it "does not change slug if slugged fields have changed but generated slug is identical" do
-        caption.identity = "Edward Hopper"
+        caption.my_identity = "Edward Hopper"
         caption.save
         caption.to_param.should eql "edward-hopper-soir-bleu-1914"
-      end
-
-      it "finds by slug" do
-        Caption.find_by_slug(caption.to_param).should eql caption
-      end
-
-      context "using find" do
-        it "finds by slug" do
-          Caption.find(caption.to_param).should eql caption
-        end
       end
     end
 
@@ -520,64 +452,54 @@ module Mongoid
       end
     end
 
-    context "when :index is passed as an argument" do
+    context "when indexes are created" do
       before do
-        Book.collection.drop_indexes
-        Author.collection.drop_indexes
+        Author.create_indexes
+        Book.create_indexes
+      end
+
+      after do
+        Author.remove_indexes
+        Book.remove_indexes
       end
 
       context "when slug is not scoped by a reference association" do
         it "defines an index on the slug" do
-          Book.create_indexes
-          Book.collection.index_information.should have_key "slug_1"
+          Book.index_options.should have_key( :_slugs => 1 )
         end
 
         it "defines a unique index" do
-          Book.create_indexes
-          Book.index_information["slug_1"]["unique"].should be_true
+          Book.index_options[ :_slugs => 1 ][:unique].should be_true
         end
       end
 
       context "when slug is scoped by a reference association" do
-        it "defines an index on the slug and the scope" do
-          Author.create_indexes
-          Author.collection.index_information.should have_key "slug_1_book_1"
+        it "does not define an index on the slug" do
+          Author.index_options.should_not have_key(:_slugs => 1 )
         end
-
-        it "defines a unique index" do
-          Author.create_indexes
-          Author.index_information["slug_1_book_1"]["unique"].should be_true
-        end
-      end
-    end
-
-    context "when :index is not passed as an argument" do
-      it "does not define an index on the slug" do
-        Person.create_indexes
-        Person.collection.index_information.should_not have_key "permalink_1"
       end
     end
 
     context "when :reserve is passed" do
       it "does not use the the reserved slugs" do
         friend1 = Friend.create(:name => "foo")
-        friend1.slug.should_not eql("foo")
-        friend1.slug.should eql("foo-1")
+        friend1.slugs.should_not eql("foo")
+        friend1.slugs.should include("foo-1")
 
         friend2 = Friend.create(:name => "bar")
-        friend2.slug.should_not eql("bar")
-        friend2.slug.should eql("bar-1")
+        friend2.slugs.should_not eql("bar")
+        friend2.slugs.should include("bar-1")
 
         friend3 = Friend.create(:name => "en")
-        friend3.slug.should_not eql("en")
-        friend3.slug.should eql("en-1")
+        friend3.slugs.should_not eql("en")
+        friend3.slugs.should include("en-1")
       end
 
       it "should start with concatenation -1" do
         friend1 = Friend.create(:name => "foo")
-        friend1.slug.should eql("foo-1")
+        friend1.slugs.should include("foo-1")
         friend2 = Friend.create(:name => "foo")
-        friend2.slug.should eql("foo-2")
+        friend2.slugs.should include("foo-2")
       end
     end
 
@@ -585,52 +507,14 @@ module Mongoid
       it "scopes by the superclass" do
         book = Book.create(:title => "Anti Oedipus")
         comic_book = ComicBook.create(:title => "Anti Oedipus")
-        comic_book.slug.should_not eql(book.slug)
+        comic_book.slugs.should_not eql(book.slugs)
       end
     end
 
     context "when slug defined on alias of field" do
       it "should use accessor, not alias" do
         pseudonim  = Alias.create(:author_name => "Max Stirner")
-        pseudonim.slug.should eql("max-stirner")
-      end
-    end
-
-    describe ".by_slug scope" do
-      let!(:author) { book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze") }
-
-      it "returns an empty array if no document is found" do
-        book.authors.by_slug("never-heard-of").should == []
-      end
-
-      it "returns an array containing the document if it is found" do
-        book.authors.by_slug(author.slug).should == [author]
-      end
-    end
-
-    describe ".find_by_slug" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
-
-      it "returns nil if no document is found" do
-        Book.find_by_slug(:title => "Anti Oedipus").should be_nil
-      end
-
-      it "returns the document if it is found" do
-        Book.find_by_slug(book.slug).should == book
-      end
-    end
-
-    describe ".find_by_slug!" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
-
-      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
-        lambda {
-          Book.find_by_slug!(:title => "Anti Oedipus")
-        }.should raise_error(Mongoid::Errors::DocumentNotFound)
-      end
-
-      it "returns the document when it is found" do
-        Book.find_by_slug!(book.slug).should == book
+        pseudonim.slugs.should include("max-stirner")
       end
     end
 
@@ -639,7 +523,6 @@ module Mongoid
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
       let!(:friend2) { Friend.create(:name => "Billy Bob") }
-      let!(:animal) { Animal.create(:name => "Cardu", :nickname => "Car") }
 
       context "using slugs" do
 
@@ -657,48 +540,8 @@ module Mongoid
             Friend.find(tricksy)
           }.should raise_error(Mongoid::Errors::DocumentNotFound)
         end
-
-        context "given a single document" do
-          it "returns the document without using history" do
-            Friend.find(friend.slug).should == friend
-          end
-
-          it "returns the document by it's history" do
-            book.title = "new title"
-            book.save!
-            Book.find("a-thousand-plateaus").should == book
-          end
-
-          it "returns the document by it's present slug even with history" do
-            book.title = "new title"
-            book.save!
-            Book.find(book.slug).should == book
-          end
-        end
-
-        context "given multiple docuemnts" do
-          it "returns the documents without using history" do
-            Friend.find([friend.slug, friend2.slug]).should == [friend, friend2]
-          end
-          it "returns the docuemnts by their histories" do
-            book.title = "new title"
-            book.save!
-            book2.title = "other title"
-            book2.save!
-            Book.find(["a-thousand-plateaus", "difference-and-repetition"]).should == [book, book2]
-          end
-          it "returns the documents when one is using a history and the other isn't" do
-            book.title = "new title"
-            book.save!
-            book2.title = "other title"
-            book2.save!
-            Book.find([book.slug, "difference-and-repetition"]).should == [book, book2]
-          end
-          it "returns the documents by their present slugs when using histories" do
-            Book.find([book.slug, book2.slug]).should == [book, book2]
-          end
-        end
       end
+
       context "using ids" do
 
         it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
@@ -713,20 +556,10 @@ module Mongoid
           end
         end
 
-        context "given multiple docuemnts" do
+        context "given multiple documents" do
           it "returns the documents" do
             Book.find([book.id, book2.id]).should == [book, book2]
           end
-        end
-      end
-      context "when a key is in use" do
-        it "raises a document not found since you should be finding on the slug" do
-          lambda {
-            Animal.find(animal.id)
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
-        end
-        it "is still ok with the use of slug" do
-          Animal.find(animal.slug).should == animal
         end
       end
     end
@@ -740,12 +573,12 @@ module Mongoid
         it "generates the missing slug" do
           book = Book.first
           book.to_param
-          book.reload.slug.should eql "proust-and-signs"
+          book.reload.slugs.should include("proust-and-signs")
         end
       end
     end
 
-    describe "#slug_changed?" do
+    describe "#_slugs_changed?" do
       before do
         Book.create(:title => "A Thousand Plateaus")
       end
@@ -753,12 +586,12 @@ module Mongoid
       let(:book) { Book.first }
 
       it "is initially unchanged" do
-        book.slug_changed?.should be_false
+        book._slugs_changed?.should be_false
       end
 
       it "tracks changes" do
-        book.slug = "Anti Oedipus"
-        book.slug_changed?.should be_true
+        book.slugs = ["Anti Oedipus"]
+        book._slugs_changed?.should be_true
       end
     end
 
@@ -794,19 +627,19 @@ module Mongoid
     context "when the slugged field is set manually" do
       context "when it set to a non-empty string" do
         it "respects the provided slug" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book = Book.create(:title => "A Thousand Plateaus", :slugs => ["not-what-you-expected"])
           book.to_param.should eql "not-what-you-expected"
         end
 
         it "ensures uniqueness" do
-          book1 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
-          book2 = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
+          book1 = Book.create(:title => "A Thousand Plateaus", :slugs => ["not-what-you-expected"])
+          book2 = Book.create(:title => "A Thousand Plateaus", :slugs => ["not-what-you-expected"])
           book2.to_param.should eql "not-what-you-expected-1"
         end
 
         it "updates the slug when a new one is passed in" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "not-what-you-expected")
-          book.slug = "not-it-either"
+          book = Book.create(:title => "A Thousand Plateaus", :slugs => ["not-what-you-expected"])
+          book.slugs = ["not-it-either"]
           book.save
           book.to_param.should eql "not-it-either"
         end
@@ -814,7 +647,7 @@ module Mongoid
 
       context "when it is set to an empty string" do
         it "generate a new one" do
-          book = Book.create(:title => "A Thousand Plateaus", :slug => "")
+          book = Book.create(:title => "A Thousand Plateaus")
           book.to_param.should eql "a-thousand-plateaus"
         end
       end

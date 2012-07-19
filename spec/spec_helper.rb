@@ -1,20 +1,28 @@
-require 'rubygems'
-require 'bundler/setup'
-
-require 'pry'
+begin
+  require 'pry'
+rescue LoadError
+end
 require 'rspec'
 
-require File.expand_path('../../lib/mongoid_slug', __FILE__)
+require File.expand_path '../../lib/mongoid_slug', __FILE__
 
-Mongoid.configure do |config|
-  name = 'mongoid_slug_test'
-  config.master = Mongo::Connection.new.db(name)
+def database_id
+    ENV['CI'] ? "mongoid_slug_#{Process.pid}" : 'mongoid_slug_test'
 end
 
-Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
+Mongoid.configure do |config|
+  config.connect_to database_id
+end
+
+Dir['./spec/models/*.rb'].each { |f| require f }
 
 RSpec.configure do |c|
   c.before(:each) do
-    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:remove)
+    Mongoid.purge!
+    Mongoid::IdentityMap.clear
+  end
+
+  c.after(:suite) do
+    Mongoid::Threaded.sessions[:default].drop if ENV['CI']
   end
 end
