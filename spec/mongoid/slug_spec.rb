@@ -596,18 +596,6 @@ module Mongoid
       end
     end
 
-    describe ".by_slug scope" do
-      let!(:author) { book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze") }
-
-      it "returns an empty array if no document is found" do
-        book.authors.by_slug("never-heard-of").should == []
-      end
-
-      it "returns an array containing the document if it is found" do
-        book.authors.by_slug(author.slugs).should == [author]
-      end
-    end
-
     describe ".find_by_slug" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
 

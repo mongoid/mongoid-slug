@@ -19,13 +19,6 @@ module Mongoid
 
       #-- alias the _slugs with slugs
       alias_attribute :slugs, :_slugs
-
-      # Build a scope based on the slug name.
-      #
-      # Defaults to `by_slug`.
-      scope :by_slug, lambda { |slug|
-        where(:_slugs => slug)
-      }
     end
 
     module ClassMethods
