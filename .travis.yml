@@ -2,5 +2,4 @@ language: ruby
 matrix:
   include:
     - rvm: 1.9.3
-    - rvm: ruby-head
     - rvm: jruby-19mode
