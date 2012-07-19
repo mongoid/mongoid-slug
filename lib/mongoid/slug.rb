@@ -1,17 +1,15 @@
 module Mongoid
-  # The Slug module helps you generate a URL slug or permalink based on one or
-  # more fields in a Mongoid model.
+  # Slugs your Mongoid model.
   module Slug
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :slug_builder,
+      cattr_accessor :reserved_words,
+                     :slug_builder,
                      :slug_scope,
-                     :reserved_words_in_slug,
                      :slugged_attributes
 
-      field :_slugs, :type => Array, :default => []
-
+      field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
     end
 
@@ -25,16 +23,9 @@ module Mongoid
       #   Sets one ore more fields as source of slug.
       #   @param [Array] fields One or more fields the slug should be based on.
       #   @param [Hash] options
-      #   @param options [String] :as The name of the field that stores the
-      #   slug. Defaults to `slug`.
       #   @param options [Boolean] :history Whether a history of changes to
       #   the slug should be retained. When searched by slug, the document now
       #   matches both past and present slugs.
-      #   @param options [Boolean] :index Whether an index should be defined
-      #   on the slug field. Defaults to `false` and has no effect if the
-      #   document is embedded.
-      #   Make sure you have a unique index on the slugs of root documents to
-      #   avoid race conditions.
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
@@ -57,12 +48,12 @@ module Mongoid
       def slug(*fields, &block)
         options = fields.extract_options!
 
-        self.slug_scope             = options[:scope]
-        self.reserved_words_in_slug = options[:reserve] || [:new, :edit]
-        self.slugged_attributes     = fields.map(&:to_s)
 
         #-- always index the slug field. Reasoning: Mongoid indexes
         #   the id field and a slug is just an alternative id.
+        self.slug_scope         = options[:scope]
+        self.reserved_words     = options[:reserve] || Set.new([:new, :edit])
+        self.slugged_attributes = fields.map &:to_s
 
         if slug_scope
           index({:_slugs => 1, self.slug_scope => 1}, {:unique => true})
@@ -163,7 +154,7 @@ module Mongoid
         # Do not allow Moped::BSON::ObjectIds as slugs
         existing_slugs << _slug if Moped::BSON::ObjectId.legal?(_slug)
 
-        if reserved_words_in_slug.any? { |word| word === _slug }
+        if reserved_words.any? { |word| word === _slug }
           existing_slugs << _slug
         end
 
