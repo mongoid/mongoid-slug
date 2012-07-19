@@ -41,15 +41,7 @@ module Mongoid
         book.to_param.should eql "a-thousand-plateaus"
       end
 
-      it "finds by slug" do
-        Book.find_by_slug(book.to_param).should eql book
-      end
-
       context "using find" do
-        it "finds by slug" do
-          Book.find_by_slug(book.to_param).should eql book
-        end
-
         it "finds by id as string" do
           Book.find(book.id.to_s).should eql book
         end
@@ -107,15 +99,7 @@ module Mongoid
         subject.to_param.should eql "psychoanalysis"
       end
 
-      it "finds by slug" do
-        book.subjects.find_by_slug(subject.to_param).should eql subject
-      end
-
       context "using find" do
-        it "finds by slug" do
-          book.subjects.find_by_slug(subject.to_param).should eql subject
-        end
-
         it "finds by id as string" do
           book.subjects.find(subject.id.to_s).should eql subject
         end
@@ -188,15 +172,7 @@ module Mongoid
         lover.to_param.should eql partner.to_param
       end
 
-      it "finds by slug" do
-        relationship.partners.find_by_slug(partner.to_param).should eql partner
-      end
-
       context "using find" do
-        it "finds by slug" do
-          relationship.partners.find_by_slug(partner.to_param).should eql partner
-        end
-
         it "finds by id as string" do
           relationship.partners.find(partner.id.to_s).should eql partner
         end
@@ -264,17 +240,6 @@ module Mongoid
         author.save
         author.to_param.should eql "gilles-deleuze"
       end
-
-      it "finds by slug" do
-        Author.find_by_slug("gilles-deleuze").should eql author
-      end
-
-      context "using find" do
-        it "finds by slug" do
-          Author.find_by_slug("gilles-deleuze").should eql author
-        end
-      end
-
     end
 
     context "when :as is passed as an argument" do
@@ -285,10 +250,6 @@ module Mongoid
       it "sets an alternative slug field name" do
         person.should respond_to(:_slugs)
         person.slugs.should eql ["john-doe"]
-      end
-
-      it "finds by slug" do
-        Person.find_by_slug("john-doe").should eql person
       end
 
       it 'defines #slug' do
@@ -330,14 +291,6 @@ module Mongoid
         book.slugs.should include("book-title")
       end
 
-      it "returns the document for the old slug" do
-        Book.find_by_slug("book-title").should == book
-      end
-
-      it "returns the document for the new slug" do
-        Book.find_by_slug("other-book-title").should == book
-      end
-
       it "generates a unique slug by appending a counter to duplicate text" do
         dup = Book.create(:title => "Book Title")
         dup.to_param.should eql "book-title-1"
@@ -353,17 +306,6 @@ module Mongoid
         book.update_attributes :title => 'Foo'
         book.slugs.find_all { |slug| slug == 'book-title' }.size.should eql 1
       end
-
-      context "using find" do
-        it "returns the document for the old slug" do
-          Book.find_by_slug("book-title").should == book
-        end
-
-        it "returns the document for the new slug" do
-          Book.find_by_slug("other-book-title").should == book
-        end
-      end
-
     end
 
     context "when slug is scoped by a reference association" do
@@ -482,16 +424,6 @@ module Mongoid
         caption.save
         caption.to_param.should eql "edward-hopper-soir-bleu-1914"
       end
-
-      it "finds by slug" do
-        Caption.find_by_slug(caption.to_param).should eql caption
-      end
-
-      context "using find" do
-        it "finds by slug" do
-          Caption.find_by_slug(caption.to_param).should eql caption
-        end
-      end
     end
 
     context "when slugged field contains non-ASCII characters" do
@@ -596,38 +528,11 @@ module Mongoid
       end
     end
 
-    describe ".find_by_slug" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
-
-      it "returns nil if no document is found" do
-        Book.find_by_slug(:title => "Anti Oedipus").should be_nil
-      end
-
-      it "returns the document if it is found" do
-        Book.find_by_slug(book.slugs.last).should == book
-      end
-    end
-
-    describe ".find_by_slug!" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
-
-      it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
-        lambda {
-          Book.find_by_slug!(:title => "Anti Oedipus")
-        }.should raise_error(Mongoid::Errors::DocumentNotFound)
-      end
-
-      it "returns the document when it is found" do
-        Book.find_by_slug!(book.slugs.last).should == book
-      end
-    end
-
     describe ".find" do
       let!(:book) { Book.create(:title => "A Thousand Plateaus") }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
       let!(:friend2) { Friend.create(:name => "Billy Bob") }
-      let!(:animal) { Animal.create(:name => "Cardu", :nickname => "Car") }
 
       context "using slugs" do
 
@@ -645,48 +550,8 @@ module Mongoid
             Friend.find(tricksy)
           }.should raise_error(Mongoid::Errors::DocumentNotFound)
         end
-
-        context "given a single document" do
-          it "returns the document without using history" do
-            Friend.find_by_slug(friend.slugs.last).should == friend
-          end
-
-          it "returns the document by it's history" do
-            book.title = "new title"
-            book.save!
-            Book.find_by_slug("a-thousand-plateaus").should == book
-          end
-
-          it "returns the document by it's present slug even with history" do
-            book.title = "new title"
-            book.save!
-            Book.find_by_slug(book.slugs.last).should == book
-          end
-        end
-
-        context "given multiple documents" do
-          it "returns the documents without using history" do
-            Friend.find_by_slug([friend.slugs, friend2.slugs]).should == [friend, friend2]
-          end
-          it "returns the docuemnts by their histories" do
-            book.title = "new title"
-            book.save!
-            book2.title = "other title"
-            book2.save!
-            Book.find_by_slug([book.slugs.first, book2.slugs.first]).should == [book, book2]
-          end
-          it "returns the documents when one is using a history and the other isn't" do
-            book.title = "new title"
-            book.save!
-            book2.title = "other title"
-            book2.save!
-            Book.find_by_slug([book.slugs, book2.slugs.first]).should == [book, book2]
-          end
-          it "returns the documents by their present slugs when using histories" do
-            Book.find_by_slug([book.slugs, book2.slugs]).should == [book, book2]
-          end
-        end
       end
+
       context "using ids" do
 
         it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
@@ -705,16 +570,6 @@ module Mongoid
           it "returns the documents" do
             Book.find([book.id, book2.id]).should == [book, book2]
           end
-        end
-      end
-      context "when a key is in use" do
-        it "raises a document not found since you should be finding on the slug" do
-          lambda {
-            Animal.find(animal.id)
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
-        end
-        it "is still ok with the use of slug" do
-          Animal.find_by_slug(animal.slugs.last).should == animal
         end
       end
     end

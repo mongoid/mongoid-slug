@@ -10,14 +10,8 @@ module Mongoid
                      :reserved_words_in_slug,
                      :slugged_attributes
 
-      #array that stores all slugs
-      #  - last entry equals last slug
-      #  - [0..length - 1] is history slugs
       field :_slugs, :type => Array, :default => []
 
-
-
-      #-- alias the _slugs with slugs
       alias_attribute :slugs, :_slugs
     end
 
@@ -187,24 +181,6 @@ module Mongoid
         end
 
         _slug
-      end
-
-      # Build a finder for slug.
-      #
-      # Defaults to `find_by_slug`.
-
-
-      def find_by_slug(_slug)
-        if _slug.instance_of?(Array)
-          where( :_slugs.in => _slug )
-        else
-          where( :_slugs => _slug ).first
-        end
-      end
-
-      def find_by_slug!(_slug)
-        find_by_slug(_slug) ||
-            raise(Mongoid::Errors::DocumentNotFound.new self, _slug)
       end
 
       private
