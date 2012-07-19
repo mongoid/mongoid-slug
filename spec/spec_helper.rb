@@ -1,25 +1,28 @@
-require 'rubygems'
-require 'bundler/setup'
-
-require 'pry'
+begin
+  require 'pry'
+rescue LoadError
+end
 require 'rspec'
 
-require File.expand_path('../../lib/mongoid_slug', __FILE__)
+require File.expand_path '../../lib/mongoid_slug', __FILE__
 
-Mongoid.configure do |config|
-  name = 'mongoid_slug_test'
-  config.connect_to(name)
+def database_id
+    ENV['CI'] ? "mongoid_slug_#{Process.pid}" : 'mongoid_slug_test'
 end
 
-# Requires supporting ruby files with custom matchers and macros, etc,
-# in spec/support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/models/*.rb"].each { |f| require f }
+Mongoid.configure do |config|
+  config.connect_to database_id
+end
 
-RSpec.configure do |config|
-  config.mock_with :rspec
+Dir['./spec/models/*.rb'].each { |f| require f }
 
-  config.before :each do
+RSpec.configure do |c|
+  c.before(:each) do
     Mongoid.purge!
     Mongoid::IdentityMap.clear
+  end
+
+  c.after(:suite) do
+    Mongoid::Threaded.sessions[:default].drop if ENV['CI']
   end
 end
