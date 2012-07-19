@@ -48,17 +48,12 @@ module Mongoid
       def slug(*fields, &block)
         options = fields.extract_options!
 
-
-        #-- always index the slug field. Reasoning: Mongoid indexes
-        #   the id field and a slug is just an alternative id.
         self.slug_scope         = options[:scope]
         self.reserved_words     = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes = fields.map &:to_s
 
-        if slug_scope
-          index({:_slugs => 1, self.slug_scope => 1}, {:unique => true})
-        else
-          index({:_slugs => 1}, {:unique => true})
+        unless slug_scope
+          index({_slugs: 1}, {unique: true})
         end
 
         #-- Why is it necessary to customize the slug builder?

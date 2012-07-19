@@ -3,7 +3,7 @@ class Book
   include Mongoid::Slug
   field :title
 
-  slug  :title, :index => true, :history => true
+  slug  :title, :history => true
   embeds_many :subjects
   has_many :authors
 end

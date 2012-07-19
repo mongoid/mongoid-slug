@@ -452,41 +452,31 @@ module Mongoid
       end
     end
 
-    context "when :index is passed as an argument" do
+    context "when indexes are created" do
       before do
-        Book.remove_indexes
         Author.create_indexes
+        Book.create_indexes
+      end
+
+      after do
+        Author.remove_indexes
+        Book.remove_indexes
       end
 
       context "when slug is not scoped by a reference association" do
         it "defines an index on the slug" do
-          Book.create_indexes
           Book.index_options.should have_key( :_slugs => 1 )
         end
 
         it "defines a unique index" do
-          Book.create_indexes
           Book.index_options[ :_slugs => 1 ][:unique].should be_true
         end
       end
 
       context "when slug is scoped by a reference association" do
-        it "defines an index on the slug and the scope" do
-          Author.create_indexes
-          Author.index_options.should have_key( {:_slugs => 1, Author.slug_scope => 1})
+        it "does not define an index on the slug" do
+          Author.index_options.should_not have_key(:_slugs => 1 )
         end
-
-        it "defines a unique index" do
-          Author.create_indexes
-          Author.index_options[ {:_slugs => 1 , Author.slug_scope => 1}][:unique].should be_true
-        end
-      end
-    end
-
-    context "when :index is not passed as an argument" do
-      it "does not define an index on the slug" do
-        Person.create_indexes
-        Person.index_options.should_not have_key(:permalink_1 )
       end
     end
 
