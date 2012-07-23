@@ -234,7 +234,7 @@ module Mongoid
     end
 
     def slugged_attributes_changed?
-      slugged_attributes.any? { |f| attribute_changed? f.to_s }
+      slugged_attributes.any? { |f| self.send :"#{f}_changed?" }
     end
 
     # @return [String] A string which Action Pack uses for constructing an URL
