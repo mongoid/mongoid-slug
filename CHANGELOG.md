@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 
+* Fixed broken #find al (Alan Larkin)
+
 ## 0.10.0
 * Add .find_unique_slug_for and #find_unique_slug_for methods DouweM (Douwe Maan)
 * Ensure uniqueness of slug set manually DouweM (Douwe Maan)
