@@ -1,7 +1,17 @@
 # CHANGELOG
 
-## 
+## 0.11.0
+
+### Major Changes (Backwards Incompatible)
+
 * Fixed broken #find al (Alan Larkin)
+* Only Mongoid 3.0 syntax is supported (digitalplaywright)
+* Store all slugs in a single field of array type (digitalplaywright)
+* Removed the ':as' feature (digitalplaywright)
+* Renamed slug field to _slugs (digitalplaywright)
+* Slugs are indexes by default and removed the :index option (digitalplaywright)
+* Reserved words should default to :new and :edit (digitalplaywright)
+* Removed find_by_slug (digitalplaywright)
 
 ## 0.10.0
 * Add .find_unique_slug_for and #find_unique_slug_for methods DouweM (Douwe Maan)
