@@ -171,6 +171,27 @@ module Mongoid
         _slug
       end
 
+      # Find documents by slugs.
+      #
+      # A document matches if any of its slugs match one of the supplied params.
+      #
+      # A document matching multiple supplied params will be returned only once.
+      #
+      # If any supplied param does not match a document a Mongoid::Errors::DocumentNotFound will be raised.
+      #
+      # @example Find by a slug.
+      #   Model.find_by_slug('some-slug')
+      #
+      # @example Find by multiple slugs.
+      #   Model.find_by_slug('some-slug', 'some-other-slug')
+      #
+      # @param [ Array<Object> ] args The slugs to search for.
+      #
+      # @return [ Array<Document>, Document ] The matching document(s).
+      def find_by_slug(*args)
+        with_default_scope.find_by_slug(*args)
+      end
+
       private
 
       def uniqueness_scope(model = nil)
