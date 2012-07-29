@@ -5,9 +5,9 @@ module Mongoid
 
     included do
       cattr_accessor :reserved_words,
-                     :slug_builder,
                      :slug_scope,
-                     :slugged_attributes
+                     :slugged_attributes,
+                     :url_builder
 
       field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
@@ -59,11 +59,11 @@ module Mongoid
         end
 
         #-- Why is it necessary to customize the slug builder?
-        default_builder = lambda do |doc|
-          slugged_attributes.map { |f| doc.send f }.join ' '
+        default_url_builder = lambda do |desired_slug|
+          desired_slug.to_url
         end
 
-        self.slug_builder = block_given? ? block : default_builder
+        self.url_builder = block_given? ? block : default_url_builder
 
         #-- a slug can be permanent or not
         set_callback options[:permanent] ? :create : :save, :before do |doc|
@@ -97,7 +97,7 @@ module Mongoid
 
         excluded_id = options[:model]._id if options[:model]
 
-        _slug = desired_slug.to_url
+        _slug = self.url_builder.call(desired_slug)
 
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
@@ -271,10 +271,15 @@ module Mongoid
       _slugs.last
     end
 
+    def slug_builder(doc)
+      self.slugged_attributes.map { |f| doc.send f }.join ' '
+
+    end
+
     private
 
     def find_unique_slug
-      find_unique_slug_for user_defined_slug || slug_builder.call(self)
+      find_unique_slug_for user_defined_slug || slug_builder(self)
     end
 
     def user_defined_slug
