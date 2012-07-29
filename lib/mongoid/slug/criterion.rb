@@ -83,7 +83,7 @@ module Mongoid
     end
 
     def for_slugs(slugs)
-      where({ _slugs: { '$in' => slugs } })
+      where({ _slugs: { '$in' => slugs } }).limit(slugs.length)
     end
 
     def execute_or_raise_for_slugs(slugs, multi)
