@@ -178,10 +178,10 @@ module Mongoid
       # If any supplied param does not match a document a Mongoid::Errors::DocumentNotFound will be raised.
       #
       # @example Find by a slug.
-      #   criteria.find('some-slug')
+      #   Model.find_by_slug('some-slug')
       #
       # @example Find by multiple slugs.
-      #   criteria.find([ 'some-slug', 'some-other-slug' ])
+      #   Model.find_by_slug('some-slug', 'some-other-slug')
       #
       # @param [ Array<Object> ] args The slugs to search for.
       #
