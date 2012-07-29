@@ -94,7 +94,7 @@ module Mongoid
     end
 
     def check_for_missing_documents_for_slugs!(result, slugs)
-      if (result.size < slugs.size) && Mongoid.raise_not_found_error
+      if (result.size != slugs.size) && Mongoid.raise_not_found_error
         raise Errors::DocumentNotFound.new(klass, slugs, slugs - result.map(&:_slugs))
       end
     end
