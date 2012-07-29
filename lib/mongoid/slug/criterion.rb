@@ -87,14 +87,16 @@ module Mongoid
     end
 
     def execute_or_raise_for_slugs(slugs, multi)
-      result = entries
+      result = uniq
       check_for_missing_documents_for_slugs!(result, slugs)
       multi ? result : result.first
     end
 
     def check_for_missing_documents_for_slugs!(result, slugs)
-      if (result.size < slugs.size) && Mongoid.raise_not_found_error
-        raise Errors::DocumentNotFound.new(klass, slugs, slugs - result.map(&:_slugs))
+      missing_slugs = slugs - result.map(&:slugs).flatten
+
+      if !missing_slugs.blank? && Mongoid.raise_not_found_error
+        raise Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
       end
     end
   end

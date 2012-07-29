@@ -518,7 +518,7 @@ module Mongoid
     end
 
     describe "#find" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
+      let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
       let!(:friend2) { Friend.create(:name => friend.id.to_s) }
@@ -548,7 +548,7 @@ module Mongoid
 
         context "(multiple)" do
           context "and all documents are found" do
-            it "returns the documents as an array" do
+            it "returns the documents as an array without duplication" do
               Book.find(book.slugs + book2.slugs).should =~ [book, book2]
             end
           end
@@ -625,7 +625,7 @@ module Mongoid
 
         context "(multiple)" do
           context "and all documents are found" do
-            it "returns the documents as an array" do
+            it "returns the documents as an array without duplication" do
               Book.find(book.slugs + book2.slugs, force_slugs: true).should =~ [book, book2]
             end
           end
