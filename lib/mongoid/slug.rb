@@ -52,7 +52,9 @@ module Mongoid
         self.reserved_words     = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes = fields.map &:to_s
 
-        unless slug_scope
+        if slug_scope
+          index({slug_scope: 1, _slugs: 1}, {unique: true})
+        else
           index({_slugs: 1}, {unique: true})
         end
 
