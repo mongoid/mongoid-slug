@@ -526,6 +526,8 @@ module Mongoid
       let!(:integer_id2) { IntegerId.new(:name => integer_id.id.to_s).tap { |d| d.id = 456; d.save } }
       let!(:string_id) { StringId.new(:name => "I have string ids").tap { |d| d.id = 'abc'; d.save } }
       let!(:string_id2) { StringId.new(:name => string_id.id.to_s).tap { |d| d.id = 'def'; d.save } }
+      let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
+      let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
 
       context "using slugs" do
         context "(single)" do
@@ -583,6 +585,23 @@ module Mongoid
         context "when ids are Integers and the supplied arguments looks like an Integer" do
           it "it should find based on slugs not ids" do # i.e. it should not type cast the argument
             IntegerId.find(integer_id.id.to_s).should == integer_id2
+          end
+        end
+
+        context "when scoped" do
+          context "and a document is found" do
+            it "returns the document as an object" do
+              book.subjects.find(subject.slugs.first).should == subject
+              book2.subjects.find(subject.slugs.first).should == subject2
+            end
+          end
+
+          context "but no document is found" do
+            it "raises a Mongoid::Errors::DocumentNotFound error" do
+              lambda {
+                book.subjects.find('Another Subject')
+              }.should raise_error(Mongoid::Errors::DocumentNotFound)
+            end
           end
         end
       end
