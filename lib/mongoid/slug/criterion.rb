@@ -59,6 +59,7 @@ module Mongoid
       ids_or_slugs = args.__find_args__
       raise_invalid if ids_or_slugs.any?(&:nil?)
       if opts[:force_slugs] || look_like_slugs?(ids_or_slugs)
+        ids_or_slugs.uniq!
         for_slugs(ids_or_slugs).execute_or_raise_for_slugs(ids_or_slugs, args.multi_arged?)
       else
         for_ids(ids_or_slugs).execute_or_raise(ids_or_slugs, args.multi_arged?)
@@ -83,7 +84,7 @@ module Mongoid
     end
 
     def for_slugs(slugs)
-      where({ _slugs: { '$in' => slugs } })
+      where({ _slugs: { '$in' => slugs } }).limit(slugs.size)
     end
 
     def execute_or_raise_for_slugs(slugs, multi)
