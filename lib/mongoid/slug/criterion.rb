@@ -74,7 +74,7 @@ module Mongoid
         id_type = @klass.fields['_id'].type
         case
           when id_type == Moped::BSON::ObjectId
-            args.any? { |id| Moped::BSON::ObjectId.from_string(id).nil? rescue true }
+            args.any? { |id| !Moped::BSON::ObjectId.legal?(id) }
           else args.any? { |id| id.class != id_type }
         end
       else
