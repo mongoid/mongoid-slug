@@ -606,60 +606,6 @@ module Mongoid
         end
       end
 
-      context "explicitly using slugs" do
-        context "(single)" do
-          context "and a document is found" do
-            it "returns the document as an object" do
-              Book.find(book.slugs.first, force_slugs: true).should == book
-            end
-          end
-
-          context "but no document is found" do
-            it "raises a Mongoid::Errors::DocumentNotFound error" do
-              lambda {
-                Book.find("Anti Oedipus", force_slugs: true)
-              }.should raise_error(Mongoid::Errors::DocumentNotFound)
-            end
-          end
-        end
-
-        context "(multiple)" do
-          context "and all documents are found" do
-            it "returns the documents as an array without duplication" do
-              Book.find(book.slugs + book2.slugs, force_slugs: true).should =~ [book, book2]
-            end
-          end
-
-          context "but not all documents are found" do
-            it "raises a Mongoid::Errors::DocumentNotFound error" do
-              lambda {
-                Book.find(book.slugs + ['something-nonexistent'], force_slugs: true)
-              }.should raise_error(Mongoid::Errors::DocumentNotFound)
-            end
-          end
-        end
-
-        context "when ids are BSON::ObjectIds and the supplied argument looks like a BSON::ObjectId" do
-          it "raises a Mongoid::Errors::DocumentNotFound error" do # Because if the slug looked like a BSON::ObjectId it would have been suffixed prior to insert
-            lambda {
-              Friend.find(friend.id.to_s, force_slugs: true)
-            }.should raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
-
-        context "when ids are Strings" do
-          it "it should find based on slugs not ids" do
-            StringId.find(string_id.id.to_s, force_slugs: true).should == string_id2
-          end
-        end
-
-        context "when ids are Integers and the supplied arguments looks like an Integer" do
-          it "it should find based on slugs not ids" do
-            IntegerId.find(integer_id.id.to_s, force_slugs: true).should == integer_id2
-          end
-        end
-      end
-
       context "using ids" do
         it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
           lambda {
@@ -676,6 +622,68 @@ module Mongoid
         context "given multiple documents" do
           it "returns the documents" do
             Book.find([book.id, book2.id]).should =~ [book, book2]
+          end
+        end
+      end
+    end
+
+    describe "#find_by_slug" do
+      let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
+      let!(:book2) { Book.create(:title => "Difference and Repetition") }
+      let!(:friend) { Friend.create(:name => "Jim Bob") }
+      let!(:friend2) { Friend.create(:name => friend.id.to_s) }
+      let!(:integer_id) { IntegerId.new(:name => "I have integer ids").tap { |d| d.id = 123; d.save } }
+      let!(:integer_id2) { IntegerId.new(:name => integer_id.id.to_s).tap { |d| d.id = 456; d.save } }
+      let!(:string_id) { StringId.new(:name => "I have string ids").tap { |d| d.id = 'abc'; d.save } }
+      let!(:string_id2) { StringId.new(:name => string_id.id.to_s).tap { |d| d.id = 'def'; d.save } }
+      let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
+      let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
+
+      context "(single)" do
+        context "and a document is found" do
+          it "returns the document as an object" do
+            Book.find_by_slug(book.slugs.first).should == book
+          end
+        end
+
+        context "but no document is found" do
+          it "raises a Mongoid::Errors::DocumentNotFound error" do
+            lambda {
+              Book.find_by_slug("Anti Oedipus")
+            }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+      end
+
+      context "(multiple)" do
+        context "and all documents are found" do
+          it "returns the documents as an array without duplication" do
+            Book.find_by_slug(book.slugs + book2.slugs).should =~ [book, book2]
+          end
+        end
+
+        context "but not all documents are found" do
+          it "raises a Mongoid::Errors::DocumentNotFound error" do
+            lambda {
+              Book.find_by_slug(book.slugs + ['something-nonexistent'])
+            }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+      end
+
+      context "when scoped" do
+        context "and a document is found" do
+          it "returns the document as an object" do
+            book.subjects.find_by_slug(subject.slugs.first).should == subject
+            book2.subjects.find_by_slug(subject.slugs.first).should == subject2
+          end
+        end
+
+        context "but no document is found" do
+          it "raises a Mongoid::Errors::DocumentNotFound error" do
+            lambda {
+              book.subjects.find_by_slug('Another Subject')
+            }.should raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
       end
