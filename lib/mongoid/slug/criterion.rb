@@ -30,6 +30,8 @@ module Mongoid
     # @return [ Array<Document>, Document ] The matching document(s).
     alias :original_find :find
     def find(*args)
+      return original_find(*args) unless @klass.ancestors.include?(Mongoid::Slug)
+
       send (look_like_slugs?(args.__find_args__) ? :find_by_slug! : :original_find), *args
     end
 

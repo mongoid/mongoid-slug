@@ -528,6 +528,7 @@ module Mongoid
       let!(:string_id2) { StringId.new(:name => string_id.id.to_s).tap { |d| d.id = 'def'; d.save } }
       let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
       let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
+      let!(:without_slug) { WithoutSlug.new().tap { |d| d.id = 456; d.save } }
 
       context "using slugs" do
         context "(single)" do
@@ -585,6 +586,12 @@ module Mongoid
         context "when ids are Integers and the supplied arguments looks like an Integer" do
           it "it should find based on slugs not ids" do # i.e. it should not type cast the argument
             IntegerId.find(integer_id.id.to_s).should == integer_id2
+          end
+        end
+
+        context "models that does not use slugs, should find using the original find" do
+          it "it should find based on ids" do # i.e. it should not type cast the argument
+            WithoutSlug.find(without_slug.id.to_s).should == without_slug
           end
         end
 
