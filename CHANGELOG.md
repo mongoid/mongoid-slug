@@ -2,6 +2,10 @@
 
 ## 0.20.0
 
+## Features
+* only look for a new unique slug if the existing slugs contains the current slug (digitalplaywright)
+  - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
+
 ### Major Changes (Backwards Incompatible)
 
 * Fixed broken #find al (Alan Larkin)

@@ -14,6 +14,8 @@ module Mongoid
     end
 
     module ClassMethods
+
+
       # @overload slug(*fields)
       #   Sets one ore more fields as source of slug.
       #   @param [Array] fields One or more fields the slug should be based on.
@@ -71,6 +73,11 @@ module Mongoid
         end
 
       end
+
+      def look_like_slugs?(*args)
+        with_default_scope.look_like_slugs?(*args)
+      end
+
 
       # Finds a unique slug, were specified string used to generate a slug.
       #
@@ -138,34 +145,40 @@ module Mongoid
           existing_history_slugs.push(*history_slugs.first(history_slugs.length() -1).find_all { |cur_slug| cur_slug =~ pattern })
         end
 
-        # If the only conflict is in the history of a document in the same scope,
-        # transfer the slug
-        if slug_scope && last_entered_slug.count == 0 && existing_history_slugs.count > 0
-          history_slugged_documents.each do |doc|
-            doc._slugs -= existing_history_slugs
-            doc.save
-          end
-          existing_slugs = []
-        end
+        #do not allow a slug that can be interpreted as the current document id
+        existing_slugs << _slug unless look_like_slugs?([_slug])
 
-        # Do not allow Moped::BSON::ObjectIds as slugs
-        existing_slugs << _slug if Moped::BSON::ObjectId.legal?(_slug)
-
+        #make sure that the slug is not equal to a reserved word
         if reserved_words.any? { |word| word === _slug }
           existing_slugs << _slug
         end
 
-        if existing_slugs.count > 0
-          # Sort the existing_slugs in increasing order by comparing the
-          # suffix numbers:
-          # slug, slug-1, slug-2, ..., slug-n
-          existing_slugs.sort! do |a, b|
-            (pattern.match(a)[1] || -1).to_i <=>
-            (pattern.match(b)[1] || -1).to_i
+        #only look for a new unique slug if the existing slugs contains the current slug
+        # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
+        if existing_slugs.include? _slug
+          # If the only conflict is in the history of a document in the same scope,
+          # transfer the slug
+          if slug_scope && last_entered_slug.count == 0 && existing_history_slugs.count > 0
+            history_slugged_documents.each do |doc|
+              doc._slugs -= existing_history_slugs
+              doc.save
+            end
+            existing_slugs = []
           end
-          max = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
 
-          _slug += "-#{max + 1}"
+          if existing_slugs.count > 0
+            # Sort the existing_slugs in increasing order by comparing the
+            # suffix numbers:
+            # slug, slug-1, slug-2, ..., slug-n
+            existing_slugs.sort! do |a, b|
+              (pattern.match(a)[1] || -1).to_i <=>
+              (pattern.match(b)[1] || -1).to_i
+            end
+            max = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
+
+            _slug += "-#{max + 1}"
+          end
+
         end
 
         _slug
@@ -191,6 +204,8 @@ module Mongoid
       def find_by_slug!(*args)
         with_default_scope.find_by_slug!(*args)
       end
+
+
 
       private
 

@@ -756,6 +756,20 @@ module Mongoid
       end
     end
 
+    describe "when regular expression matches, but document does not" do
+      let!(:book_1) { Book.create(:title => "book-1") }
+      let!(:book_2) { Book.create(:title => "book") }
+      let!(:book_3) { Book.create(:title => "book") }
+
+      it "book_2 should have the user supplied title without -1 after it" do
+        book_2.to_param.should eql "book"
+      end
+
+      it "book_3 should have a generated slug" do
+        book_3.to_param.should eql "book-2"
+      end
+    end
+
     context "when the slugged field is set manually" do
       context "when it set to a non-empty string" do
         it "respects the provided slug" do
