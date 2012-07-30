@@ -517,7 +517,7 @@ module Mongoid
       end
     end
 
-    describe "#find" do
+    describe ".find" do
       let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
@@ -529,6 +529,13 @@ module Mongoid
       let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
       let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
       let!(:without_slug) { WithoutSlug.new().tap { |d| d.id = 456; d.save } }
+
+      context "when the model does not use mongoid slugs" do 
+        it "should not use mongoid slug's custom find methods" do
+          Mongoid::Slug::Criteria.any_instance.should_not_receive(:find)
+          WithoutSlug.find(without_slug.id.to_s).should == without_slug
+        end
+      end
 
       context "using slugs" do
         context "(single)" do
@@ -634,7 +641,7 @@ module Mongoid
       end
     end
 
-    describe "#find_by_slug!" do
+    describe ".find_by_slug!" do
       let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }

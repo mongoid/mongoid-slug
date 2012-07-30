@@ -209,7 +209,9 @@ module Mongoid
         with_default_scope.find_by_slug!(*args)
       end
 
-
+      def queryable
+        scope_stack.last || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+      end
 
       private
 
