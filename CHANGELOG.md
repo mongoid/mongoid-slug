@@ -12,6 +12,7 @@
 * Slugs are indexes by default and removed the :index option (digitalplaywright)
 * Reserved words should default to :new and :edit (digitalplaywright)
 * Removed find_by_slug (digitalplaywright)
+* Add `#find_by_slug!` al (Alan Larkin)
 
 ## 0.10.0
 * Add .find_unique_slug_for and #find_unique_slug_for methods DouweM (Douwe Maan)

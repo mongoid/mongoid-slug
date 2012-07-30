@@ -30,7 +30,7 @@ module Mongoid
     # @return [ Array<Document>, Document ] The matching document(s).
     alias :original_find :find
     def find(*args)
-      send (look_like_slugs?(args.__find_args__) ? :find_by_slug : :original_find), *args
+      send (look_like_slugs?(args.__find_args__) ? :find_by_slug! : :original_find), *args
     end
 
     # Find the matchind document(s) in the criteria for the provided slugs.
@@ -44,7 +44,7 @@ module Mongoid
     # @param [ Array<Object> ] args The slugs to search for.
     #
     # @return [ Array<Document>, Document ] The matching document(s).
-    def find_by_slug(*args)
+    def find_by_slug!(*args)
       slugs = args.__find_args__
       raise_invalid if slugs.any?(&:nil?)
       for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
