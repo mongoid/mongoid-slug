@@ -517,7 +517,7 @@ module Mongoid
       end
     end
 
-    describe "#find" do
+    describe ".find" do
       let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
@@ -635,7 +635,7 @@ module Mongoid
       end
     end
 
-    describe "#find_by_slug!" do
+    describe ".find_by_slug!" do
       let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
