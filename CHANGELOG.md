@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.11.0
+## 0.20.0
 
 ### Major Changes (Backwards Incompatible)
 
