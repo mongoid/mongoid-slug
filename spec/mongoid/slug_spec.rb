@@ -627,7 +627,7 @@ module Mongoid
       end
     end
 
-    describe "#find_by_slug" do
+    describe "#find_by_slug!" do
       let!(:book) { Book.create(:title => "A Working Title").tap { |d| d.update_attribute(:title, "A Thousand Plateaus") } }
       let!(:book2) { Book.create(:title => "Difference and Repetition") }
       let!(:friend) { Friend.create(:name => "Jim Bob") }
@@ -642,14 +642,14 @@ module Mongoid
       context "(single)" do
         context "and a document is found" do
           it "returns the document as an object" do
-            Book.find_by_slug(book.slugs.first).should == book
+            Book.find_by_slug!(book.slugs.first).should == book
           end
         end
 
         context "but no document is found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
             lambda {
-              Book.find_by_slug("Anti Oedipus")
+              Book.find_by_slug!("Anti Oedipus")
             }.should raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
@@ -658,14 +658,14 @@ module Mongoid
       context "(multiple)" do
         context "and all documents are found" do
           it "returns the documents as an array without duplication" do
-            Book.find_by_slug(book.slugs + book2.slugs).should =~ [book, book2]
+            Book.find_by_slug!(book.slugs + book2.slugs).should =~ [book, book2]
           end
         end
 
         context "but not all documents are found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
             lambda {
-              Book.find_by_slug(book.slugs + ['something-nonexistent'])
+              Book.find_by_slug!(book.slugs + ['something-nonexistent'])
             }.should raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
@@ -674,15 +674,15 @@ module Mongoid
       context "when scoped" do
         context "and a document is found" do
           it "returns the document as an object" do
-            book.subjects.find_by_slug(subject.slugs.first).should == subject
-            book2.subjects.find_by_slug(subject.slugs.first).should == subject2
+            book.subjects.find_by_slug!(subject.slugs.first).should == subject
+            book2.subjects.find_by_slug!(subject.slugs.first).should == subject2
           end
         end
 
         context "but no document is found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
             lambda {
-              book.subjects.find_by_slug('Another Subject')
+              book.subjects.find_by_slug!('Another Subject')
             }.should raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end

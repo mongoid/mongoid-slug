@@ -178,16 +178,16 @@ module Mongoid
       # If any supplied param does not match a document a Mongoid::Errors::DocumentNotFound will be raised.
       #
       # @example Find by a slug.
-      #   Model.find_by_slug('some-slug')
+      #   Model.find_by_slug!('some-slug')
       #
       # @example Find by multiple slugs.
-      #   Model.find_by_slug('some-slug', 'some-other-slug')
+      #   Model.find_by_slug!('some-slug', 'some-other-slug')
       #
       # @param [ Array<Object> ] args The slugs to search for.
       #
       # @return [ Array<Document>, Document ] The matching document(s).
-      def find_by_slug(*args)
-        with_default_scope.find_by_slug(*args)
+      def find_by_slug!(*args)
+        with_default_scope.find_by_slug!(*args)
       end
 
       private
