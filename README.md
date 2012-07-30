@@ -31,12 +31,30 @@ class Book
 end
 ```
 
-Find a record by its slug:
+Find a document by its slug:
 
 ```ruby
 # GET /books/a-thousand-plateaus
-book = Book.find_by_slug params[:book_id]
+book = Book.find params[:book_id]
 ```
+
+Mongoid Slug will attempt to determine whether you want to find using the `slugs` field or the `_id` field by inspecting the supplied parameters.
+
+* If your document uses `BSON::ObjectId` identifiers, and all arguments passed to `find` are `String` and look like valid `BSON::ObjectId`, then Mongoid Slug will perform a find based on `_id`.
+* If your document uses any other type of identifiers, and all arguments passed to `find` are of the same type, then Mongoid Slug will perform a find based on `_id`.
+* Otherwise, if all arguments passed to `find` are of the type `String`, then Mongoid Slug will perform a find based on `slugs`.
+
+To override this behaviour you may supply a hash of options as the final argument to `find` with the key `force_slugs` set to `true` or `false` as required. For example:
+
+```ruby
+Book.fields['_id'].type
+=> String
+book = Book.find 'a-thousand-plateaus' # Finds by _id
+=> ...
+book = Book.find 'a-thousand-plateaus', { force_slugs: true } # Finds by slugs
+=> ...
+```
+
 
 [Read here] [4] for all available options.
 
@@ -109,7 +127,7 @@ page = Page.new title: "Home"
 page.save
 page.update_attributes title: "Welcome"
 
-Page.find_by_slug("welcome") == Page.find_by_slug("home") #=> true
+Page.find("welcome") == Page.find("home") #=> true
 ```
 
 Reserved Slugs
@@ -126,7 +144,7 @@ class Friend
 end
 
 friend = Friend.create name: 'admin'
-Friend.find_by_slug('admin') # => nil
+Friend.find('admin') # => nil
 friend.slug # => 'admin-1'
 ```
 
