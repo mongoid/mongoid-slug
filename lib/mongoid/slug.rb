@@ -5,15 +5,17 @@ module Mongoid
 
     included do
       cattr_accessor :reserved_words,
-                     :slug_builder,
                      :slug_scope,
-                     :slugged_attributes
+                     :slugged_attributes,
+                     :url_builder
 
       field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
     end
 
     module ClassMethods
+
+
       # @overload slug(*fields)
       #   Sets one ore more fields as source of slug.
       #   @param [Array] fields One or more fields the slug should be based on.
@@ -52,23 +54,34 @@ module Mongoid
         self.reserved_words     = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes = fields.map &:to_s
 
-        unless slug_scope
+        if slug_scope
+          index({slug_scope: 1, _slugs: 1}, {unique: true})
+        else
           index({_slugs: 1}, {unique: true})
         end
 
         #-- Why is it necessary to customize the slug builder?
-        default_builder = lambda do |doc|
-          slugged_attributes.map { |f| doc.send f }.join ' '
+        default_url_builder = lambda do |desired_slug|
+          desired_slug.to_url
         end
 
-        self.slug_builder = block_given? ? block : default_builder
+        self.url_builder = block_given? ? block : default_url_builder
 
-        #-- a slug can be permanent or not
-        set_callback options[:permanent] ? :create : :save, :before do |doc|
-          doc.build_slug if doc.slug_should_be_rebuilt?
+        #-- always create slug on create
+        #-- do not create new slug on update if the slug is permanent
+        if options[:permanent]
+          set_callback :create, :before, :build_slug
+        else
+          set_callback :save, :before, :build_slug, :if => :slug_should_be_rebuilt?
         end
+
 
       end
+
+      def look_like_slugs?(*args)
+        with_default_scope.look_like_slugs?(*args)
+      end
+
 
       # Finds a unique slug, were specified string used to generate a slug.
       #
@@ -95,7 +108,7 @@ module Mongoid
 
         excluded_id = options[:model]._id if options[:model]
 
-        _slug = desired_slug.to_url
+        _slug = self.url_builder.call(desired_slug)
 
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
@@ -136,34 +149,40 @@ module Mongoid
           existing_history_slugs.push(*history_slugs.first(history_slugs.length() -1).find_all { |cur_slug| cur_slug =~ pattern })
         end
 
-        # If the only conflict is in the history of a document in the same scope,
-        # transfer the slug
-        if slug_scope && last_entered_slug.count == 0 && existing_history_slugs.count > 0
-          history_slugged_documents.each do |doc|
-            doc._slugs -= existing_history_slugs
-            doc.save
-          end
-          existing_slugs = []
-        end
+        #do not allow a slug that can be interpreted as the current document id
+        existing_slugs << _slug unless look_like_slugs?([_slug])
 
-        # Do not allow Moped::BSON::ObjectIds as slugs
-        existing_slugs << _slug if Moped::BSON::ObjectId.legal?(_slug)
-
+        #make sure that the slug is not equal to a reserved word
         if reserved_words.any? { |word| word === _slug }
           existing_slugs << _slug
         end
 
-        if existing_slugs.count > 0
-          # Sort the existing_slugs in increasing order by comparing the
-          # suffix numbers:
-          # slug, slug-1, slug-2, ..., slug-n
-          existing_slugs.sort! do |a, b|
-            (pattern.match(a)[1] || -1).to_i <=>
-            (pattern.match(b)[1] || -1).to_i
+        #only look for a new unique slug if the existing slugs contains the current slug
+        # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
+        if existing_slugs.include? _slug
+          # If the only conflict is in the history of a document in the same scope,
+          # transfer the slug
+          if slug_scope && last_entered_slug.count == 0 && existing_history_slugs.count > 0
+            history_slugged_documents.each do |doc|
+              doc._slugs -= existing_history_slugs
+              doc.save
+            end
+            existing_slugs = []
           end
-          max = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
 
-          _slug += "-#{max + 1}"
+          if existing_slugs.count > 0
+            # Sort the existing_slugs in increasing order by comparing the
+            # suffix numbers:
+            # slug, slug-1, slug-2, ..., slug-n
+            existing_slugs.sort! do |a, b|
+              (pattern.match(a)[1] || -1).to_i <=>
+              (pattern.match(b)[1] || -1).to_i
+            end
+            max = existing_slugs.last.match(/-(\d+)$/).try(:[], 1).to_i
+
+            _slug += "-#{max + 1}"
+          end
+
         end
 
         _slug
@@ -273,10 +292,15 @@ module Mongoid
       _slugs.last
     end
 
+    def slug_builder(doc)
+      self.slugged_attributes.map { |f| doc.send f }.join ' '
+
+    end
+
     private
 
     def find_unique_slug
-      find_unique_slug_for user_defined_slug || slug_builder.call(self)
+      find_unique_slug_for user_defined_slug || slug_builder(self)
     end
 
     def user_defined_slug

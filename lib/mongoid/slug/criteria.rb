@@ -50,7 +50,6 @@ module Mongoid
         for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
       end
 
-      protected
 
       # True if all supplied args look like slugs. Will only attempt to type cast for Moped::BSON::ObjectId.
       # Thus '123' will be interpreted as a slug even if the _id is an Integer field, etc.
@@ -66,6 +65,8 @@ module Mongoid
           false
         end
       end
+      
+      protected
 
       def for_slugs(slugs)
         where({ _slugs: { '$in' => slugs } }).limit(slugs.length)

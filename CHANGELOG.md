@@ -1,7 +1,25 @@
 # CHANGELOG
 
-## 
+## 0.20.0
+
+## Features
+* only look for a new unique slug if the existing slugs contains the current slug (digitalplaywright)
+  - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
+
+## Minor Changes
+
+* #76 Cleanup of callback handling (empact)
+
+### Major Changes (Backwards Incompatible)
+
 * Fixed broken #find al (Alan Larkin)
+* Only Mongoid 3.0 syntax is supported (digitalplaywright)
+* Store all slugs in a single field of array type (digitalplaywright)
+* Removed the ':as' feature (digitalplaywright)
+* Renamed slug field to _slugs (digitalplaywright)
+* Slugs are indexes by default and removed the :index option (digitalplaywright)
+* Reserved words should default to :new and :edit (digitalplaywright)
+* Removed find_by_slug (digitalplaywright)
 * Add `#find_by_slug!` al (Alan Larkin)
 
 ## 0.10.0

@@ -596,6 +596,12 @@ module Mongoid
           end
         end
 
+        context "models that does not use slugs, should find using the original find" do
+          it "it should find based on ids" do # i.e. it should not type cast the argument
+            WithoutSlug.find(without_slug.id.to_s).should == without_slug
+          end
+        end
+
         context "when scoped" do
           context "and a document is found" do
             it "returns the document as an object" do
@@ -754,6 +760,20 @@ module Mongoid
       it "returns the unique slug with a counter if necessary" do
         Book.create(:title => "Anti Oedipus")
         book.find_unique_slug_for("Anti Oedipus").should eq("anti-oedipus-1")
+      end
+    end
+
+    describe "when regular expression matches, but document does not" do
+      let!(:book_1) { Book.create(:title => "book-1") }
+      let!(:book_2) { Book.create(:title => "book") }
+      let!(:book_3) { Book.create(:title => "book") }
+
+      it "book_2 should have the user supplied title without -1 after it" do
+        book_2.to_param.should eql "book"
+      end
+
+      it "book_3 should have a generated slug" do
+        book_3.to_param.should eql "book-2"
       end
     end
 
