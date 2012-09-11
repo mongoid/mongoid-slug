@@ -7,7 +7,8 @@ module Mongoid
       cattr_accessor :reserved_words,
                      :slug_scope,
                      :slugged_attributes,
-                     :url_builder
+                     :url_builder,
+                     :history
 
       field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
@@ -53,6 +54,7 @@ module Mongoid
         self.slug_scope         = options[:scope]
         self.reserved_words     = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes = fields.map &:to_s
+        self.history            = options[:history]
 
         if slug_scope
           index({slug_scope: 1, _slugs: 1}, {unique: true})
@@ -255,8 +257,11 @@ module Mongoid
     def build_slug
       _new_slug = find_unique_slug
       self._slugs.delete(_new_slug)
-      self._slugs << _new_slug
-
+      if self.history == true
+        self._slugs << _new_slug
+      else
+        self._slugs = [_new_slug]
+      end
       true
     end
 
@@ -291,6 +296,7 @@ module Mongoid
 
       _slugs.last
     end
+    alias_method :slug, :to_param
 
     def slug_builder(doc)
       self.slugged_attributes.map { |f| doc.send f }.join ' '
