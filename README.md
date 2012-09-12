@@ -1,3 +1,6 @@
+*IMPORTANT:*  If you are upgrading to Mongoid Slug 0.20.0 please migrate in accordance with the instructions in https://github.com/digitalplaywright/mongoid-slug/wiki/How-to-upgrade-to-0.20.0.
+Mongoid Slug 0.20.0 stores the slugs in a single field _slugs of array type, and all previous slugs must be migrated.
+
 Mongoid Slug
 ============
 
@@ -5,7 +8,7 @@ Mongoid Slug generates a URL slug or permalink based on one or more fields in a
 Mongoid model. It sits idly on top of [stringex] [1], supporting non-Latin
 characters.
 
-[![travis] [2]] [3]
+[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.png)](http://travis-ci.org/digitalplaywright/mongoid-slug)
 
 Installation
 ------------
