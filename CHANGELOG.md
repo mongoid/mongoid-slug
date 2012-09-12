@@ -23,6 +23,8 @@
 * Add `#find_by_slug!` al (Alan Larkin)
 
 ## 0.10.0
+* Bugfix: Slug history should only apply if history is set to true. (tomaswitek)
+* Bugfix: Model.slug should alias to to_param (tomaswitek) `
 * Add .find_unique_slug_for and #find_unique_slug_for methods DouweM (Douwe Maan)
 * Ensure uniqueness of slug set manually DouweM (Douwe Maan)
 * Add support for reserved slugs siong1987 (Teng Siong Ong) DouweM (Douwe Maan)
