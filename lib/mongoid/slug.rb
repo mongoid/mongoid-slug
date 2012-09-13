@@ -298,19 +298,27 @@ module Mongoid
     end
     alias_method :slug, :to_param
 
-    def slug_builder(doc)
-      self.slugged_attributes.map { |f| doc.send f }.join ' '
+    def slug_builder
 
+      _cur_slug = nil
+      if (new_record? and _slugs.present?) or (persisted? and _slugs_changed?)
+        #user defined slug
+        _cur_slug =  _slugs.last
+      end
+
+      #generate slug if the slug is not user defined or does not exist
+      unless _cur_slug
+        self.slugged_attributes.map { |f| self.send f }.join ' '
+      else
+        _cur_slug
+      end
     end
 
     private
 
     def find_unique_slug
-      find_unique_slug_for user_defined_slug || slug_builder(self)
-    end
-
-    def user_defined_slug
-      _slugs.last if (new_record? and _slugs.present?) or (persisted? and _slugs_changed?)
+      find_unique_slug_for slug_builder
     end
   end
 end
+
