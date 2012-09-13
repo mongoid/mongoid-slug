@@ -734,35 +734,6 @@ module Mongoid
       end
     end
 
-    describe ".find_unique_slug_for" do
-      it "returns the unique slug" do
-        Book.find_unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus")
-      end
-
-      it "returns the unique slug with a counter if necessary" do
-        Book.create(:title => "A Thousand Plateaus")
-        Book.find_unique_slug_for("A Thousand Plateaus").should eq("a-thousand-plateaus-1")
-      end
-
-      it "returns the unique slug as if it were the provided object" do
-        book = Book.create(:title => "A Thousand Plateaus")
-        Book.find_unique_slug_for("A Thousand Plateaus", :model => book).should eq("a-thousand-plateaus")
-      end
-    end
-
-    describe "#find_unique_slug_for" do
-      let!(:book) { Book.create(:title => "A Thousand Plateaus") }
-
-      it "returns the unique slug" do
-        book.find_unique_slug_for("Anti Oedipus").should eq("anti-oedipus")
-      end
-
-      it "returns the unique slug with a counter if necessary" do
-        Book.create(:title => "Anti Oedipus")
-        book.find_unique_slug_for("Anti Oedipus").should eq("anti-oedipus-1")
-      end
-    end
-
     describe "when regular expression matches, but document does not" do
       let!(:book_1) { Book.create(:title => "book-1") }
       let!(:book_2) { Book.create(:title => "book") }

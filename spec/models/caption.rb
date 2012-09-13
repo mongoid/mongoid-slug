@@ -11,7 +11,7 @@ class Caption
   #
   # We are only interested in the name of the artist so we remove the
   # paranthesized details.
-  slug :my_identity, :title do |desired_slug|
-    desired_slug.gsub(/\s*\([^)]+\)/, '').to_url
+  slug :my_identity, :title do |cur_object|
+    cur_object.slug_builder.gsub(/\s*\([^)]+\)/, '').to_url
   end
 end
