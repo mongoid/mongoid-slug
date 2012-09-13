@@ -61,6 +61,26 @@ book = Book.find 'a-thousand-plateaus', { force_slugs: true } # Finds by slugs
 
 [Read here] [4] for all available options.
 
+Custom Slug Generation
+-------
+
+By default Mongoid Slug generates slugs with stringex. If this is not desired you can
+define your own slug generator like this:
+
+```
+class Caption
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  #create a block that takes the current object as an argument
+  #and returns the slug.
+  slug do |cur_object|
+    cur_object.slug_builder.to_url
+  end
+end
+
+```
+
 Scoping
 -------
 
