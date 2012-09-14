@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.20.0
+## 1.0.0
 
 ## Features
 * only look for a new unique slug if the existing slugs contains the current slug (digitalplaywright)
