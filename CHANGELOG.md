@@ -12,6 +12,7 @@
 
 ### Major Changes (Backwards Incompatible)
 
+* Custom slug block now passes in the object (digitalplaywright)
 * Fixed broken #find al (Alan Larkin)
 * Only Mongoid 3.0 syntax is supported (digitalplaywright)
 * Store all slugs in a single field of array type (digitalplaywright)
