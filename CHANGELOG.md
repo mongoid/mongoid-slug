@@ -23,6 +23,10 @@
 * Removed find_by_slug (digitalplaywright)
 * Add `#find_by_slug!` al (Alan Larkin)
 
+## Bugfixes
+
+* Correct index creation on scoped slugs ( Douwe Maan )
+
 ## 0.10.0
 * Bugfix: Slug history should only apply if history is set to true. (tomaswitek)
 * Bugfix: Model.slug should alias to to_param (tomaswitek) `
