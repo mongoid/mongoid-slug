@@ -57,7 +57,8 @@ module Mongoid
         self.history            = options[:history]
 
         if slug_scope
-          index({slug_scope: 1, _slugs: 1}, {unique: true})
+          scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
+          index({scope_key => 1, _slugs: 1}, {unique: true})
         else
           index({_slugs: 1}, {unique: true})
         end
