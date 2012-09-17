@@ -1,5 +1,5 @@
-*IMPORTANT:*  If you are upgrading to Mongoid Slug 0.20.0 please migrate in accordance with the instructions in https://github.com/digitalplaywright/mongoid-slug/wiki/How-to-upgrade-to-0.20.0.
-Mongoid Slug 0.20.0 stores the slugs in a single field _slugs of array type, and all previous slugs must be migrated.
+*IMPORTANT:*  If you are upgrading to Mongoid Slug 1.0.0 please migrate in accordance with the instructions in https://github.com/digitalplaywright/mongoid-slug/wiki/How-to-upgrade-to-0.20.0.
+Mongoid Slug 1.0.0  stores the slugs in a single field _slugs of array type, and all previous slugs must be migrated.
 
 Mongoid Slug
 ============
