@@ -56,11 +56,13 @@ module Mongoid
         self.slugged_attributes = fields.map &:to_s
         self.history            = options[:history]
 
-        if slug_scope
-          scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
-          index({scope_key => 1, _slugs: 1}, {unique: true})
-        else
-          index({_slugs: 1}, {unique: true})
+        unless embedded?
+          if slug_scope
+            scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
+            index({scope_key => 1, _slugs: 1}, {unique: true})
+          else
+            index({_slugs: 1}, {unique: true})
+          end
         end
 
         #-- Why is it necessary to customize the slug builder?

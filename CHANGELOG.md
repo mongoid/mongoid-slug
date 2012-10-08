@@ -1,12 +1,18 @@
 # CHANGELOG
 
+## 1.0.1
+
+###Bugfixes
+
+* do not create indexes for embedded documents (digitalplaywright)
+
 ## 1.0.0
 
-## Features
+### Features
 * only look for a new unique slug if the existing slugs contains the current slug (digitalplaywright)
   - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
 
-## Minor Changes
+### Minor Changes
 
 * #76 Cleanup of callback handling (empact)
 
@@ -23,7 +29,7 @@
 * Removed find_by_slug (digitalplaywright)
 * Add `#find_by_slug!` al (Alan Larkin)
 
-## Bugfixes
+### Bugfixes
 
 * Correct index creation on scoped slugs ( Douwe Maan )
 
