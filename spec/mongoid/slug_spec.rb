@@ -29,6 +29,12 @@ module Mongoid
         bad = Book.create(:title => "4ea0389f0364313d79104fb3")
         bad.slugs.should_not include("4ea0389f0364313d79104fb3")
       end
+      
+      it "does allow a Moped::BSON::ObjectId as use for a slug if it is the document id" do
+        book = Book.create()
+        book.update_attributes(:title => book.id.to_s)
+        book.slugs.should include(book.id.to_s)
+      end
 
       it "does not update slug if slugged fields have not changed" do
         book.save

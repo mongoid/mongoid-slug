@@ -173,8 +173,9 @@ module Mongoid
         existing_history_slugs.push(*history_slugs.first(history_slugs.length() -1).find_all { |cur_slug| cur_slug =~ pattern })
       end
 
-      #do not allow a slug that can be interpreted as the current document id
-      existing_slugs << _slug unless self.class.look_like_slugs?([_slug])
+      # do not allow a slug that can be interpreted as the current document id
+      # unless it is the current document id which will work with either find
+      existing_slugs << _slug if !self.class.look_like_slugs?([_slug]) && _slug != self._id.to_s
 
       #make sure that the slug is not equal to a reserved word
       if reserved_words.any? { |word| word === _slug }
