@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Andreas Saebjoernsen']
   s.email       = ['andy@cosemble.com']
-  s.homepage    = 'http://github.com/digitalplaywright/mongoid-slug'
+  s.homepage    = 'http://github.com/musicglue/mongoid-slug'
   s.summary     = 'Mongoid URL slugs'
   s.description = 'Mongoid URL slug or permalink generator'
 
@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'awesome_print'
+  s.add_development_dependency 'uuid'
 
   s.files         = Dir.glob('lib/**/*') + %w(LICENSE README.md)
   s.test_files    = Dir.glob('spec/**/*')

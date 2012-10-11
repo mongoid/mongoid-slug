@@ -7,7 +7,59 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
+    context "when option reference is used with UUID _id " do
+      let(:entity0) do
+        Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
+      end
+      let(:entity1) do
+        Entity.create(:_id => UUID.generate, :name => 'Jackson 5', :user_edited_variation => 'jackson-5')
+      end
+      let(:entity2) do
+        Entity.create(:_id => UUID.generate, :name => 'Jackson 5', :user_edited_variation => 'jackson-5')
+      end
+
+      it "generates a unique slug by appending a counter to duplicate text" do
+        entity0.to_param.should eql "pelham-1-2-3"
+
+        5.times{ |x|
+          dup = Entity.create(:_id => UUID.generate, :name => entity0.name, :user_edited_variation => entity0.user_edited_variation)
+          dup.to_param.should eql "pelham-1-2-3-#{x.succ}"
+        }
+      end
+
+      it "allows the user to edit the sluggable field" do
+        entity1.to_param.should eql "jackson-5"
+        entity2.to_param.should eql "jackson-5-1"
+        entity2.user_edited_variation = "jackson-5-indiana"
+        entity2.save
+        entity2.to_param.should eql "jackson-5-indiana"
+      end
+
+      it "allows users to edit the sluggable field" do
+        entity1.to_param.should eql "jackson-5"
+        entity2.to_param.should eql "jackson-5-1"
+        entity2.user_edited_variation = "jackson-5-indiana"
+        entity2.save
+        entity2.to_param.should eql "jackson-5-indiana"
+      end
+
+      it "it restores the slug if the editing user tries to use an existing slug" do
+        entity1.to_param.should eql "jackson-5"
+        entity2.to_param.should eql "jackson-5-1"
+        entity2.user_edited_variation = "jackson-5"
+        entity2.save
+        entity2.to_param.should eql "jackson-5-1"
+      end
+
+      it "does not force an appended counter on a plain string" do
+        entity = Entity.create(:_id => UUID.generate, :name => 'Adele', :user_edited_variation => 'adele')
+        entity.to_param.should eql "adele"
+      end
+
+    end
+
     context "when the object is top-level" do
+
       it "generates a slug" do
         book.to_param.should eql "a-thousand-plateaus"
       end
@@ -26,8 +78,9 @@ module Mongoid
       end
 
       it "does not allow a Moped::BSON::ObjectId as use for a slug" do
-        bad = Book.create(:title => "4ea0389f0364313d79104fb3")
-        bad.slugs.should_not include("4ea0389f0364313d79104fb3")
+        bson_id = Moped::BSON::ObjectId.new.to_s
+        bad = Book.create(:title => bson_id)
+        bad.slugs.should_not include(bson_id)
       end
 
       it "does not update slug if slugged fields have not changed" do
@@ -530,7 +583,7 @@ module Mongoid
       let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
       let!(:without_slug) { WithoutSlug.new().tap { |d| d.id = 456; d.save } }
 
-      context "when the model does not use mongoid slugs" do 
+      context "when the model does not use mongoid slugs" do
         it "should not use mongoid slug's custom find methods" do
           Mongoid::Slug::Criteria.any_instance.should_not_receive(:find)
           WithoutSlug.find(without_slug.id.to_s).should == without_slug

@@ -3,6 +3,8 @@ begin
 rescue LoadError
 end
 require 'rspec'
+require 'uuid'
+require "awesome_print"
 
 require File.expand_path '../../lib/mongoid_slug', __FILE__
 
