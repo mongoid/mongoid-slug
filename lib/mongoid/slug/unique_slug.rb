@@ -25,11 +25,11 @@ module Mongoid
           end
         end
 
-        def existing?
+        def existing_slugs?
           existing_slugs.size > 0
         end
 
-        def appended?
+        def attempt_appended?
           existing_slugs.include? @attempt
         end
 
@@ -126,7 +126,7 @@ module Mongoid
 
         #only look for a new unique slug if the existing slugs contains the current slug
         # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
-        if @state.appended? && @state.existing?
+        if @state.attempt_appended? && @state.existing_slugs?
           ref = slug_reference ? model.send(slug_reference) : nil
           @state.sort_existing(ref)
           counter = @state.next_counter
