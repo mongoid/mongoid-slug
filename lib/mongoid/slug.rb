@@ -10,8 +10,7 @@ module Mongoid
                      :url_builder,
                      :history,
                      :slug_reference,
-                     :check_against_id,
-                     :transfer_from_history
+                     :check_against_id
 
       field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
@@ -58,7 +57,6 @@ module Mongoid
         self.history               = options[:history]
         self.slug_reference        = options[:reference]
         self.check_against_id      = !options.fetch(:skip_id_check, false)
-        self.transfer_from_history = options.fetch(:transfer_historic, true)
 
         unless embedded?
           if slug_scope

@@ -25,15 +25,6 @@ module Mongoid
           end
         end
 
-        def transfer_history
-          return unless last_entered_slug.count == 0 && existing_history_slugs.count > 0
-          @documents.each do |doc|
-            doc._slugs -= existing_history_slugs
-            doc.save
-          end
-          @existing_slugs = []
-        end
-
         def existing?
           existing_slugs.size > 0
         end
@@ -47,6 +38,7 @@ module Mongoid
         end
 
         def next_counter
+          return 0 unless @sorted_existing.last
           @sorted_existing.last.match(/-(\d+)$/).try(:[], 1).to_i.succ
         end
 
@@ -84,7 +76,7 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-        :check_against_id, :reserved_words, :transfer_from_history, :slug_reference,
+        :check_against_id, :reserved_words, :slug_reference, :url_builder
         :collection_name, :embedded?, :reflect_on_all_associations, :metadata
 
       def initialize model
@@ -97,7 +89,7 @@ module Mongoid
         @_slug = if attempt
           attempt.to_url
         else
-          @model.url_builder.call(model)
+          url_builder.call(model)
         end
         # Regular expression that matches slug, slug-1, ... slug-n
         # If slug_name field was indexed, MongoDB will utilize that
@@ -124,15 +116,11 @@ module Mongoid
 
         #only look for a new unique slug if the existing slugs contains the current slug
         # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
-        if @state.appended?
-          @state.transfer_history if transfer_from_history && slug_scope
-
-          if @state.existing?
-            ref = slug_reference ? model.send(slug_reference) : nil
-            @state.sort_existing(ref)
-            counter = @state.next_counter
-            @_slug += "-#{counter}"
-          end
+        if @state.appended? && @state.existing?
+          ref = slug_reference ? model.send(slug_reference) : nil
+          @state.sort_existing(ref)
+          counter = @state.next_counter
+          @_slug += "-#{counter}"
         end
         _slug
       end
