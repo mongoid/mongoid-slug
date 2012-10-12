@@ -34,6 +34,7 @@ module Mongoid
         end
 
         def append_attempt
+          return if attempt_appended?
           existing_slugs << @attempt
         end
 
