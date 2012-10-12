@@ -55,7 +55,6 @@ module Mongoid
         entity = Entity.create(:_id => UUID.generate, :name => 'Adele', :user_edited_variation => 'adele')
         entity.to_param.should eql "adele"
       end
-
     end
 
     context "when the object is top-level" do
@@ -403,30 +402,6 @@ module Mongoid
         it "scopes by parent object provided that inverse_of is specified" do
           dup = author2.characters.create(:name => character.name)
           dup.to_param.should eql character.to_param
-        end
-      end
-
-      context "when using history and reusing a slug within the scope" do
-        let!(:subject1) do
-          book.subjects.create(:name => "A Subject")
-        end
-        let!(:subject2) do
-          book.subjects.create(:name => "Another Subject")
-        end
-
-        before(:each) do
-          subject1.name = "Something Else Entirely"
-          subject1.save
-          subject2.name = "A Subject"
-          subject2.save
-        end
-
-        it "allows using the slug" do
-          subject2.slugs.should include("a-subject")
-        end
-
-        it "removes the slug from the old owner's history" do
-          subject1.slugs.should_not include("a-subject")
         end
       end
     end
