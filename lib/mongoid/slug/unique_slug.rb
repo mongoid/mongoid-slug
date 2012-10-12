@@ -69,6 +69,16 @@ module Mongoid
         def prep_compare obj
           (@pattern.match(obj)[1] || -1).to_i
         end
+
+        def inspect
+          {
+            :attempt                => @attempt,
+            :existing_slugs         => existing_slugs,
+            :last_entered_slug      => last_entered_slug,
+            :existing_history_slugs => existing_history_slugs,
+            :sorted_existing        => sorted_existing
+          }
+        end
       end
 
       extend Forwardable
@@ -76,7 +86,7 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-        :check_against_id, :reserved_words, :slug_reference, :url_builder
+        :check_against_id, :reserved_words, :slug_reference, :url_builder,
         :collection_name, :embedded?, :reflect_on_all_associations, :metadata
 
       def initialize model
