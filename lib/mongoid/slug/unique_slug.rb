@@ -38,7 +38,7 @@ module Mongoid
         end
 
         def next_counter
-          return 0 unless @sorted_existing.last
+          return 1 unless @sorted_existing.last
           @sorted_existing.last.match(/-(\d+)$/).try(:[], 1).to_i.succ
         end
 
