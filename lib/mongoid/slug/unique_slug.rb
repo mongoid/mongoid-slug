@@ -8,8 +8,8 @@ module Mongoid
       class SlugState
         attr_reader :last_entered_slug, :existing_slugs, :existing_history_slugs, :sorted_existing
 
-        def initialize attempt, documents, pattern
-          @attempt = attempt
+        def initialize slug, documents, pattern
+          @slug = slug
           @documents = documents
           @pattern = pattern
           @last_entered_slug = []
@@ -25,54 +25,30 @@ module Mongoid
           end
         end
 
-        def existing_slugs?
-          existing_slugs.size > 0
+        def slug_included?
+          existing_slugs.include? @slug
         end
 
-        def attempt_appended?
-          existing_slugs.include? @attempt
+        def include_slug
+          existing_slugs << @slug
         end
 
-        def append_attempt
-          existing_slugs << @attempt
+        def highest_existing_counter
+          sort_existing_slugs
+          @sorted_existing.last || 0
         end
 
-        def next_counter
-          return 1 unless @sorted_existing.last
-          @sorted_existing.last.match(/-(\d+)$/).try(:[], 1).to_i.succ
-        end
-
-        def sort_existing reference = nil
-          @sorted_existing = reference ? counter_sort(reference) : standard_sort
-        end
-
-        def counter_sort reference
-          # lop off the reference part to leave the counter part i.e '', '-1', '-2'
-          base = reference.to_url
-          re = %r(^#{Regexp.escape(base)})
-          existing_slugs.select do |s|
-            s =~ /-(\d+)$/
-          end.map do |s|
-            s.sub(re,'')
+        def sort_existing_slugs
+          # remove the slug part and leave the absolute integer part and sort
+          re = %r(^#{Regexp.escape(@slug)})
+          @sorted_existing = existing_slugs.map do |s|
+            s.sub(re,'').to_i.abs
           end.sort
-        end
-
-        def standard_sort
-          # Sort the existing_slugs in increasing order by comparing the
-          # suffix numbers:
-          # slug, slug-1, slug-2, ..., slug-n
-          existing_slugs.sort do |a, b|
-            prep_compare(a) <=> prep_compare(b)
-          end
-        end
-
-        def prep_compare obj
-          (@pattern.match(obj)[1] || -1).to_i
         end
 
         def inspect
           {
-            :attempt                => @attempt,
+            :slug                   => @slug,
             :existing_slugs         => existing_slugs,
             :last_entered_slug      => last_entered_slug,
             :existing_history_slugs => existing_history_slugs,
@@ -86,8 +62,8 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-        :check_against_id, :reserved_words, :slug_reference, :url_builder,
-        :collection_name, :embedded?, :reflect_on_all_associations, :metadata
+        :check_against_id, :reserved_words, :url_builder, :metadata,
+        :collection_name, :embedded?, :reflect_on_all_associations
 
       def initialize model
         @model = model
@@ -118,19 +94,17 @@ module Mongoid
 
         @state = SlugState.new _slug, uniqueness_scope.where(where_hash), pattern
 
-        # #do not allow a slug that can be interpreted as the current document id
-        @state.append_attempt if check_against_id && !model.class.look_like_slugs?([_slug])
+        # do not allow a slug that can be interpreted as the current document id
+        @state.include_slug if check_against_id && !model.class.look_like_slugs?([_slug])
 
-        # #make sure that the slug is not equal to a reserved word
-        @state.append_attempt if reserved_words.any? { |word| word === _slug }
+        # make sure that the slug is not equal to a reserved word
+        @state.include_slug if reserved_words.any? { |word| word === _slug }
 
-        #only look for a new unique slug if the existing slugs contains the current slug
+        # only look for a new unique slug if the existing slugs contains the current slug
         # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
-        if @state.attempt_appended? && @state.existing_slugs?
-          ref = slug_reference ? model.send(slug_reference) : nil
-          @state.sort_existing(ref)
-          counter = @state.next_counter
-          @_slug += "-#{counter}"
+        if @state.slug_included?
+          highest = @state.highest_existing_counter
+          @_slug += "-#{highest.succ}"
         end
         _slug
       end

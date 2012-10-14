@@ -7,5 +7,5 @@ class Entity
   field :name
   field :user_edited_variation
 
-  slug  :user_edited_variation, :history => true, :skip_id_check => true, :reference => :name
+  slug  :user_edited_variation, :history => true, :skip_id_check => true
 end

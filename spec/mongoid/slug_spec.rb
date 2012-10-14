@@ -7,7 +7,7 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
-    context "when option reference is used with UUID _id " do
+    context "when option skip_id_check is used with UUID _id " do
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
       end
@@ -794,6 +794,21 @@ module Mongoid
           book.slugs = ["not-it-either"]
           book.save
           book.to_param.should eql "not-it-either"
+        end
+
+        it "updates the slug when a new one is appended" do
+          book = Book.create(:title => "A Thousand Plateaus", :slugs => ["not-what-you-expected"])
+          book.slugs.push "not-it-either"
+          book.save
+          book.to_param.should eql "not-it-either"
+        end
+
+        it "updates the slug to a unique slug when a new one is appended" do
+          book1 = Book.create(:title => "Sleepyhead")
+          book2 = Book.create(:title => "A Thousand Plateaus")
+          book2.slugs.push "sleepyhead"
+          book2.save
+          book2.to_param.should eql "sleepyhead-1"
         end
       end
 
