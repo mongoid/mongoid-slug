@@ -8,6 +8,12 @@ require "awesome_print"
 
 require File.expand_path '../../lib/mongoid_slug', __FILE__
 
+module Mongoid::Slug::UuidIdStrategy
+  def self.call id
+    id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
+  end
+end
+
 def database_id
     ENV['CI'] ? "mongoid_slug_#{Process.pid}" : 'mongoid_slug_test'
 end

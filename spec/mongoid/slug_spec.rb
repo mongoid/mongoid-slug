@@ -8,12 +8,6 @@ module Mongoid
     end
 
     context "when option skip_id_check is used with UUID _id " do
-      before do
-        Mongoid::Slug::Criteria.any_instance.stub :string_id_check do |id|
-          id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
-        end
-      end
-
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
       end
