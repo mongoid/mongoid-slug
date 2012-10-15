@@ -50,22 +50,36 @@ module Mongoid
         for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
       end
 
-
       # True if all supplied args look like slugs. Will only attempt to type cast for Moped::BSON::ObjectId.
       # Thus '123' will be interpreted as a slug even if the _id is an Integer field, etc.
       def look_like_slugs?(args)
-        if args.all? { |id| id.is_a?(String) }
-          id_type = @klass.fields['_id'].type
-          case
-            when id_type == Moped::BSON::ObjectId
-              args.any? { |id| !Moped::BSON::ObjectId.legal?(id) }
-            else args.any? { |id| id.class != id_type }
-          end
-        else
-          false
-        end
+        return false unless args.all? { |id| id.is_a?(String) }
+        id_type = @klass.fields['_id'].type.to_s.downcase
+        strategy = check_strategies[id_type]
+        args.none? { |id| strategy.call(id) }
       end
       
+      def check_strategies
+        @check_strategies ||= build_strategies
+      end
+
+      def build_strategies
+        hash = {
+          'object_id' => method(:object_id_check)
+          'string'    => method(:string_id_check)
+        }
+        hash.default = lambda {|id| false}
+        hash
+      end
+
+      def object_id_check id
+        Moped::BSON::ObjectId.legal?(id)
+      end
+
+      def string_id_check id
+        true
+      end
+
       protected
 
       def for_slugs(slugs)
