@@ -95,7 +95,7 @@ module Mongoid
         @state = SlugState.new _slug, uniqueness_scope.where(where_hash), pattern
 
         # do not allow a slug that can be interpreted as the current document id
-        @state.include_slug if check_against_id && !model.class.look_like_slugs?([_slug])
+        @state.include_slug unless model.class.look_like_slugs?([_slug])
 
         # make sure that the slug is not equal to a reserved word
         @state.include_slug if reserved_words.any? { |word| word === _slug }

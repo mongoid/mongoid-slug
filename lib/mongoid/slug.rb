@@ -8,8 +8,7 @@ module Mongoid
                      :slug_scope,
                      :slugged_attributes,
                      :url_builder,
-                     :history,
-                     :check_against_id
+                     :history
 
       field :_slugs, type: Array, default: []
       alias_attribute :slugs, :_slugs
@@ -54,7 +53,6 @@ module Mongoid
         self.reserved_words        = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes    = fields.map &:to_s
         self.history               = options[:history]
-        self.check_against_id      = !options.fetch(:skip_id_check, false)
 
         unless embedded?
           if slug_scope

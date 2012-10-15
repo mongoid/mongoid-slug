@@ -65,8 +65,8 @@ module Mongoid
 
       def build_strategies
         hash = {
-          'object_id' => method(:object_id_check)
-          'string'    => method(:string_id_check)
+          'moped::bson::objectid' => method(:object_id_check),
+          'string'                => method(:string_id_check)
         }
         hash.default = lambda {|id| false}
         hash

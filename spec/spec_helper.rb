@@ -28,13 +28,3 @@ RSpec.configure do |c|
     Mongoid::Threaded.sessions[:default].drop if ENV['CI']
   end
 end
-
-module Mongoid
-  module Slug
-    module UuidIdCheck
-      def string_id_check id
-        id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
-      end
-    end
-  end
-end

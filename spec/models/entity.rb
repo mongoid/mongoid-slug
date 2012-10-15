@@ -1,7 +1,6 @@
 class Entity
   include Mongoid::Document
   include Mongoid::Slug
-  include Mongoid::Slug::UuidIdCheck
 
   field :_id, type: String
 
