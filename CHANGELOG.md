@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2.0.0
+
+### New Features
+
+* Separate out unique finding logic into own class (guyboertje)
+* Enable custom specification of looks_like_slug? method (guyboertje)
+
+### Major Changes (Backwards Incompatible)
+
+* remove transfer from history (guyboertje)
+
 ## 1.0.1
 
 ###Bugfixes
