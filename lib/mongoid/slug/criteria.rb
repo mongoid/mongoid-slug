@@ -50,23 +50,33 @@ module Mongoid
         for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
       end
 
-
-      # True if all supplied args look like slugs. Will only attempt to type cast for Moped::BSON::ObjectId.
-      # Thus '123' will be interpreted as a slug even if the _id is an Integer field, etc.
       def look_like_slugs?(args)
-        if args.all? { |id| id.is_a?(String) }
-          id_type = @klass.fields['_id'].type
-          case
-            when id_type == Moped::BSON::ObjectId
-              args.any? { |id| !Moped::BSON::ObjectId.legal?(id) }
-            else args.any? { |id| id.class != id_type }
-          end
-        else
-          false
-        end
+        return false unless args.all? { |id| id.is_a?(String) }
+        id_field = @klass.fields['_id']
+        @slug_strategy ||= id_field.options[:slug_id_strategy] || build_slug_strategy(id_field.type)
+        args.none? { |id| @slug_strategy.call(id) }
       end
-      
+
       protected
+
+      # unless a :slug_id_strategy option is defined on the id field,
+      # use object_id or string strategy depending on the id_type
+      # otherwise default for all other id_types
+      def build_slug_strategy id_type
+        type_method = id_type.to_s.downcase.split('::').last + "_slug_strategy"
+        self.respond_to?(type_method) ? method(type_method) : lambda {|id| false}
+      end
+
+      # a string will not look like a slug if it looks like a legal ObjectId
+      def objectid_slug_strategy id
+        Moped::BSON::ObjectId.legal?(id)
+      end
+
+      # a string will always look like a slug
+      def string_slug_strategy id
+        true
+      end
+
 
       def for_slugs(slugs)
         where({ _slugs: { '$in' => slugs } }).limit(slugs.length)
