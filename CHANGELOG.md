@@ -9,6 +9,8 @@
 
 ### Major Changes (Backwards Incompatible)
 
+* calling `to_param` on a document without a slug no longer builds a slug and
+  persists the document
 * remove transfer from history (guyboertje)
 
 ## 1.0.1

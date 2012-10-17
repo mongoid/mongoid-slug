@@ -146,14 +146,13 @@ module Mongoid
     # @return [String] A string which Action Pack uses for constructing an URL
     # to this record.
     def to_param
-      unless _slugs.last
-        build_slug
-        save
-      end
+      slug || super
+    end
 
+    # @return [String] the slug, or nil if the document does not have a slug.
+    def slug
       _slugs.last
     end
-    alias_method :slug, :to_param
 
     def slug_builder
       _cur_slug = nil
