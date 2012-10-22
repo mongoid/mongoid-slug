@@ -43,22 +43,35 @@ book = Book.find params[:book_id]
 
 Mongoid Slug will attempt to determine whether you want to find using the `slugs` field or the `_id` field by inspecting the supplied parameters.
 
-* If your document uses `BSON::ObjectId` identifiers, and all arguments passed to `find` are `String` and look like valid `BSON::ObjectId`, then Mongoid Slug will perform a find based on `_id`.
+* Mongoid Slug will perform a find based on `slugs` only if all arguments passed to `find` are of the type `String`
+* If your document uses `BSON::ObjectId` identifiers, and all arguments look like valid `BSON::ObjectId`, then Mongoid Slug will perform a find based on `_id`.
 * If your document uses any other type of identifiers, and all arguments passed to `find` are of the same type, then Mongoid Slug will perform a find based on `_id`.
-* Otherwise, if all arguments passed to `find` are of the type `String`, then Mongoid Slug will perform a find based on `slugs`.
+* If your document uses `String` identifiers and you want to be able find by slugs or ids, to get the correct behaviour, you should add a slug_id_strategy option to your _id field definition.  This option should return something that responds to `call` (a callable) and takes one string argument, e.g. a lambda.  This callable must return true if the string looks like one of your ids.
 
-To override this behaviour you may supply a hash of options as the final argument to `find` with the key `force_slugs` set to `true` or `false` as required. For example:
 
 ```ruby
 Book.fields['_id'].type
 => String
-book = Book.find 'a-thousand-plateaus' # Finds by _id
+book = Book.find 'a-thousand-plateaus' # Finds by slugs
 => ...
-book = Book.find 'a-thousand-plateaus', { force_slugs: true } # Finds by slugs
+
+class Post
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :_id, type: String, slug_id_strategy: lambda {|id| id.start_with?('....')}
+
+  field :name
+  slug  :name, :history => true
+end
+
+Post.fields['_id'].type
+=> String
+post = Post.find 'a-thousand-plateaus' # Finds by slugs
+=> ...
+post = Post.find '....1000/Plateus' # Finds by ids
 => ...
 ```
-
-
 [Read here] [4] for all available options.
 
 Custom Slug Generation
@@ -169,6 +182,20 @@ end
 friend = Friend.create name: 'admin'
 Friend.find('admin') # => nil
 friend.slug # => 'admin-1'
+```
+
+Adhoc checking whether a string is unique on a per Model basis
+--------------------------------------------------------------
+
+Lets say you want to have a auto-suggest function on your GUI that could provide a preview of what the url or slug could be before the form to create the record was submitted.
+
+You can use the UniqueSlug class in your server side code to do this, e.g.
+
+```ruby
+title = params[:title]
+unique = Mongoid::Slug::UniqueSlug.new(Book.new).find_unique(title)
+...
+# return some representation of unique
 ```
 
 [1]: https://github.com/rsl/stringex/
