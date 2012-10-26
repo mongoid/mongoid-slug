@@ -732,15 +732,28 @@ module Mongoid
     end
 
     describe "#to_param" do
+      context "when called on a new record" do
+        let(:book) { Book.new }
+
+        it "should return nil" do
+          book.to_param.should be_nil
+        end
+
+        it "should not persist the record" do
+          book.to_param
+          book.should_not be_persisted
+        end
+      end
+
       context "when called on an existing record with no slug" do
         before do
           Book.collection.insert(:title => "Proust and Signs")
         end
 
-        it "generates the missing slug" do
+        it "should return the id" do
           book = Book.first
-          book.to_param
-          book.reload.slugs.should include("proust-and-signs")
+          book.to_param.should == book.id.to_s
+          book.reload.slugs.should be_empty
         end
       end
     end
