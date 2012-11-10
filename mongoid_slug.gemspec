@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Andreas Saebjoernsen']
   s.email       = ['andy@cosemble.com']
-  s.homepage    = 'http://github.com/musicglue/mongoid-slug'
+  s.homepage    = 'https://github.com/digitalplaywright/mongoid-slug'
   s.summary     = 'Mongoid URL slugs'
   s.description = 'Mongoid URL slug or permalink generator'
 
