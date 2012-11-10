@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.1
+
+###Bugfixes
+
+* fix wrong homepage link in gemspec (digitalplaywright)
+
 ## 2.0.0
 
 ### New Features
