@@ -184,6 +184,38 @@ Friend.find('admin') # => nil
 friend.slug # => 'admin-1'
 ```
 
+Custom Find Strategies
+--------------
+
+By default find will search for the document by the id field if the provided id 
+looks like a BSON ObjectId, and it will otherwise find by the _slugs field. However,
+custom strategies can ovveride the default behavior, like e.g:
+
+```
+
+module Mongoid::Slug::UuidIdStrategy
+  def self.call id
+    id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
+  end
+end
+
+```
+
+Use a custom strategy by adding the slug_id_strategy annotation to the _id field:
+
+```
+class Entity
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :_id, type: String, slug_id_strategy: UuidIdStrategy
+
+  field :user_edited_variation
+  slug  :user_edited_variation, :history => true
+end
+```
+
+
 Adhoc checking whether a string is unique on a per Model basis
 --------------------------------------------------------------
 
