@@ -69,7 +69,7 @@ Post.fields['_id'].type
 => String
 post = Post.find 'a-thousand-plateaus' # Finds by slugs
 => ...
-post = Post.find '....1000/Plateus' # Finds by ids
+post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 => ...
 ```
 [Read here] [4] for all available options.
