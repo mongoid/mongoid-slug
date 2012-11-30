@@ -192,13 +192,11 @@ looks like a BSON ObjectId, and it will otherwise find by the _slugs field. Howe
 custom strategies can ovveride the default behavior, like e.g:
 
 ```
-
 module Mongoid::Slug::UuidIdStrategy
   def self.call id
     id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
   end
 end
-
 ```
 
 Use a custom strategy by adding the slug_id_strategy annotation to the _id field:
