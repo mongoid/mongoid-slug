@@ -832,5 +832,42 @@ module Mongoid
         end
       end
     end
+
+    context "slug can be localized" do
+      it "generate a new slug for each localization" do
+        
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageLocalize.new
+        page.title = "Title on English"
+        page.save
+        page.slug.should eql "title-on-english"
+        I18n.locale = :nl
+        page.title = "Title on Netherlands"
+        page.save
+        page.slug.should eql "title-on-netherlands"
+
+        # Set locale back to english
+        I18n.locale = old_locale
+      end
+
+      it "return _id if no slug" do
+        
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageLocalize.new
+        page.title = "Title on English"
+        page.save
+        page.slug.should eql "title-on-english"
+        I18n.locale = :nl
+        page.slug.should eql page._id.to_s
+
+        # Set locale back to english
+        I18n.locale = old_locale
+      end
+    end
+
   end
 end
