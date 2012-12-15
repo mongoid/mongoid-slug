@@ -10,8 +10,8 @@ module Mongoid
                      :url_builder,
                      :history
 
-      field :_slugs, type: Array, default: [], localize: true
-      alias_attribute :slugs, :_slugs
+      # field :_slugs, type: Array, default: [], localize: false
+      # alias_attribute :slugs, :_slugs
     end
 
     module ClassMethods
@@ -53,6 +53,9 @@ module Mongoid
         self.reserved_words        = options[:reserve] || Set.new([:new, :edit])
         self.slugged_attributes    = fields.map &:to_s
         self.history               = options[:history]
+
+        field :_slugs, type: Array, default: [], localize: options[:localize]
+        alias_attribute :slugs, :_slugs
 
         unless embedded?
           if slug_scope
