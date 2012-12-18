@@ -80,7 +80,7 @@ Custom Slug Generation
 By default Mongoid Slug generates slugs with stringex. If this is not desired you can
 define your own slug generator like this:
 
-```
+```ruby
 class Caption
   include Mongoid::Document
   include Mongoid::Slug
@@ -91,8 +91,8 @@ class Caption
     cur_object.slug_builder.to_url
   end
 end
-
 ```
+You can call stringex `to_url` method.
 
 Scoping
 -------
@@ -191,7 +191,7 @@ By default find will search for the document by the id field if the provided id
 looks like a BSON ObjectId, and it will otherwise find by the _slugs field. However,
 custom strategies can ovveride the default behavior, like e.g:
 
-```
+```ruby
 module Mongoid::Slug::UuidIdStrategy
   def self.call id
     id =~ /\A([0-9a-fA-F]){8}-(([0-9a-fA-F]){4}-){3}([0-9a-fA-F]){12}\z/
@@ -201,7 +201,7 @@ end
 
 Use a custom strategy by adding the slug_id_strategy annotation to the _id field:
 
-```
+```ruby
 class Entity
   include Mongoid::Document
   include Mongoid::Slug
