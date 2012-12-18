@@ -866,6 +866,31 @@ module Mongoid
         I18n.locale = old_locale
       end
 
+      it "fallbacks if slug not localized yet" do 
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageSlugLocalize.new
+        page.title = "Title on English"
+        page.save
+        page.slug.should eql "title-on-english"
+        I18n.locale = :nl
+        page.slug.should eql page._id.to_s
+
+        # Turn on i18n fallback
+        require "i18n/backend/fallbacks"
+        I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+        ::I18n.fallbacks[:nl] = [ :nl, :en ]
+        page.slug.should eql "title-on-english"
+        fallback_slug = page.slug
+
+        fallback_page = PageSlugLocalize.find(fallback_slug) rescue nil
+        fallback_page.should eq(page)
+
+        # Set locale back to english
+        I18n.locale = old_locale
+      end
+
       it "returns default slug if not localized" do 
         old_locale = I18n.locale
 
