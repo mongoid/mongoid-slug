@@ -7,6 +7,14 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
+    context "slug should not be a reserved word (new and edit are reserved words by default)" do
+      let(:book1) { Book.create(:title => "new") }
+
+      it "slug should not contain reserved word new" do
+        book1.slugs.should_not include "new"
+      end
+    end
+
     context "when option skip_id_check is used with UUID _id " do
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
