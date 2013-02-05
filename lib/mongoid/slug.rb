@@ -10,8 +10,8 @@ module Mongoid
                      :url_builder,
                      :history
 
-      field :_slugs, type: Array, default: []
-      alias_attribute :slugs, :_slugs
+      # field :_slugs, type: Array, default: [], localize: false
+      # alias_attribute :slugs, :_slugs
     end
 
     module ClassMethods
@@ -53,6 +53,9 @@ module Mongoid
         self.reserved_words        = options[:reserve] || Set.new(["new", "edit"])
         self.slugged_attributes    = fields.map &:to_s
         self.history               = options[:history]
+
+        field :_slugs, type: Array, default: [], localize: options[:localize]
+        alias_attribute :slugs, :_slugs
 
         unless embedded?
           if slug_scope
@@ -115,7 +118,7 @@ module Mongoid
     # @return [true]
     def build_slug
       _new_slug = find_unique_slug
-      self._slugs.delete(_new_slug)
+      self._slugs.delete(_new_slug) if self._slugs
       if !!self.history
         self._slugs << _new_slug
       else
@@ -151,7 +154,8 @@ module Mongoid
 
     # @return [String] the slug, or nil if the document does not have a slug.
     def slug
-      _slugs.last
+      return _slugs.last if _slugs
+      return _id.to_s
     end
 
     def slug_builder
