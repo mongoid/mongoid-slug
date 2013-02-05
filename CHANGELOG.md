@@ -2,10 +2,13 @@
 
 ## 3.0.0
 
+### Bugfixes
+
+* Avoid using reserved words as slugs (deepakkumarnd)
+
 ### New Features
 
 * Make slugs localizable by option (xslim)
-* Avoid using reserved words as slugs (deepakkumarnd)
 
 ## 2.0.1
 
