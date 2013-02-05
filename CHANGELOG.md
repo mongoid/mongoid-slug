@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.0.0
+
+### New Features
+
+* Make slugs localizable by option (xslim)
+* Avoid using reserved words as slugs (deepakkumarnd)
+
 ## 2.0.1
 
 ###Bugfixes
