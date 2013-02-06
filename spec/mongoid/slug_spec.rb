@@ -7,14 +7,6 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
-    context "slug should not be a reserved word (new and edit are reserved words by default)" do
-      let(:book1) { Book.create(:title => "new") }
-
-      it "slug should not contain reserved word new" do
-        book1.slugs.should_not include "new"
-      end
-    end
-
     context "when option skip_id_check is used with UUID _id " do
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
@@ -515,26 +507,45 @@ module Mongoid
       end
     end
 
-    context "when :reserve is passed" do
-      it "does not use the the reserved slugs" do
-        friend1 = Friend.create(:name => "foo")
-        friend1.slugs.should_not eql("foo")
-        friend1.slugs.should include("foo-1")
+    context "for reserved words" do
+      context "when the :reserve option is used on the model" do
+        it "does not use the reserved slugs" do
+          friend1 = Friend.create(:name => "foo")
+          friend1.slugs.should_not include("foo")
+          friend1.slugs.should include("foo-1")
 
-        friend2 = Friend.create(:name => "bar")
-        friend2.slugs.should_not eql("bar")
-        friend2.slugs.should include("bar-1")
+          friend2 = Friend.create(:name => "bar")
+          friend2.slugs.should_not include("bar")
+          friend2.slugs.should include("bar-1")
 
-        friend3 = Friend.create(:name => "en")
-        friend3.slugs.should_not eql("en")
-        friend3.slugs.should include("en-1")
+          friend3 = Friend.create(:name => "en")
+          friend3.slugs.should_not include("en")
+          friend3.slugs.should include("en-1")
+        end
+
+        it "should start with concatenation -1" do
+          friend1 = Friend.create(:name => "foo")
+          friend1.slugs.should include("foo-1")
+          friend2 = Friend.create(:name => "foo")
+          friend2.slugs.should include("foo-2")
+        end
+
+        ["new", "edit"].each do |word|
+          it "should still dis-allow the default reserved word '#{word}'" do
+            friend = Friend.create(:name => word)
+            friend.slugs.should_not include word
+            friend.slugs.should include("#{word}-1")
+          end
+        end
       end
-
-      it "should start with concatenation -1" do
-        friend1 = Friend.create(:name => "foo")
-        friend1.slugs.should include("foo-1")
-        friend2 = Friend.create(:name => "foo")
-        friend2.slugs.should include("foo-2")
+      context "when the model does not have any reserved words set" do
+        ["new", "edit"].each do |word|
+          it "does not use the default reserved word '#{word}'" do
+            book = Book.create(:title => word)
+            book.slugs.should_not include word
+            book.slugs.should include("#{word}-1")
+          end
+        end
       end
     end
 
@@ -859,7 +870,7 @@ module Mongoid
         I18n.locale = old_locale
       end
 
-      it "returns _id if no slug" do 
+      it "returns _id if no slug" do
         old_locale = I18n.locale
 
         # Using a default locale of en.
@@ -874,7 +885,7 @@ module Mongoid
         I18n.locale = old_locale
       end
 
-      it "fallbacks if slug not localized yet" do 
+      it "fallbacks if slug not localized yet" do
         old_locale = I18n.locale
 
         # Using a default locale of en.
@@ -899,7 +910,7 @@ module Mongoid
         I18n.locale = old_locale
       end
 
-      it "returns default slug if not localized" do 
+      it "returns default slug if not localized" do
         old_locale = I18n.locale
 
         # Using a default locale of en.
