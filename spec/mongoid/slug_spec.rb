@@ -531,10 +531,9 @@ module Mongoid
         end
 
         ["new", "edit"].each do |word|
-          it "should still dis-allow the default reserved word '#{word}'" do
+          it "should overwrite the default reserved words allowing the word '#{word}'" do
             friend = Friend.create(:name => word)
-            friend.slugs.should_not include word
-            friend.slugs.should include("#{word}-1")
+            friend.slugs.should include word
           end
         end
       end
