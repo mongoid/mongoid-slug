@@ -102,17 +102,17 @@ To scope a slug by a reference association, pass `:scope`:
 ```ruby
 class Company
   include Mongoid::Document
-  
+
   references_many :employees
 end
 
 class Employee
   include Mongoid::Document
   include Mongoid::Slug
-  
+
   field :name
   referenced_in :company
-  
+
   slug  :name, :scope => :company
 end
 ```
@@ -131,10 +131,10 @@ The value of `:scope` can alternatively be a field within the model itself:
 class Employee
   include Mongoid::Document
   include Mongoid::Slug
-  
+
   field :name
   field :company_id
-  
+
   slug  :name, :scope => :company_id
 end
 ```
@@ -149,9 +149,9 @@ To specify that the history of a document should be kept track of, pass
 class Page
   include Mongoid::Document
   include Mongoid::Slug
-  
+
   field :title
-  
+
   slug :title, history: true
 end
 ```
@@ -184,10 +184,13 @@ Friend.find('admin') # => nil
 friend.slug # => 'admin-1'
 ```
 
+When reserved words are not specified, the words 'new' and 'edit' are considered reserved by default.
+Specifying an array of custom reserved words will overwrite these defaults.
+
 Custom Find Strategies
 --------------
 
-By default find will search for the document by the id field if the provided id 
+By default find will search for the document by the id field if the provided id
 looks like a BSON ObjectId, and it will otherwise find by the _slugs field. However,
 custom strategies can ovveride the default behavior, like e.g:
 
