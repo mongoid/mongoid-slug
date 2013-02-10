@@ -119,7 +119,7 @@ module Mongoid
     def build_slug
       _new_slug = find_unique_slug
       self._slugs.delete(_new_slug) if self._slugs
-      if !!self.history
+      if !!self.history && self._slugs.is_a?(Array)
         self._slugs << _new_slug
       else
         self._slugs = [_new_slug]
