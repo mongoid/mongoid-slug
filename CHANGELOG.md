@@ -5,6 +5,7 @@
 ### Bugfixes
 
 * Avoid using reserved words as slugs (deepakkumarnd)
+* Fix localized slug creation when using history and when the locale changes after document is created (byscripts)
 
 ### New Features
 
