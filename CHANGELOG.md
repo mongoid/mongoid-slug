@@ -7,6 +7,7 @@
 * Avoid using reserved words as slugs (deepakkumarnd)
 * Fix localized slug creation when using history and when the locale changes after document is created (byscripts)
 * Improved specs for reserved words (astjohn)
+* Mongoid Paranoia specs aded (simi)
 
 ### New Features
 
