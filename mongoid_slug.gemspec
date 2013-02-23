@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = 'mongoid_slug'
 
-  s.add_dependency "mongoid", ["~> 3.0"]
+  s.add_dependency "mongoid", ["> 3.0"]
   s.add_dependency 'stringex', '~> 1.4'
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake'

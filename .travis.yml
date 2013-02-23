@@ -1,6 +1,8 @@
 language: ruby
 services: mongodb
-matrix:
-  include:
-    - rvm: 1.9.3
-    - rvm: jruby-19mode
+gemfile:
+  - Gemfile
+  - Gemfile.mongoid4
+rvm:
+  - 1.9.3
+  - jruby-19mode
