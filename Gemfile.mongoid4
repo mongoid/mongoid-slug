@@ -1,0 +1,10 @@
+source :rubygems
+
+gem 'mongoid', github: 'mongoid/mongoid', branch: "master"
+gem 'mongoid-paranoia', github: 'simi/mongoid-paranoia', branch: "3.0.0-stable"
+
+git "git://github.com/rails/rails.git" do
+  gem "activemodel"
+end
+
+gemspec
