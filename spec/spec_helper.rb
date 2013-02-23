@@ -7,6 +7,7 @@ require 'uuid'
 require "awesome_print"
 
 require File.expand_path '../../lib/mongoid_slug', __FILE__
+require 'mongoid/paranoia'
 
 module Mongoid::Slug::UuidIdStrategy
   def self.call id
