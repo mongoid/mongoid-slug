@@ -187,6 +187,27 @@ friend.slug # => 'admin-1'
 When reserved words are not specified, the words 'new' and 'edit' are considered reserved by default.
 Specifying an array of custom reserved words will overwrite these defaults.
 
+Localize Slug
+--------------
+
+The slug can be localized: 
+
+```ruby
+class PageSlugLocalize
+  include Mongoid::Document
+  include Mongoid::Slug
+  
+  field :title, localize: true
+  slug  :title, localize: true
+end
+```
+
+This feature is built upon Mongoid localized fields, so fallbacks and localization
+works as documented in the Mongoid manual.
+
+PS! A migration is needed to use Mongoid localized fields for documents that was created when this 
+feature was off. Anything else will cause errors.
+
 Custom Find Strategies
 --------------
 
