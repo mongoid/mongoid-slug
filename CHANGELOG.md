@@ -8,6 +8,7 @@
 * Fix localized slug creation when using history and when the locale changes after document is created (byscripts)
 * Improved specs for reserved words (astjohn)
 * Mongoid Paranoia specs aded (simi)
+* Fix Mongoid Slug for Ruby 2.0.0 (digitalplaywright)
 
 ### New Features
 

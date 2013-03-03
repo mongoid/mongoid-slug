@@ -64,7 +64,7 @@ module Mongoid
       # otherwise default for all other id_types
       def build_slug_strategy id_type
         type_method = id_type.to_s.downcase.split('::').last + "_slug_strategy"
-        self.respond_to?(type_method) ? method(type_method) : lambda {|id| false}
+        self.respond_to?(type_method, true) ? method(type_method) : lambda {|id| false}
       end
 
       # a string will not look like a slug if it looks like a legal ObjectId
