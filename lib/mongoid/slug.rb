@@ -60,9 +60,20 @@ module Mongoid
         unless embedded?
           if slug_scope
             scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
-            index({scope_key => 1, _slugs: 1}, {unique: true})
+            if options[:polymorphic]
+              # Add _type to the index to fix polymorphism
+              index({ _type: 1, scope_key => 1, _slugs: 1}, {unique: true})
+            else
+              index({scope_key => 1, _slugs: 1}, {unique: true})
+            end
+
           else
-            index({_slugs: 1}, {unique: true})
+            # Add _type to the index to fix polymorphism
+            if options[:polymorphic]
+              index({_type: 1, _slugs: 1}, {unique: true})
+            else
+              index({_slugs: 1}, {unique: true})
+            end
           end
         end
 
