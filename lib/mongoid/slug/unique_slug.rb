@@ -63,7 +63,7 @@ module Mongoid
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
         :check_against_id, :reserved_words, :url_builder, :metadata,
-        :collection_name, :embedded?, :reflect_on_all_associations
+        :collection_name, :embedded?, :reflect_on_all_associations, :polymorphic
 
       def initialize model
         @model = model
@@ -90,6 +90,10 @@ module Mongoid
           # scope is not an association, so it's scoped to a local field
           # (e.g. an association id in a denormalized db design)
           where_hash[scope] = model.try(:read_attribute, scope)
+        end
+
+        if polymorphic
+          where_hash[:_type] = model.try(:read_attribute, :_type)
         end
 
         @state = SlugState.new _slug, uniqueness_scope.where(where_hash), pattern
