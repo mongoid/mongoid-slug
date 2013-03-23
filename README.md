@@ -163,7 +163,7 @@ comic_book = ComicBook.create(:title => "Anti Oedipus")
 comic_book.slugs.should_not eql(book.slugs)
 ```
 
-If you want the scope to be around the subclass, then set the polymorphic option to true.
+If you want the scope to be around the subclass, then set the scoped_by option to :subclass.
 
 ```ruby
 class Book
@@ -171,9 +171,9 @@ class Book
   include Mongoid::Slug
   field :title
 
-  slug  :title, :history => true, :polymorphic => true
+  slug  :title, :history => true, :scoped_by => :subclass
   embeds_many :subjects
-  has_many :author_polymorphics
+  has_many :authors
 end
 
 class ComicBook < Book

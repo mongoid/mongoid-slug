@@ -512,7 +512,7 @@ module Mongoid
         end
       end
 
-      context "for polymorphic scope" do
+      context "for subclass scope" do
         context "when slug is not scoped by a reference association" do
           it "defines an index on the slug" do
             BookPolymorphic.index_options.should have_key( :_type => 1, :_slugs => 1 )
@@ -540,8 +540,13 @@ module Mongoid
             c = ComicBookPolymorphic.create!(title: 'Book')
             c.slug.should == 'book'
 
-            c = ComicBookPolymorphic.create!(title: 'Book')
-            c.slug.should == 'book-1'
+            c2 = ComicBookPolymorphic.create!(title: 'Book')
+            c2.slug.should == 'book-1'
+
+            BookPolymorphic.find('book').should == b
+            BookPolymorphic.find('book-1').should == b2
+            ComicBookPolymorphic.find('book').should == c
+            ComicBookPolymorphic.find('book-1').should == c2
           end
         end
       end
@@ -599,6 +604,9 @@ module Mongoid
         book = BookPolymorphic.create(:title => "Anti Oedipus")
         comic_book = ComicBookPolymorphic.create(:title => "Anti Oedipus")
         comic_book.slugs.should eql(book.slugs)
+
+        BookPolymorphic.find(book.slug).should == book
+        ComicBookPolymorphic.find(comic_book.slug).should == comic_book
       end
     end
 
