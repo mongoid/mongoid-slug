@@ -7,6 +7,19 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
+    context "when slug is validated for presence" do
+      let(:validation) {Validation.new}
+
+      it "should be saved with title" do
+        validation.title = "test"
+        validation.save.should eql true
+      end
+
+      it "should not be saved without title" do
+        validation.save.should eql false
+      end
+    end
+
     context "when option skip_id_check is used with UUID _id " do
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
