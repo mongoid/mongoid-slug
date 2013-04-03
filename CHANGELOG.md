@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.0.1
+
+### New Features 
+
+* update slug moved to before validation (simi)
+
 ## 3.0.0
 
 ### Bugfixes
