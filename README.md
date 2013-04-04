@@ -139,6 +139,51 @@ class Employee
 end
 ```
 
+Single-Table Inheritance (STI) and Scoping
+-------
+
+By default when using STI, the scope will be around the super-class.
+
+```ruby
+class Book
+  include Mongoid::Document
+  include Mongoid::Slug
+  field :title
+
+  slug  :title, :history => true
+  embeds_many :subjects
+  has_many :authors
+end
+
+class ComicBook < Book
+end
+
+book = Book.create(:title => "Anti Oedipus")
+comic_book = ComicBook.create(:title => "Anti Oedipus")
+comic_book.slugs.should_not eql(book.slugs)
+```
+
+If you want the scope to be around the subclass, then set the option :by_model_type => true.
+
+```ruby
+class Book
+  include Mongoid::Document
+  include Mongoid::Slug
+  field :title
+
+  slug  :title, :history => true, :by_model_type => true
+  embeds_many :subjects
+  has_many :authors
+end
+
+class ComicBook < Book
+end
+
+book = Book.create(:title => "Anti Oedipus")
+comic_book = ComicBook.create(:title => "Anti Oedipus")
+comic_book.slugs.should eql(book.slugs)
+```
+
 History
 -------
 
