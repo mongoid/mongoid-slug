@@ -63,7 +63,7 @@ module Mongoid
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
         :check_against_id, :reserved_words, :url_builder, :metadata,
-        :collection_name, :embedded?, :reflect_on_all_associations, :scoped_by
+        :collection_name, :embedded?, :reflect_on_all_associations, :by_model_type
 
       def initialize model
         @model = model
@@ -92,7 +92,7 @@ module Mongoid
           where_hash[scope] = model.try(:read_attribute, scope)
         end
 
-        if scoped_by == :subclass
+        if by_model_type == true
           where_hash[:_type] = model.try(:read_attribute, :_type)
         end
 
