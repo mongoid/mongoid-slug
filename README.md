@@ -139,7 +139,7 @@ class Employee
 end
 ```
 
-Single-Table Inheritance (STI) and Scoping
+Optionally find and create slugs per model type
 -------
 
 By default when using STI, the scope will be around the super-class.
