@@ -1,10 +1,11 @@
 # CHANGELOG
 
-## 3.0.1
+## 3.1.0
 
 ### New Features 
 
 * update slug moved to before validation (simi)
+* optionally slugs are created and found per model type (joe1chen)
 
 ## 3.0.0
 
