@@ -20,6 +20,26 @@ module Mongoid
       end
     end
 
+    context "should not persist incorrect slugs" do
+      it "slugs should not be generated from invalid documents" do
+
+        #this will fail now
+        x = IncorrectSlugPersistence.create!(name: "test")
+        x.slug.should == 'test'
+
+        #I believe this will now fail
+        x.name = 'te'
+        x.valid?
+        x.slug.should_not == 'te'  
+
+        #I believe this will persist the 'te' 
+        x.name = 'tested'
+        x.save!
+
+      end
+
+    end
+
     context "when option skip_id_check is used with UUID _id " do
       let(:entity0) do
         Entity.create(:_id => UUID.generate, :name => 'Pelham 1 2 3', :user_edited_variation => 'pelham-1-2-3')
