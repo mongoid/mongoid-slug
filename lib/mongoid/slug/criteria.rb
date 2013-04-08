@@ -84,9 +84,9 @@ module Mongoid
         if localized
           def_loc = I18n.default_locale
           query = { '$in' => slugs }
-          where({'$or' => [{ _slugs: query }, { "_slugs.#{def_loc}" => query }]}).limit(slugs.length)
+          unscoped.where({'$or' => [{ _slugs: query }, { "_slugs.#{def_loc}" => query }]}).limit(slugs.length)
         else
-          where({ _slugs: { '$in' => slugs } }).limit(slugs.length)
+          unscoped.where({ _slugs: { '$in' => slugs } }).limit(slugs.length)
         end
       end
 
