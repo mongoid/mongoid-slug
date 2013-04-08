@@ -7,19 +7,6 @@ module Mongoid
       Book.create(:title => "A Thousand Plateaus")
     end
 
-    context "when slug is validated for presence" do
-      let(:validation) {Validation.new}
-
-      it "should be saved with title" do
-        validation.title = "test"
-        validation.save.should eql true
-      end
-
-      it "should not be saved without title" do
-        validation.save.should eql false
-      end
-    end
-
     context "should not persist incorrect slugs" do
       it "slugs should not be generated from invalid documents" do
 
@@ -33,7 +20,7 @@ module Mongoid
         x.slug.should_not == 'te'  
 
         #I believe this will persist the 'te' 
-        x.name = 'tested'
+        x.name = 'testb'
         x.save!
 
       end

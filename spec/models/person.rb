@@ -5,5 +5,4 @@ class Person
   slug  :name, :permanent => true, :scope => :author
   embeds_many :relationships
   belongs_to :author, :inverse_of => :characters
-  validates :slug, presence: true
 end

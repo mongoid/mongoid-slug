@@ -89,9 +89,9 @@ module Mongoid
         #-- always create slug on create
         #-- do not create new slug on update if the slug is permanent
         if options[:permanent]
-          set_callback :validation, :before, :build_slug, :if => :new_record?
+          set_callback :create, :before, :build_slug
         else
-          set_callback :validation, :before, :build_slug, :if => :slug_should_be_rebuilt?
+          set_callback :save, :before, :build_slug, :if => :slug_should_be_rebuilt?
         end
       end
 
