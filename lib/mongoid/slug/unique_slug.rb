@@ -96,7 +96,7 @@ module Mongoid
           where_hash[:_type] = model.try(:read_attribute, :_type)
         end
 
-        @state = SlugState.new _slug, uniqueness_scope.where(where_hash), pattern
+        @state = SlugState.new _slug, uniqueness_scope.unscoped.where(where_hash), pattern
 
         # do not allow a slug that can be interpreted as the current document id
         @state.include_slug unless model.class.look_like_slugs?([_slug])
