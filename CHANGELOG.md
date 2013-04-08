@@ -4,8 +4,11 @@
 
 ### New Features 
 
-* update slug moved to before validation (simi)
 * optionally slugs are created and found per model type (joe1chen)
+
+### Bugfixes
+
+* fix issue with default scope and slug uniqueness (loopj)
 
 ## 3.0.0
 
