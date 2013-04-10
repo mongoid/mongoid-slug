@@ -17,12 +17,17 @@ module Mongoid
         #I believe this will now fail
         x.name = 'te'
         x.valid?
-        x.slug.should_not == 'te'  
+        x.slug.should_not == 'te'
 
-        #I believe this will persist the 'te' 
+        #I believe this will persist the 'te'
         x.name = 'testb'
         x.save!
 
+      end
+
+      it "doesn't persist blank strings" do
+        book = Book.create!(:title => "")
+        book.reload.slugs.should be_empty
       end
 
     end
