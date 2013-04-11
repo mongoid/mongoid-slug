@@ -4,7 +4,7 @@
 
 ### Bugfixes
 
-* do not generate empty slug. Resolves: #121, #122) (digitalplaywright)
+* do not generate empty slug. Resolves: #121, #122 (digitalplaywright)
 
 ## 3.1.0
 
