@@ -840,17 +840,24 @@ module Mongoid
           book.to_param
           book.should_not be_persisted
         end
+
       end
 
       context "when called on an existing record with no slug" do
+        let!(:book_no_title) { Book.create() }
+
         before do
           Book.collection.insert(:title => "Proust and Signs")
         end
 
-        it "should return the id" do
+        it "should return the id if there is no slug" do
           book = Book.first
           book.to_param.should == book.id.to_s
           book.reload.slugs.should be_empty
+        end
+
+        it "should not persist the record" do
+          book_no_title.to_param.should == book_no_title._id.to_s
         end
       end
     end

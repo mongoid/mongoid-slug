@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.1.1
+
+### Bugfixes
+
+* do not generate empty slug. Resolves: #121, #122) (digitalplaywright)
+
 ## 3.1.0
 
 ### New Features 
