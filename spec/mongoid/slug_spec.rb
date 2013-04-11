@@ -651,8 +651,8 @@ module Mongoid
       let!(:integer_id2) { IntegerId.new(:name => integer_id.id.to_s).tap { |d| d.id = 456; d.save } }
       let!(:string_id) { StringId.new(:name => "I have string ids").tap { |d| d.id = 'abc'; d.save } }
       let!(:string_id2) { StringId.new(:name => string_id.id.to_s).tap { |d| d.id = 'def'; d.save } }
-      let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
-      let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
+      let!(:subject) { Subject.create(:name  => "A Subject", :book => book) }
+      let!(:subject2) { Subject.create(:name  => "A Subject", :book => book2) }
       let!(:without_slug) { WithoutSlug.new().tap { |d| d.id = 456; d.save } }
 
       context "when the model does not use mongoid slugs" do
@@ -775,8 +775,8 @@ module Mongoid
       let!(:integer_id2) { IntegerId.new(:name => integer_id.id.to_s).tap { |d| d.id = 456; d.save } }
       let!(:string_id) { StringId.new(:name => "I have string ids").tap { |d| d.id = 'abc'; d.save } }
       let!(:string_id2) { StringId.new(:name => string_id.id.to_s).tap { |d| d.id = 'def'; d.save } }
-      let!(:subject) { Subject.create(:title  => "A Subject", :book => book) }
-      let!(:subject2) { Subject.create(:title  => "A Subject", :book => book2) }
+      let!(:subject) { Subject.create(:name  => "A Subject", :book => book) }
+      let!(:subject2) { Subject.create(:name  => "A Subject", :book => book2) }
 
       context "(single)" do
         context "and a document is found" do

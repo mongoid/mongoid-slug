@@ -131,13 +131,21 @@ module Mongoid
     # @return [true]
     def build_slug
       _new_slug = find_unique_slug
+
+      #skip slug generation and use Mongoid id
+      #to find document instead
+      return true if _new_slug.size == 0
+
       self._slugs.delete(_new_slug) if self._slugs
+
       if !!self.history && self._slugs.is_a?(Array)
         self._slugs << _new_slug
       else
         self._slugs = [_new_slug]
       end
+
       true
+
     end
 
     # Finds a unique slug, were specified string used to generate a slug.
