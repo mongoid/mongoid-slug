@@ -8,7 +8,7 @@ Mongoid Slug generates a URL slug or permalink based on one or more fields in a
 Mongoid model. It sits idly on top of [stringex] [1], supporting non-Latin
 characters.
 
-[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.png)](http://travis-ci.org/digitalplaywright/mongoid-slug) [![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.png)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
+[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.png)](http://travis-ci.org/digitalplaywright/mongoid-slug) [![Dependency Status](https://gemnasium.com/digitalplaywright/mongoid-slug.png)](https://gemnasium.com/digitalplaywright/mongoid-slug) [![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.png)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
 
 Installation
 ------------
