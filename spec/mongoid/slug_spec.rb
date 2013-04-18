@@ -1105,9 +1105,36 @@ module Mongoid
         ParanoidDocument.deleted.first.restore
         expect(ParanoidDocument.find(paranoid_doc.slug)).to eq(paranoid_doc)
       end
+    end
 
+    describe "When 'no_dash: true' option is used" do
 
+      let(:first_book) { NoDashOnDuplicate.create(title: 'Electronica') }
+      let(:second_book) { NoDashOnDuplicate.create(title: first_book.title) }
+      let(:reserved_title) { NoDashOnDuplicate.create(title: 'edit') }
 
+      it "generates a unique slug without a dash before the number" do
+        second_book.to_param.should eql "electronica1"
+      end
+
+      it "does not add a dash to the default reserved word" do
+        reserved_title.to_param.should eql 'edit1'
+      end
+
+      context "when history is set to true" do
+
+        before do
+          first_book.title = 'Electric'
+          first_book.save
+        end
+
+        it "generates a unique slug by appending a counter, with no dash, to duplicate title" do
+          dup = NoDashOnDuplicate.create(:title => "Electronica")
+          dup.to_param.should eql "electronica1"
+        end
+
+      end
+      
     end
   end
 end

@@ -5,6 +5,7 @@ module Mongoid
 
     included do
       cattr_accessor :reserved_words,
+                     :no_dash,
                      :slug_scope,
                      :slugged_attributes,
                      :url_builder,
@@ -52,6 +53,7 @@ module Mongoid
 
         self.slug_scope            = options[:scope]
         self.reserved_words        = options[:reserve] || Set.new(["new", "edit"])
+        self.no_dash               = options[:no_dash] ? "" : "-"
         self.slugged_attributes    = fields.map &:to_s
         self.history               = options[:history]
         self.by_model_type         = options[:by_model_type]

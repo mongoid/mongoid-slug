@@ -62,7 +62,7 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-        :check_against_id, :reserved_words, :url_builder, :metadata,
+        :check_against_id, :reserved_words, :no_dash, :url_builder, :metadata,
         :collection_name, :embedded?, :reflect_on_all_associations, :by_model_type
 
       def initialize model
@@ -108,7 +108,7 @@ module Mongoid
         # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
         if @state.slug_included?
           highest = @state.highest_existing_counter
-          @_slug += "-#{highest.succ}"
+          @_slug += "#{no_dash}#{highest.succ}"
         end
         _slug
       end
