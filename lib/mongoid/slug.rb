@@ -9,7 +9,9 @@ module Mongoid
                      :slugged_attributes,
                      :url_builder,
                      :history,
-                     :by_model_type
+                     :by_model_type,
+                     :sync,
+                     :syncing
 
       # field :_slugs, type: Array, default: [], localize: false
       # alias_attribute :slugs, :_slugs
@@ -30,6 +32,9 @@ module Mongoid
       #   matches both past and present slugs.
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
+      #   @param options [Boolean] :sync Whether the slug should update the
+      #   fields the slug is based on to the value of the newly generated
+      #   slug. Not recommended for multiple fields. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
       #   @param options :scope [Symbol] a reference association or field to
       #   scope the slug by. Embedded documents are, by default, scoped by
@@ -55,6 +60,7 @@ module Mongoid
         self.slugged_attributes    = fields.map &:to_s
         self.history               = options[:history]
         self.by_model_type         = options[:by_model_type]
+        self.sync                  = options[:sync]
 
         field :_slugs, type: Array, default: [], localize: options[:localize]
         alias_attribute :slugs, :_slugs
@@ -144,6 +150,14 @@ module Mongoid
         self._slugs = [_new_slug]
       end
 
+      if sync
+        self.syncing = true
+        slugged_attributes.each do |slugged_attribute|
+          update_attribute slugged_attribute, _new_slug
+        end
+        self.syncing = false
+      end
+
       true
 
     end
@@ -160,7 +174,7 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? or _slugs_changed? or slugged_attributes_changed?
+      (new_record? or _slugs_changed? or slugged_attributes_changed?) and !syncing
     end
 
     def slugged_attributes_changed?

@@ -384,6 +384,16 @@ module Mongoid
       end
     end
 
+    context "when :sync is passed as an argument" do
+      let(:sync) do
+        Sync.create(:username => "i.have.periods.")
+      end
+
+      it "ensures that the slug attribute is equal to the latest slug" do
+        sync.username.should == sync.slug
+      end
+    end
+
     context "when slug is scoped by a reference association" do
       let(:author) do
         book.authors.create(:first_name => "Gilles", :last_name  => "Deleuze")
@@ -1106,8 +1116,7 @@ module Mongoid
         expect(ParanoidDocument.find(paranoid_doc.slug)).to eq(paranoid_doc)
       end
 
-
-
     end
+
   end
 end
