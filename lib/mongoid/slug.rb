@@ -32,6 +32,9 @@ module Mongoid
       #   matches both past and present slugs.
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
+      #   @param options [Boolean] :sync Whether the slug should update the
+      #   fields the slug is based on to the value of the newly generated
+      #   slug. Not recommended for multiple fields. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
       #   @param options :scope [Symbol] a reference association or field to
       #   scope the slug by. Embedded documents are, by default, scoped by
