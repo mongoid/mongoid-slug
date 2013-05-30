@@ -938,11 +938,16 @@ module Mongoid
     end
 
     context "slug can be localized" do
-      it "generate a new slug for each localization" do
-        old_locale = I18n.locale
+      before(:each) do
+        @old_locale = I18n.locale
+      end
 
-        # Using a default locale of en.
-        page = PageSlugLocalize.new
+      after(:each) do
+        I18n.locale = @old_locale
+      end
+
+      it "generates a new slug for each localization" do
+        page = PageSlugLocalized.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
@@ -950,31 +955,19 @@ module Mongoid
         page.title = "Title on Netherlands"
         page.save
         page.slug.should eql "title-on-netherlands"
-
-        # Set locale back to english
-        I18n.locale = old_locale
       end
 
       it "returns _id if no slug" do
-        old_locale = I18n.locale
-
-        # Using a default locale of en.
-        page = PageSlugLocalize.new
+        page = PageSlugLocalized.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
         I18n.locale = :nl
         page.slug.should eql page._id.to_s
-
-        # Set locale back to english
-        I18n.locale = old_locale
       end
 
       it "fallbacks if slug not localized yet" do
-        old_locale = I18n.locale
-
-        # Using a default locale of en.
-        page = PageSlugLocalize.new
+        page = PageSlugLocalized.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
@@ -988,20 +981,14 @@ module Mongoid
         page.slug.should eql "title-on-english"
         fallback_slug = page.slug
 
-        fallback_page = PageSlugLocalize.find(fallback_slug) rescue nil
+        fallback_page = PageSlugLocalized.find(fallback_slug) rescue nil
         fallback_page.should eq(page)
-
-        # Set locale back to english
-        I18n.locale = old_locale
 
         # Restore fallback for next tests
         ::I18n.fallbacks[:nl] = [ :nl ]
       end
 
-      it "returns default slug if not localized" do
-        old_locale = I18n.locale
-
-        # Using a default locale of en.
+      it "returns a default slug if not localized" do
         page = PageLocalize.new
         page.title = "Title on English"
         page.save
@@ -1011,19 +998,88 @@ module Mongoid
         page.slug.should eql "title-on-english"
         page.save
         page.slug.should eql "title-on-netherlands"
+      end
 
+      it "slugs properly when translations are set directly" do
+        page = PageSlugLocalized.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
+      end
 
-        # Set locale back to english
+      it "does not produce duplicate slugs" do
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageSlugLocalized.new
+        page.title = "Title on English"
+        page.save
+        I18n.locale = "nl"
+        page.title = "Title on Netherlands"
+        page.save
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+
         I18n.locale = old_locale
+        page.title = "Title on English"
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when one has changed" do
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageSlugLocalized.new
+        page.title = "Title on English"
+        page.save
+        I18n.locale = "nl"
+        page.title = "Title on Netherlands"
+        page.save
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+
+        I18n.locale = old_locale
+        page.title = "Modified Title on English"
+        page.save
+        page.title_translations.should == {"en" => "Modified Title on English",
+                                           "nl" => "Title on Netherlands"}
+        page["_slugs"].should == {"en" => ["modified-title-on-english"],
+                                  "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when transactions are set directly" do
+        page = PageSlugLocalized.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when transactions are set directly and one has changed" do
+        page = PageSlugLocalized.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page.title_translations = {"en" => "Modified Title on English",
+                                   "nl" => "Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["modified-title-on-english"],
+                                  "nl" => ["title-on-netherlands"]}
       end
     end
 
     context "slug can be localized when using history" do
+      before(:each) do
+        @old_locale = I18n.locale
+      end
+
+      after(:each) do
+        I18n.locale = @old_locale
+      end
+
       it "generate a new slug for each localization and keep history" do
         old_locale = I18n.locale
 
-        # Using a default locale of en.
-        page = PageSlugLocalizeHistory.new
+        page = PageSlugLocalizedHistory.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
@@ -1041,31 +1097,19 @@ module Mongoid
         page.save
         page.slug.should eql "modified-title-on-netherlands"
         page.slug.should include("title-on-netherlands")
-
-        # Set locale back to english
-        I18n.locale = old_locale
       end
 
       it "returns _id if no slug" do
-        old_locale = I18n.locale
-
-        # Using a default locale of en.
-        page = PageSlugLocalizeHistory.new
+        page = PageSlugLocalizedHistory.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
         I18n.locale = :nl
         page.slug.should eql page._id.to_s
-
-        # Set locale back to english
-        I18n.locale = old_locale
       end
 
       it "fallbacks if slug not localized yet" do
-        old_locale = I18n.locale
-
-        # Using a default locale of en.
-        page = PageSlugLocalizeHistory.new
+        page = PageSlugLocalizedHistory.new
         page.title = "Title on English"
         page.save
         page.slug.should eql "title-on-english"
@@ -1079,12 +1123,79 @@ module Mongoid
         page.slug.should eql "title-on-english"
         fallback_slug = page.slug
 
-        fallback_page = PageSlugLocalizeHistory.find(fallback_slug) rescue nil
+        fallback_page = PageSlugLocalizedHistory.find(fallback_slug) rescue nil
         fallback_page.should eq(page)
-
-        # Set locale back to english
-        I18n.locale = old_locale
       end
+
+      it "slugs properly when translations are set directly" do
+        page = PageSlugLocalizedHistory.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page.title_translations = {"en" => "Modified Title on English",
+                                   "nl" => "Modified Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english", "modified-title-on-english"],
+                                  "nl" => ["title-on-netherlands", "modified-title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs" do
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageSlugLocalizedHistory.new
+        page.title = "Title on English"
+        page.save
+        I18n.locale = "nl"
+        page.title = "Title on Netherlands"
+        page.save
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+
+        I18n.locale = old_locale
+        page.title = "Title on English"
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when one has changed" do
+        old_locale = I18n.locale
+
+        # Using a default locale of en.
+        page = PageSlugLocalizedHistory.new
+        page.title = "Title on English"
+        page.save
+        I18n.locale = "nl"
+        page.title = "Title on Netherlands"
+        page.save
+        page.title_translations.should == {"en" => "Title on English", "nl" => "Title on Netherlands"}
+
+        I18n.locale = old_locale
+        page.title = "Modified Title on English"
+        page.save
+        page.title_translations.should == {"en" => "Modified Title on English",
+                                           "nl" => "Title on Netherlands"}
+        page["_slugs"].should == {"en" => ["title-on-english", "modified-title-on-english"],
+                                  "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when transactions are set directly" do
+        page = PageSlugLocalizedHistory.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
+      end
+
+      it "does not produce duplicate slugs when transactions are set directly and one has changed" do
+        page = PageSlugLocalizedHistory.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page.title_translations = {"en" => "Modified Title on English", "nl" => "Title on Netherlands"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english", "modified-title-on-english"],
+                                  "nl" => ["title-on-netherlands"]}
+      end
+
     end
 
     context "Mongoid paranoia with mongoid slug model" do
@@ -1092,7 +1203,7 @@ module Mongoid
       let(:paranoid_doc) {ParanoidDocument.create!(:title => "slug")}
 
       it "returns paranoid_doc for correct slug" do
-        expect(ParanoidDocument.find(paranoid_doc.slug)).to eq(paranoid_doc)
+        expect{ParanoidDocument.find(paranoid_doc.slug)}.to eq(paranoid_doc)
       end
 
       it "raises for deleted slug" do
@@ -1103,7 +1214,7 @@ module Mongoid
       it "returns paranoid_doc for correct restored slug" do
         paranoid_doc.delete
         ParanoidDocument.deleted.first.restore
-        expect(ParanoidDocument.find(paranoid_doc.slug)).to eq(paranoid_doc)
+        expect{ParanoidDocument.find(paranoid_doc.slug)}.to eq(paranoid_doc)
       end
 
 
