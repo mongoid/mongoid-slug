@@ -1203,7 +1203,7 @@ module Mongoid
       let(:paranoid_doc) {ParanoidDocument.create!(:title => "slug")}
 
       it "returns paranoid_doc for correct slug" do
-        expect{ParanoidDocument.find(paranoid_doc.slug)}.to eq(paranoid_doc)
+        ParanoidDocument.find(paranoid_doc.slug).should eq(paranoid_doc)
       end
 
       it "raises for deleted slug" do
@@ -1214,7 +1214,7 @@ module Mongoid
       it "returns paranoid_doc for correct restored slug" do
         paranoid_doc.delete
         ParanoidDocument.deleted.first.restore
-        expect{ParanoidDocument.find(paranoid_doc.slug)}.to eq(paranoid_doc)
+        ParanoidDocument.find(paranoid_doc.slug).should eq(paranoid_doc)
       end
 
 
