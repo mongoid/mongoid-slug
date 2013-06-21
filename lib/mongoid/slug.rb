@@ -130,22 +130,39 @@ module Mongoid
     #
     # @return [true]
     def build_slug
+      if localized?
+        begin
+          orig_locale = I18n.locale
+          all_locales = self.slugged_attributes
+                            .map{|attr| self.send("#{attr}_translations").keys}.flatten.uniq
+          all_locales.each do |target_locale|
+            I18n.locale = target_locale
+            set_slug
+          end
+        ensure
+          I18n.locale = orig_locale
+        end
+      else
+        set_slug
+      end
+      true
+    end
+
+    def set_slug
       _new_slug = find_unique_slug
 
       #skip slug generation and use Mongoid id
       #to find document instead
       return true if _new_slug.size == 0
 
+      # avoid duplicate slugs
       self._slugs.delete(_new_slug) if self._slugs
 
       if !!self.history && self._slugs.is_a?(Array)
-        self._slugs << _new_slug
+        append_slug(_new_slug)
       else
         self._slugs = [_new_slug]
       end
-
-      true
-
     end
 
     # Finds a unique slug, were specified string used to generate a slug.
@@ -181,15 +198,60 @@ module Mongoid
 
     def slug_builder
       _cur_slug = nil
-      if (new_record? and _slugs.present?) or (persisted? and _slugs_changed?)
+      if new_with_slugs? or persisted_with_slug_changes?
         #user defined slug
-        _cur_slug =  _slugs.last
+        _cur_slug = _slugs.last
       end
       #generate slug if the slug is not user defined or does not exist
       _cur_slug || pre_slug_string
     end
 
+
+
     private
+
+    def append_slug(_slug)
+      if localized?
+        # This is necessary for the scenario in which the slugged locale is not yet present
+        # but the default locale is. In this situation, self._slugs falls back to the default
+        # which is undesired
+        current_slugs = self._slugs_translations.fetch(I18n.locale.to_s, [])
+        current_slugs << _slug
+        self._slugs_translations = self._slugs_translations.merge(I18n.locale.to_s => current_slugs)
+      else
+        self._slugs << _slug
+      end
+    end
+
+    # Returns true if object is a new record and slugs are present
+    def new_with_slugs?
+      if localized?
+        # We need to check if slugs are present for the locale without falling back
+        # to a default
+        new_record? and _slugs_translations.fetch(I18n.locale.to_s, []).any?
+      else
+        new_record? and _slugs.present?
+      end
+    end
+
+    # Returns true if object has been persisted and has changes in the slug
+    def persisted_with_slug_changes?
+      if localized?
+        changes = self._slugs_change
+        return (persisted? and false) if changes.nil?
+
+        # ensure we check for changes only between the same locale
+        original = changes.first.try(:fetch, I18n.locale.to_s, nil)
+        compare = changes.last.try(:fetch, I18n.locale.to_s, nil)
+        persisted? and original != compare
+      else
+        persisted? and _slugs_changed?
+      end
+    end
+
+    def localized?
+      self.fields['_slugs'].options[:localize] rescue false
+    end
 
     def pre_slug_string
       self.slugged_attributes.map { |f| self.send f }.join ' '

@@ -1,4 +1,4 @@
-class PageSlugLocalize
+class PageSlugLocalized
   include Mongoid::Document
   include Mongoid::Slug
   field :title, localize: true

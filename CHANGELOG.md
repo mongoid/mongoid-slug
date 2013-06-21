@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.1.2
+
+### Bugfixes
+
+* fixes for i8n slug generation (astjohn)
+
 ## 3.1.1
 
 ### Bugfixes
