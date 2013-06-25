@@ -544,7 +544,7 @@ module Mongoid
           end
 
           it "defines a unique index" do
-            BookPolymorphic.index_options[ :_type => 1, :_slugs => 1 ][:unique].should be_true
+            BookPolymorphic.index_options[ :_type => 1, :_slugs => 1 ][:unique].should_not be_true
           end
         end
 
