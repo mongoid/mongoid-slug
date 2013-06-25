@@ -64,7 +64,7 @@ module Mongoid
             scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
             if options[:by_model_type] == true
               # Add _type to the index to fix polymorphism
-              index({ _type: 1, scope_key => 1, _slugs: 1}, {unique: true})
+              index({ _type: 1, scope_key => 1, _slugs: 1})
             else
               index({scope_key => 1, _slugs: 1}, {unique: true})
             end
@@ -72,7 +72,7 @@ module Mongoid
           else
             # Add _type to the index to fix polymorphism
             if options[:by_model_type] == true
-              index({_type: 1, _slugs: 1}, {unique: true})
+              index({_type: 1, _slugs: 1})
             else
               index({_slugs: 1}, {unique: true})
             end
