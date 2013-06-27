@@ -7,6 +7,10 @@
 * fixes for i8n slug generation (astjohn)
 * don't use unique indexes with polymorphics (pdf)
 
+### Improvements
+
+* refactoring of test cases (lucasrenan)
+
 ## 3.1.1
 
 ### Bugfixes
