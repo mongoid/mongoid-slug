@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.2.0
+
+### Improvements
+
+* update stringex dependency to 2.0 or higher
+
 ## 3.1.2
 
 ### Bugfixes
