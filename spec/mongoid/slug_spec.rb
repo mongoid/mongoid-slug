@@ -879,6 +879,13 @@ module Mongoid
         page["_slugs"].should == {"en" => ["modified-title-on-english"],
                                   "nl" => ["title-on-netherlands"]}
       end
+
+      it "works with a custom slug strategy" do
+        page = PageSlugLocalizedCustom.new
+        page.title = "a title for the slug"
+        page.save
+        page["_slugs"].should == {"en" => ["a-title-for-the-slug"]}
+      end
     end
 
     context "slug can be localized when using history" do

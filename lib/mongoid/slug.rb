@@ -133,8 +133,6 @@ module Mongoid
       if localized?
         begin
           orig_locale = I18n.locale
-          all_locales = self.slugged_attributes
-                            .map{|attr| self.send("#{attr}_translations").keys}.flatten.uniq
           all_locales.each do |target_locale|
             I18n.locale = target_locale
             set_slug
@@ -251,6 +249,18 @@ module Mongoid
 
     def localized?
       self.fields['_slugs'].options[:localize] rescue false
+    end
+
+    # Return all possible locales for model
+    # Avoiding usage of I18n.available_locales in case the user hasn't set it properly, or is
+    # doing something crazy, but at the same time we need a fallback in case the model doesn't
+    # have any localized attributes at all (extreme edge case).
+    def all_locales
+      locales = self.slugged_attributes
+                    .map{|attr| self.send("#{attr}_translations").keys if self.respond_to?("#{attr}_translations")}
+                    .flatten.compact.uniq
+      locales = I18n.available_locales if locales.empty?
+      locales
     end
 
     def pre_slug_string
