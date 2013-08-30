@@ -6,6 +6,10 @@
 
 * update stringex dependency to 2.0 or higher
 
+### Bugfixes
+
+* Fix for when using localized slug with custom slug building strategy on virtual attrbitues (asjohn)
+
 ## 3.1.2
 
 ### Bugfixes
