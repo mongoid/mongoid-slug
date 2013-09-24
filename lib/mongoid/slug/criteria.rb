@@ -5,8 +5,8 @@ module Mongoid
     class Criteria < Mongoid::Criteria
       # Find the matchind document(s) in the criteria for the provided ids or slugs.
       #
-      # If the document _ids are of the type Moped::BSON::ObjectId, and all the supplied parameters are
-      # convertible to Moped::BSON::ObjectId (via Moped::BSON::ObjectId#from_string), finding will be
+      # If the document _ids are of the type BSON::ObjectId, and all the supplied parameters are
+      # convertible to BSON::ObjectId (via BSON::ObjectId#from_string), finding will be
       # performed via _ids.
       #
       # If the document has any other type of _id field, and all the supplied parameters are of the same
@@ -15,10 +15,10 @@ module Mongoid
       # Otherwise finding will be performed via slugs.
       #
       # @example Find by an id.
-      #   criteria.find(Moped::BSON::ObjectId.new)
+      #   criteria.find(BSON::ObjectId.new)
       #
       # @example Find by multiple ids.
-      #   criteria.find([ Moped::BSON::ObjectId.new, Moped::BSON::ObjectId.new ])
+      #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
       # @example Find by a slug.
       #   criteria.find('some-slug')
@@ -69,7 +69,7 @@ module Mongoid
 
       # a string will not look like a slug if it looks like a legal ObjectId
       def objectid_slug_strategy id
-        Moped::BSON::ObjectId.legal?(id)
+        BSON::ObjectId.legal?(id)
       end
 
       # a string will always look like a slug
