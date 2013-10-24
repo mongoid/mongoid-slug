@@ -204,7 +204,9 @@ module Mongoid
       _cur_slug || pre_slug_string
     end
 
-
+    def self.mongoid3?
+      ::Mongoid.const_defined? :Observer
+    end
 
     private
 

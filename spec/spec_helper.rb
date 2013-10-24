@@ -23,7 +23,9 @@ Mongoid.configure do |config|
   config.connect_to database_id
 end
 
-Dir['./spec/models/*.rb'].each { |f| require f }
+[ 'models', 'shared' ].each do |dir|
+  Dir["./spec/#{dir}/*.rb"].each { |f| require f }
+end
 
 RSpec.configure do |c|
   c.before(:each) do

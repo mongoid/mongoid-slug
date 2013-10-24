@@ -257,7 +257,7 @@ Custom Find Strategies
 --------------
 
 By default find will search for the document by the id field if the provided id
-looks like a BSON ObjectId, and it will otherwise find by the _slugs field. However,
+looks like a BSON::ObjectId, and it will otherwise find by the _slugs field. However,
 custom strategies can ovveride the default behavior, like e.g:
 
 ```ruby
