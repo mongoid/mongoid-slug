@@ -5,6 +5,7 @@
 ### Improvements
 
 * update stringex dependency to 2.0 or higher
+* Mongoid 4 support (dblock)
 
 ### Bugfixes
 
