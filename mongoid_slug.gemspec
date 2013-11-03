@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/digitalplaywright/mongoid-slug'
   s.summary     = 'Mongoid URL slugs'
   s.description = 'Mongoid URL slug or permalink generator'
+  s.license     = 'MIT'
 
   s.rubyforge_project = 'mongoid_slug'
 
