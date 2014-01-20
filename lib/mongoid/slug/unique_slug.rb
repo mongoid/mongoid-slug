@@ -62,13 +62,17 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-        :check_against_id, :reserved_words, :url_builder, :metadata,
-        :collection_name, :embedded?, :reflect_on_all_associations, :by_model_type
+        :check_against_id, :reserved_words, :url_builder, :collection_name,
+        :embedded?, :reflect_on_all_associations, :by_model_type
 
       def initialize model
         @model = model
         @_slug = ""
         @state = nil
+      end
+
+      def metadata
+        @model.respond_to?(:relation_metadata) ? @model.relation_metadata : @model.metadata
       end
 
       def find_unique attempt = nil
@@ -132,7 +136,7 @@ module Mongoid
 
         if embedded?
           parent_metadata = reflect_on_all_associations(:embedded_in)[0]
-          return model._parent.send(parent_metadata.inverse_of || model.metadata.name)
+          return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 
         #unless embedded or slug scope, return the deepest document superclass
