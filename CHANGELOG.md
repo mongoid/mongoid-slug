@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 3.2.1
+
+### Bugfixes
+
+* fix for Mongoid4 (blackxored)
+
 ## 3.2.0
 
 ### Improvements
