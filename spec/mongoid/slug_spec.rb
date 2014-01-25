@@ -809,6 +809,18 @@ module Mongoid
         page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-netherlands"]}
       end
 
+      it "exact same title multiple langauges" do
+        page = PageSlugLocalized.new
+        page.title_translations = {"en" => "Title on English", "nl" => "Title on English"}
+        page.save
+        page["_slugs"].should == {"en" => ["title-on-english"], "nl" => ["title-on-english"]}
+
+        page = PageSlugLocalized.create(title_translations: {"en" => "Title on English2", "nl" => "Title on English2"})
+        page["_slugs"].should == {"en" => ["title-on-english2"], "nl" => ["title-on-english2"]}
+      end
+
+
+
       it "does not produce duplicate slugs" do
         old_locale = I18n.locale
 
