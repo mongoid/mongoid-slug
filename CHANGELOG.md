@@ -2,6 +2,9 @@
 
 ## 3.2.1
 
+### Improvements
+* Bump Mongoid 4 requirement to beta1 
+
 ### Bugfixes
 
 * fix for Mongoid4 (blackxored)
