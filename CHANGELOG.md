@@ -8,6 +8,7 @@
 ### Bugfixes
 
 * fix for Mongoid4 (blackxored)
+* Add sparse option to slug index (klacointe)
 
 ## 3.2.0
 
