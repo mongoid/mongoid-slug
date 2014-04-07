@@ -9,6 +9,7 @@
 
 * fix for Mongoid4 (blackxored)
 * fix translation tests (digitalplaywright) 
+* Add sparse option to slug index (klacointe)
 
 ## 3.2.0
 

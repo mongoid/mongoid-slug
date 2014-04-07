@@ -66,7 +66,7 @@ module Mongoid
               # Add _type to the index to fix polymorphism
               index({ _type: 1, scope_key => 1, _slugs: 1})
             else
-              index({scope_key => 1, _slugs: 1}, {unique: true})
+              index({scope_key => 1, _slugs: 1}, {unique: true, sparse: true})
             end
 
           else
@@ -74,7 +74,7 @@ module Mongoid
             if options[:by_model_type] == true
               index({_type: 1, _slugs: 1})
             else
-              index({_slugs: 1}, {unique: true})
+              index({_slugs: 1}, {unique: true, sparse: true})
             end
           end
         end
