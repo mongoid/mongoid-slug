@@ -8,6 +8,7 @@
 ### Bugfixes
 
 * fix for Mongoid4 (blackxored)
+* fix translation tests (digitalplaywright) 
 
 ## 3.2.0
 
