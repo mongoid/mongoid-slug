@@ -884,7 +884,7 @@ module Mongoid
         page = PageSlugLocalizedCustom.new
         page.title = "a title for the slug"
         page.save
-        page["_slugs"].should == {"en" => ["a-title-for-the-slug"]}
+        page["_slugs"].should == {"en" => ["a-title-for-the-slug"], "nl"=>["a-title-for-the-slug"]}
       end
     end
 

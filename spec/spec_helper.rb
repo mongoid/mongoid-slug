@@ -27,6 +27,8 @@ end
   Dir["./spec/#{dir}/*.rb"].each { |f| require f }
 end
 
+I18n.available_locales = [ :en, :nl ]
+
 RSpec.configure do |c|
   c.before(:each) do
     Mongoid.purge!
