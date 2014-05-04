@@ -67,7 +67,12 @@ module Mongoid
 
       # a string will not look like a slug if it looks like a legal BSON::ObjectId
       def objectid_slug_strategy id
-        Moped::BSON::ObjectId.legal? id
+        obj_id = if defined? BSON::ObjectId
+                   BSON::ObjectId
+                 else
+                   Moped::BSON::ObjectId
+                 end
+        obj_id.legal? id
       end
 
       # a string will always look like a slug
