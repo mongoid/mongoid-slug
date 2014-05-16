@@ -5,5 +5,5 @@ class PageSlugLocalized
   field :content
   field :order, :type => Integer
   slug  :title, localize: true
-  default_scope asc(:order)
+  default_scope ->{ asc(:order) }
 end

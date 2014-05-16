@@ -1,13 +1,16 @@
+require 'bundler/setup'
+
 begin
   require 'pry'
 rescue LoadError
 end
 require 'rspec'
 require 'uuid'
-require "awesome_print"
+require 'awesome_print'
+require 'mongoid'
+require 'mongoid/paranoia'
 
 require File.expand_path '../../lib/mongoid_slug', __FILE__
-require 'mongoid/paranoia'
 
 module Mongoid::Slug::UuidIdStrategy
   def self.call id
@@ -32,7 +35,7 @@ I18n.available_locales = [ :en, :nl ]
 RSpec.configure do |c|
   c.before(:each) do
     Mongoid.purge!
-    Mongoid::IdentityMap.clear
+    Mongoid::IdentityMap.clear if defined?(Mongoid::IdentityMap)
   end
 
   c.after(:suite) do
