@@ -93,10 +93,31 @@ module Mongoid
         else
           set_callback :save, :before, :build_slug, :if => :slug_should_be_rebuilt?
         end
+
+        # If paranoid document:
+        # - include callbacks shim
+        # - unset the slugs on destroy
+        # - recreate the slug on restore
+        if is_paranoid_doc?
+          self.send(:include, Mongoid::Slug::Paranoia) unless self.respond_to?(:before_restore)
+          set_callback :destroy, :after, :unset_slug
+          set_callback :restore, :before, ->{ build_slug; set_slug }
+        end
       end
 
       def look_like_slugs?(*args)
         with_default_scope.look_like_slugs?(*args)
+      end
+
+      # Indicates whether or not the document includes Mongoid::Paranoia
+      #
+      # This can be replaced with .paranoid? method once the following PRs are merged:
+      # - https://github.com/simi/mongoid-paranoia/pull/19
+      # - https://github.com/haihappen/mongoid-paranoia/pull/3
+      #
+      # @return [ Array<Document>, Document ] Whether the document is paranoid
+      def is_paranoid_doc?
+        !!(defined?(::Mongoid::Paranoia) && self < ::Mongoid::Paranoia)
       end
 
       # Find documents by slugs.
@@ -135,18 +156,18 @@ module Mongoid
           orig_locale = I18n.locale
           all_locales.each do |target_locale|
             I18n.locale = target_locale
-            set_slug
+            apply_slug
           end
         ensure
           I18n.locale = orig_locale
         end
       else
-        set_slug
+        apply_slug
       end
       true
     end
 
-    def set_slug
+    def apply_slug
       _new_slug = find_unique_slug
 
       #skip slug generation and use Mongoid id
@@ -161,6 +182,21 @@ module Mongoid
       else
         self._slugs = [_new_slug]
       end
+    end
+
+    # Atomically sets the slug field in the database to its current value
+    # This is used when working with the Mongoid::Paranoia restore callback
+    def set_slug
+      set(:_slugs, self._slugs)
+    end
+
+    # Atomically unsets the slug field in the database. It is important to unset
+    # the field for the sparse index on slugs.
+    #
+    # This also resets the in-memory value of the slug field to its default (empty array)
+    def unset_slug
+      unset(:_slugs)
+      self._slugs = []
     end
 
     # Finds a unique slug, were specified string used to generate a slug.
