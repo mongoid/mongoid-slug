@@ -59,24 +59,9 @@ module Mongoid
         field :_slugs, type: Array, default: [], localize: options[:localize]
         alias_attribute :slugs, :_slugs
 
+        # Set index
         unless embedded?
-          if slug_scope
-            scope_key = (metadata = self.reflect_on_association(slug_scope)) ? metadata.key : slug_scope
-            if options[:by_model_type] == true
-              # Add _type to the index to fix polymorphism
-              index({ _type: 1, scope_key => 1, _slugs: 1})
-            else
-              index({scope_key => 1, _slugs: 1}, {unique: true, sparse: true})
-            end
-
-          else
-            # Add _type to the index to fix polymorphism
-            if options[:by_model_type] == true
-              index({_type: 1, _slugs: 1})
-            else
-              index({_slugs: 1}, {unique: true, sparse: true})
-            end
-          end
+          index(*Mongoid::Slug::Index.build_index(self.slug_scope_key, self.by_model_type))
         end
 
         #-- Why is it necessary to customize the slug builder?
@@ -97,6 +82,14 @@ module Mongoid
 
       def look_like_slugs?(*args)
         with_default_scope.look_like_slugs?(*args)
+      end
+
+      # Returns the scope key for indexing, considering associations
+      #
+      # @return [ Array<Document>, Document ] Whether the document is paranoid
+      def slug_scope_key
+        return nil unless self.slug_scope
+        self.reflect_on_association(self.slug_scope).try(:key) || self.slug_scope
       end
 
       # Find documents by slugs.
