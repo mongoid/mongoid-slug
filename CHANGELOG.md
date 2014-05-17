@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.2.2
+
+## Bugfixes
+
+* Avoid scope error in tests (johnnyshields - #163)
+* require activesupport dependencies to fix error in test on ruby 1.9.3 and Mongoid 4 (digitalplaywright)
+
 ## 3.2.1
 
 ### Improvements
