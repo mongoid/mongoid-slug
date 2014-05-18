@@ -1,5 +1,7 @@
 # CHANGELOG
 
+* Improve support for Mongoid::Paranoia (johnnyshields - #165)
+
 ## 3.2.2
 
 ## Bugfixes

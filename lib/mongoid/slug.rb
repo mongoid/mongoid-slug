@@ -95,29 +95,21 @@ module Mongoid
         end
 
         # If paranoid document:
-        # - include callbacks shim
+        # - include shim to add callbacks for restore method
         # - unset the slugs on destroy
         # - recreate the slug on restore
+        # - force reset the slug when saving a destroyed paranoid document, to ensure it stays unset in the database
         if is_paranoid_doc?
           self.send(:include, Mongoid::Slug::Paranoia) unless self.respond_to?(:before_restore)
-          set_callback :destroy, :after, :unset_slug
-          set_callback :restore, :before, ->{ build_slug; set_slug }
+          set_callback :destroy, :after,  :unset_slug!
+          set_callback :restore, :before, :set_slug!
+          set_callback :save,    :before, :reset_slug!, :if => :paranoid_deleted?
+          set_callback :save,    :after,  :clear_slug!, :if => :paranoid_deleted?
         end
       end
 
       def look_like_slugs?(*args)
         with_default_scope.look_like_slugs?(*args)
-      end
-
-      # Indicates whether or not the document includes Mongoid::Paranoia
-      #
-      # This can be replaced with .paranoid? method once the following PRs are merged:
-      # - https://github.com/simi/mongoid-paranoia/pull/19
-      # - https://github.com/haihappen/mongoid-paranoia/pull/3
-      #
-      # @return [ Array<Document>, Document ] Whether the document is paranoid
-      def is_paranoid_doc?
-        !!(defined?(::Mongoid::Paranoia) && self < ::Mongoid::Paranoia)
       end
 
       # Find documents by slugs.
@@ -145,6 +137,16 @@ module Mongoid
         scope_stack.last || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
       end
 
+      # Indicates whether or not the document includes Mongoid::Paranoia
+      #
+      # This can be replaced with .paranoid? method once the following PRs are merged:
+      # - https://github.com/simi/mongoid-paranoia/pull/19
+      # - https://github.com/haihappen/mongoid-paranoia/pull/3
+      #
+      # @return [ Array<Document>, Document ] Whether the document is paranoid
+      def is_paranoid_doc?
+        !!(defined?(::Mongoid::Paranoia) && self < ::Mongoid::Paranoia)
+      end
     end
 
     # Builds a new slug.
@@ -184,18 +186,32 @@ module Mongoid
       end
     end
 
-    # Atomically sets the slug field in the database to its current value
-    # This is used when working with the Mongoid::Paranoia restore callback
-    def set_slug
-      set(:_slugs, self._slugs)
+    # Builds slug then atomically sets it in the database.
+    # This is used when working with the Mongoid::Paranoia restore callback.
+    #
+    # This method is adapted to use the :set method variants from both
+    # Mongoid 3 (two args) and Mongoid 4 (hash arg)
+    def set_slug!
+      build_slug
+      self.method(:set).arity == 1 ? set({_slugs: self._slugs}) : set(:_slugs, self._slugs)
     end
 
     # Atomically unsets the slug field in the database. It is important to unset
     # the field for the sparse index on slugs.
     #
     # This also resets the in-memory value of the slug field to its default (empty array)
-    def unset_slug
+    def unset_slug!
       unset(:_slugs)
+      clear_slug!
+    end
+
+    # Rolls back the slug value from the Mongoid changeset.
+    def reset_slug!
+      self.reset__slugs!
+    end
+
+    # Sets the slug to its default value.
+    def clear_slug!
       self._slugs = []
     end
 
@@ -211,7 +227,15 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? or _slugs_changed? or slugged_attributes_changed?
+      (new_record? or _slugs_changed? or slugged_attributes_changed?) and !paranoid_deleted?
+    end
+
+    # Indicates whether or not the document has been deleted in paranoid fashion
+    # Always returns false if the document is not paranoid
+    #
+    # @return [Boolean] Whether or not the document has been deleted in paranoid fashion
+    def paranoid_deleted?
+      !!(self.class.is_paranoid_doc? and self.deleted_at != nil)
     end
 
     def slugged_attributes_changed?
