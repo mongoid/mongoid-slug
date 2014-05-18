@@ -1018,25 +1018,5 @@ module Mongoid
       end
 
     end
-
-    context "Mongoid paranoia with mongoid slug model" do
-
-      let(:paranoid_doc) {ParanoidDocument.create!(:title => "slug")}
-
-      it "returns paranoid_doc for correct slug" do
-        ParanoidDocument.find(paranoid_doc.slug).should eq(paranoid_doc)
-      end
-
-      it "raises for deleted slug" do
-        paranoid_doc.delete
-        expect{ParanoidDocument.find(paranoid_doc.slug)}.to raise_error(Mongoid::Errors::DocumentNotFound)
-      end
-
-      it "returns paranoid_doc for correct restored slug" do
-        paranoid_doc.delete
-        ParanoidDocument.deleted.first.restore
-        ParanoidDocument.find(paranoid_doc.slug).should eq(paranoid_doc)
-      end
-    end
   end
 end
