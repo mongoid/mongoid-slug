@@ -1,5 +1,6 @@
 # CHANGELOG
 
+* Made thread safe ( jaxesn - #168 )
 * Improve support for Mongoid::Paranoia (johnnyshields - #165)
 
 ## 3.2.2
