@@ -58,11 +58,22 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
   end
 
   describe "index" do
-    before  { ParanoidDocument.create_indexes }
-    after   { ParanoidDocument.remove_indexes }
-    subject { ParanoidDocument }
 
-    it_should_behave_like "has an index", { _slugs: 1 }, { unique: true, sparse: true }
+    context "simple index" do
+      before  { ParanoidDocument.create_indexes }
+      after   { ParanoidDocument.remove_indexes }
+      subject { ParanoidDocument }
+
+      it_should_behave_like "has an index", { _slugs: 1 }, { unique: true, sparse: true }
+    end
+
+    context "compound index" do
+      before  { ParanoidPermanent.create_indexes }
+      after   { ParanoidPermanent.remove_indexes }
+      subject { ParanoidPermanent }
+
+      it_should_behave_like "has an index", { _slugs: 1, foo: 1 }, { unique: nil, sparse: true }
+    end
   end
 
   shared_examples_for "paranoid slugs" do
