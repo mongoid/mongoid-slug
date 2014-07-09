@@ -534,7 +534,7 @@ module Mongoid
       context "for subclass scope" do
         context "when slug is not scoped by a reference association" do
           subject { BookPolymorphic }
-          it_should_behave_like "has an index", { _type: 1, _slugs: 1 }, { unique: true }
+          it_should_behave_like "has an index", { _type: 1, _slugs: 1 }, { unique: true, sparse: true }
         end
 
         context "when slug is scoped by a reference association" do
