@@ -20,7 +20,7 @@ describe Mongoid::Slug::Index do
       end
 
       context "when paranoid is not set" do
-        it { should eq [{:_slugs=>1, :foo=>1, :_type=>1}, {:unique=>true, :sparse=>true}] }
+        it { should eq [{:_slugs=>1, :foo=>1, :_type=>1}, {:sparse=>true}] }
       end
     end
 
@@ -48,7 +48,7 @@ describe Mongoid::Slug::Index do
       end
 
       context "when paranoid is not set" do
-        it { should eq [{:_slugs=>1, :_type=>1}, {:unique=>true, :sparse=>true}] }
+        it { should eq [{:_slugs=>1, :_type=>1}, {:sparse=>true}] }
       end
     end
 

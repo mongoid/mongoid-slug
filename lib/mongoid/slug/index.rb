@@ -18,13 +18,18 @@ module Mongoid
         # See: http://docs.mongodb.org/manual/core/index-sparse/
         options = {sparse: true}
 
-        # By design, we use the unique index constraint to enforce slug uniqueness.
-        # Paranoid docs rely on sparse indexes to exclude paranoid-deleted records
-        # from the unique index constraint (i.e. when _slugs is unset.) As an edge case,
-        # when using compound keys (see above), paranoid-deleted records can become
-        # inadvertently indexed even when _slugs is unset, and collisions will occur.
-        # Hence we must exclude this case.
-        options.merge!(unique: true) unless paranoid && (scope_key || by_model_type)
+        # By design, we use the unique index constraint when possible to enforce slug uniqueness.
+        # There are two edge cases where it must not be unique:
+        #
+        # 1) Single Table Inheritance (`by_model_type`) creates indexes on the base (parent) table,
+        #    and the indexes will be applied to EVERY child (regardless if they are only defined on
+        #    ONE child). This can cause collisions using various combinations of scopes/non-scopes
+        #
+        # 2) Paranoid docs rely on sparse indexes to exclude paranoid-deleted records
+        #    from the unique index constraint (i.e. when _slugs is unset.) However, when
+        #    using compound keys (`by_model_type` or `scope_key`, see above), paranoid-deleted records can become
+        #    inadvertently indexed when _slugs is unset, causing duplicates
+        options.merge!(unique: true) unless by_model_type || (paranoid && scope_key)
 
         return [fields, options]
       end
