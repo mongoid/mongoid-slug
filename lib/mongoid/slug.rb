@@ -61,7 +61,7 @@ module Mongoid
 
         # Set index
         unless embedded?
-          index(*Mongoid::Slug::Index.build_index(self.slug_scope_key, self.by_model_type, is_paranoid_doc?))
+          index(*Mongoid::Slug::Index.build_index(self.slug_scope_key, self.by_model_type))
         end
 
         #-- Why is it necessary to customize the slug builder?

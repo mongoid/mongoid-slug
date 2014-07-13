@@ -6,30 +6,42 @@ module Mongoid
       # @param [ Boolean ] by_model_type Whether or not
       #
       # @return [ Array(Hash, Hash) ] the indexable fields and index options.
-      def self.build_index(scope_key = nil, by_model_type = false, paranoid = false)
-        fields  = {_slugs: 1}
-        fields.merge!(scope_key => 1) if scope_key
-        fields.merge!(_type: 1)       if by_model_type
+      def self.build_index(scope_key = nil, by_model_type = false)
 
-        # The sparse index option is always set, as in theory it increases performance when
-        # a large number of records do not have a _slugs value. Note the sparse option is not
-        # particularly useful with compound keys (i.e. when scope_key or by_model_type is set),
-        # as the index is created whenever ANY of the key values is present (i.e. even when _slugs is unset)
-        # See: http://docs.mongodb.org/manual/core/index-sparse/
-        options = {sparse: true}
+        # The order of field keys is intentional.
+        # See: http://docs.mongodb.org/manual/core/index-compound/
+        fields = {}
+        fields.merge!(_type: 1)       if by_model_type
+        fields.merge!(scope_key => 1) if scope_key
+        fields.merge!(_slugs: 1)
 
         # By design, we use the unique index constraint when possible to enforce slug uniqueness.
-        # There are two edge cases where it must not be unique:
+        # When migrating legacy data to Mongoid slug, the _slugs field may be null on many records,
+        # hence we set the sparse index option to ignore these from the unique index.
+        # See: http://docs.mongodb.org/manual/core/index-sparse/
         #
-        # 1) Single Table Inheritance (`by_model_type`) creates indexes on the base (parent) table,
-        #    and the indexes will be applied to EVERY child (regardless if they are only defined on
-        #    ONE child). This can cause collisions using various combinations of scopes/non-scopes
+        # There are three edge cases where the index must not be unique:
         #
-        # 2) Paranoid docs rely on sparse indexes to exclude paranoid-deleted records
+        # 1) Legacy tables with `scope_key`. The sparse indexes on compound keys (scope + _slugs) are
+        #    whenever ANY of the key values are present (e.g. when scope is set and _slugs is unset),
+        #    and collisions will occur when multiple records have the same scope but null slugs.
+        #
+        # 2) Single Table Inheritance (`by_model_type`). MongoDB creates indexes on the parent collection,
+        #    irrespective of how STI is defined in Mongoid, i.e. ANY child index will be applied to EVERY child.
+        #    This can cause collisions using various combinations of scopes.
+        #
+        # 3) Paranoid docs rely on sparse indexes to exclude paranoid-deleted records
         #    from the unique index constraint (i.e. when _slugs is unset.) However, when
-        #    using compound keys (`by_model_type` or `scope_key`, see above), paranoid-deleted records can become
-        #    inadvertently indexed when _slugs is unset, causing duplicates
-        options.merge!(unique: true) unless by_model_type || (paranoid && scope_key)
+        #    using compound keys (`by_model_type` or `scope_key`), paranoid-deleted records
+        #    can become inadvertently indexed when _slugs is unset, causing duplicates. This
+        #    is already covered by #1 and #2 above.
+        #
+        # In the future, MongoDB may implement partial indexes or improve sparse index behavior.
+        # See: https://jira.mongodb.org/browse/SERVER-785
+        #      https://jira.mongodb.org/browse/SERVER-13780
+        #      https://jira.mongodb.org/browse/SERVER-10403
+        options = {}
+        options.merge!(unique: true, sparse: true) unless scope_key || by_model_type
 
         return [fields, options]
       end
