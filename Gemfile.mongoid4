@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'mongoid', '~> 4.0.0.beta1' 
-gem 'mongoid-paranoia', github: 'simi/mongoid-paranoia'
+gem 'mongoid', '~> 4.0.0'
+gem 'mongoid_paranoia'
 
 gemspec
