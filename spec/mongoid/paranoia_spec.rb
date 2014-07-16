@@ -14,12 +14,12 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
 
     context "when Mongoid::Paranoia is included" do
       subject { paranoid_doc.class }
-      its(:is_paranoid_doc?){ should be_true }
+      specify { subject.is_paranoid_doc?.should be_true }
     end
 
     context "when Mongoid::Paranoia not included" do
       subject { non_paranoid_doc.class }
-      its(:is_paranoid_doc?){ should be_false }
+      specify { subject.is_paranoid_doc?.should be_false }
     end
   end
 
@@ -28,18 +28,18 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
     context "when Mongoid::Paranoia is included" do
 
       context "when not destroyed" do
-        its(:paranoid_deleted?){ should be_false }
+        specify { subject.paranoid_deleted?.should be_false }
       end
 
       context "when destroyed" do
         before { subject.destroy }
-        its(:paranoid_deleted?){ should be_true }
+        specify { subject.paranoid_deleted?.should be_true }
       end
     end
 
     context "when Mongoid::Paranoia not included" do
       subject { non_paranoid_doc }
-      its(:paranoid_deleted?){ should be_false }
+      specify { subject.paranoid_deleted?.should be_false }
     end
   end
 
@@ -58,11 +58,22 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
   end
 
   describe "index" do
-    before  { ParanoidDocument.create_indexes }
-    after   { ParanoidDocument.remove_indexes }
-    subject { ParanoidDocument }
 
-    it_should_behave_like "has an index", { _slugs: 1 }, { unique: true, sparse: true }
+    context "simple index" do
+      before  { ParanoidDocument.create_indexes }
+      after   { ParanoidDocument.remove_indexes }
+      subject { ParanoidDocument }
+
+      it_should_behave_like "has an index", { _slugs: 1 }, { unique: true, sparse: true }
+    end
+
+    context "compound index" do
+      before  { ParanoidPermanent.create_indexes }
+      after   { ParanoidPermanent.remove_indexes }
+      subject { ParanoidPermanent }
+
+      it_should_behave_like "has an index", { foo: 1, _slugs: 1 }, { unique: nil, sparse: nil }
+    end
   end
 
   shared_examples_for "paranoid slugs" do

@@ -4,5 +4,7 @@ class ParanoidPermanent
   include Mongoid::Slug
 
   field :title
-  slug  :title, permanent: true
+  field :foo
+
+  slug  :title, scope: :foo, permanent: true
 end
