@@ -1,5 +1,6 @@
 # CHANGELOG
 
+* Gemfile changes ( johnnyshields - #173 )
 * Made thread safe ( jaxesn - #168 )
 * Improve support for Mongoid::Paranoia (johnnyshields - #165)
 
