@@ -672,12 +672,12 @@ module Mongoid
       let(:book) { Book.first }
 
       it "is initially unchanged" do
-        book._slugs_changed?.should be_false
+        book._slugs_changed?.should be_falsey
       end
 
       it "tracks changes" do
         book.slugs = ["Anti Oedipus"]
-        book._slugs_changed?.should be_true
+        book._slugs_changed?.should be_truthy
       end
     end
 

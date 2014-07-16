@@ -11,6 +11,7 @@ require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
 require 'mongoid/paranoia'
+require 'rspec/its'
 
 require File.expand_path '../../lib/mongoid_slug', __FILE__
 

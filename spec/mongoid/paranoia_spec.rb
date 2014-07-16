@@ -14,12 +14,12 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
 
     context "when Mongoid::Paranoia is included" do
       subject { paranoid_doc.class }
-      its(:is_paranoid_doc?){ should be_true }
+      its(:is_paranoid_doc?){ should be_truthy }
     end
 
     context "when Mongoid::Paranoia not included" do
       subject { non_paranoid_doc.class }
-      its(:is_paranoid_doc?){ should be_false }
+      its(:is_paranoid_doc?){ should be_falsey }
     end
   end
 
@@ -28,18 +28,18 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
     context "when Mongoid::Paranoia is included" do
 
       context "when not destroyed" do
-        its(:paranoid_deleted?){ should be_false }
+        its(:paranoid_deleted?){ should be_falsey }
       end
 
       context "when destroyed" do
         before { subject.destroy }
-        its(:paranoid_deleted?){ should be_true }
+        its(:paranoid_deleted?){ should be_truthy }
       end
     end
 
     context "when Mongoid::Paranoia not included" do
       subject { non_paranoid_doc }
-      its(:paranoid_deleted?){ should be_false }
+      its(:paranoid_deleted?){ should be_falsey }
     end
   end
 
