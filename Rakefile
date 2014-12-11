@@ -1,7 +1,7 @@
 require "bundler"
 require "rspec/core/rake_task"
 
-Bundler::GemHelper.install_tasks
+Bundler::GemHelper.install_tasks name: 'mongoid-slug'
 
 desc "Run all specs in spec directory"
 RSpec::Core::RakeTask.new(:spec) do |spec|

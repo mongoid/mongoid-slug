@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 require 'mongoid/slug/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'mongoid_slug'
+  s.name        = 'mongoid-slug'
   s.version     = Mongoid::Slug::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Andreas Saebjoernsen']
@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.description = 'Mongoid URL slug or permalink generator'
   s.license     = 'MIT'
 
-  s.rubyforge_project = 'mongoid_slug'
+  s.rubyforge_project = 'mongoid-slug'
 
   s.add_dependency 'mongoid', '>= 3.0'
   s.add_dependency 'stringex', '~> 2.0'
@@ -28,6 +28,4 @@ Gem::Specification.new do |s|
   s.files         = Dir.glob('lib/**/*') + %w(LICENSE README.md)
   s.test_files    = Dir.glob('spec/**/*')
   s.require_paths = ['lib']
-
-  s.post_install_message = "[NOTICE]: Deprecated gem name. The name of this gem will be changing from 'mongoid_slug' to 'mongoid-slug' (notice the hyphen). To ensure you are using the correct version of this gem, please use 'mongoid-slug'."
 end

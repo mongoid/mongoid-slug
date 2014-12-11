@@ -16,7 +16,7 @@ Installation
 Add to your Gemfile:
 
 ```ruby
-gem 'mongoid_slug'
+gem 'mongoid-slug'
 ```
 
 Usage

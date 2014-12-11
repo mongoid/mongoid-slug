@@ -13,7 +13,7 @@ require 'mongoid'
 require 'mongoid/paranoia'
 require 'rspec/its'
 
-require File.expand_path '../../lib/mongoid_slug', __FILE__
+require File.expand_path '../../lib/mongoid/slug', __FILE__
 
 module Mongoid::Slug::UuidIdStrategy
   def self.call id
