@@ -2,7 +2,7 @@
 
 ## 4.0.0
 
-* Rename gem to mongoid-slug ( #179 )
+* Rename gem to mongoid-slug, but will continue to publish under mongoid_slug name as well for now ( #179 )
 * Gemfile changes ( johnnyshields - #173 )
 * Made thread safe ( jaxesn - #168 )
 * Improve support for Mongoid::Paranoia (johnnyshields - #165)
