@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.0.0
+
+* Rename gem to mongoid-slug ( #179 )
 * Gemfile changes ( johnnyshields - #173 )
 * Made thread safe ( jaxesn - #168 )
 * Improve support for Mongoid::Paranoia (johnnyshields - #165)
