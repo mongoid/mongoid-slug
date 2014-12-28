@@ -318,7 +318,7 @@ end
 
 The following variants of Mongoid Paranoia are officially supported:
 * Mongoid 3 built-in Mongoid::Paranoia
-* Mongoid 4 gem http://github.com/simi/mongoid-paranoia
+* Mongoid 4 gem http://github.com/simi/mongoid_paranoia
 
 Mongoid 4 gem "mongoid-paranoia" (http://github.com/haihappen/mongoid-paranoia)
 is not officially supported but should also work.
