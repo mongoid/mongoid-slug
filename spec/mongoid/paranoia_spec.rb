@@ -62,7 +62,7 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
     after   { ParanoidDocument.remove_indexes }
     subject { ParanoidDocument }
 
-    it_should_behave_like "has an index", { _slugs: 1 }, { unique: true, sparse: true }
+    it_should_behave_like "has an index", { _slugs: 1 }
   end
 
   shared_examples_for "paranoid slugs" do
