@@ -135,7 +135,7 @@ module Mongoid
       end
 
       def queryable
-        scope_stack.last || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+        Threaded.current_scope || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
       end
 
       # Indicates whether or not the document includes Mongoid::Paranoia
