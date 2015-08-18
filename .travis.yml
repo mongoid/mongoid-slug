@@ -3,6 +3,7 @@ services: mongodb
 gemfile:
   - Gemfile
   - Gemfile.mongoid4
+  - Gemfile.mongoid5
 rvm:
   - 1.9.3
   - jruby-19mode
