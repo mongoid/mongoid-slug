@@ -649,7 +649,7 @@ module Mongoid
         let!(:book_no_title) { Book.create() }
 
         before do
-          Book.collection.insert(:title => "Proust and Signs")
+          Book.collection.insert_one(:title => "Proust and Signs")
         end
 
         it "should return the id if there is no slug" do
