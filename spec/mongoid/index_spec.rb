@@ -12,11 +12,11 @@ describe Mongoid::Slug::Index do
 
     context "when by_model_type is true" do
       let(:by_model_type) { true }
-      it { should eq [{:_slugs=>1, :foo=>1, :_type=>1}, {}] }
+      it { is_expected.to eq [{:_slugs=>1, :foo=>1, :_type=>1}, {}] }
     end
 
     context "when by_model_type is false" do
-      it { should eq [{:_slugs=>1, :foo=>1}, {:unique=>true, :sparse=>true}] }
+      it { is_expected.to eq [{:_slugs=>1, :foo=>1}, {:unique=>true, :sparse=>true}] }
     end
   end
 
@@ -24,11 +24,11 @@ describe Mongoid::Slug::Index do
 
     context "when by_model_type is true" do
       let(:by_model_type) { true }
-      it { should eq [{:_slugs=>1, :_type=>1}, {}] }
+      it { is_expected.to eq [{:_slugs=>1, :_type=>1}, {}] }
     end
 
     context "when by_model_type is false" do
-      it { should eq [{:_slugs=>1}, {:unique=>true, :sparse=>true}] }
+      it { is_expected.to eq [{:_slugs=>1}, {:unique=>true, :sparse=>true}] }
     end
   end
 end

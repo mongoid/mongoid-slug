@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next
+
+* Mongoid 5 support ( dblock - #187 )
+
 ## 4.0.0
 
 * Rename gem to mongoid-slug, but will continue to publish under mongoid_slug name as well for now ( #179 )
@@ -17,12 +21,12 @@
 ## 3.2.1
 
 ### Improvements
-* Bump Mongoid 4 requirement to beta1 
+* Bump Mongoid 4 requirement to beta1
 
 ### Bugfixes
 
 * fix for Mongoid4 (blackxored)
-* fix translation tests (digitalplaywright) 
+* fix translation tests (digitalplaywright)
 * Add sparse option to slug index (klacointe)
 
 ## 3.2.0
@@ -55,7 +59,7 @@
 
 ## 3.1.0
 
-### New Features 
+### New Features
 
 * optionally slugs are created and found per model type (joe1chen)
 
@@ -167,7 +171,7 @@
 ## 0.7.1
 
 * Library no longers hit database multiple times to find unique slug when
-  duplicates exist. (tiendung - Alex N.) 
+  duplicates exist. (tiendung - Alex N.)
 
 ## 0.7.0
 

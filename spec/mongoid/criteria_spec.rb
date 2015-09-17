@@ -17,8 +17,8 @@ describe Mongoid::Slug::Criteria do
 
     context "when the model does not use mongoid slugs" do
       it "should not use mongoid slug's custom find methods" do
-        Mongoid::Slug::Criteria.any_instance.should_not_receive(:find)
-        WithoutSlug.find(without_slug.id.to_s).should == without_slug
+        expect_any_instance_of(Mongoid::Slug::Criteria).not_to receive(:find)
+        expect(WithoutSlug.find(without_slug.id.to_s)).to eq(without_slug)
       end
     end
 
@@ -26,15 +26,15 @@ describe Mongoid::Slug::Criteria do
       context "(single)" do
         context "and a document is found" do
           it "returns the document as an object" do
-            Book.find(book.slugs.first).should == book
+            expect(Book.find(book.slugs.first)).to eq(book)
           end
         end
 
         context "but no document is found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
-            lambda {
+            expect {
               Book.find("Anti Oedipus")
-            }.should raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
       end
@@ -42,64 +42,64 @@ describe Mongoid::Slug::Criteria do
       context "(multiple)" do
         context "and all documents are found" do
           it "returns the documents as an array without duplication" do
-            Book.find(book.slugs + book2.slugs).should =~ [book, book2]
+            expect(Book.find(book.slugs + book2.slugs)).to match_array([book, book2])
           end
         end
 
         context "but not all documents are found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
-            lambda {
+            expect {
               Book.find(book.slugs + ['something-nonexistent'])
-            }.should raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
       end
 
       context "when no documents match" do
         it "raises a Mongoid::Errors::DocumentNotFound error" do
-          lambda {
+          expect {
             Book.find("Anti Oedipus")
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
 
       context "when ids are BSON::ObjectIds and the supplied argument looks like a BSON::ObjectId" do
         it "it should find based on ids not slugs" do # i.e. it should type cast the argument
-          Friend.find(friend.id.to_s).should == friend
+          expect(Friend.find(friend.id.to_s)).to eq(friend)
         end
       end
 
       context "when ids are Strings" do
         it "it should find based on ids not slugs" do # i.e. string ids should take precedence over string slugs
-          StringId.find(string_id.id.to_s).should == string_id
+          expect(StringId.find(string_id.id.to_s)).to eq(string_id)
         end
       end
 
       context "when ids are Integers and the supplied arguments looks like an Integer" do
         it "it should find based on slugs not ids" do # i.e. it should not type cast the argument
-          IntegerId.find(integer_id.id.to_s).should == integer_id2
+          expect(IntegerId.find(integer_id.id.to_s)).to eq(integer_id2)
         end
       end
 
       context "models that does not use slugs, should find using the original find" do
         it "it should find based on ids" do # i.e. it should not type cast the argument
-          WithoutSlug.find(without_slug.id.to_s).should == without_slug
+          expect(WithoutSlug.find(without_slug.id.to_s)).to eq(without_slug)
         end
       end
 
       context "when scoped" do
         context "and a document is found" do
           it "returns the document as an object" do
-            book.subjects.find(subject.slugs.first).should == subject
-            book2.subjects.find(subject.slugs.first).should == subject2
+            expect(book.subjects.find(subject.slugs.first)).to eq(subject)
+            expect(book2.subjects.find(subject.slugs.first)).to eq(subject2)
           end
         end
 
         context "but no document is found" do
           it "raises a Mongoid::Errors::DocumentNotFound error" do
-            lambda {
+            expect {
               book.subjects.find('Another Subject')
-            }.should raise_error(Mongoid::Errors::DocumentNotFound)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
         end
       end
@@ -107,20 +107,20 @@ describe Mongoid::Slug::Criteria do
 
     context "using ids" do
       it "raises a Mongoid::Errors::DocumentNotFound error if no document is found" do
-        lambda {
+        expect {
           Book.find(friend.id)
-        }.should raise_error(Mongoid::Errors::DocumentNotFound)
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
       context "given a single document" do
         it "returns the document" do
-          Friend.find(friend.id).should == friend
+          expect(Friend.find(friend.id)).to eq(friend)
         end
       end
 
       context "given multiple documents" do
         it "returns the documents" do
-          Book.find([book.id, book2.id]).should =~ [book, book2]
+          expect(Book.find([book.id, book2.id])).to match_array([book, book2])
         end
       end
     end
@@ -141,15 +141,15 @@ describe Mongoid::Slug::Criteria do
     context "(single)" do
       context "and a document is found" do
         it "returns the document as an object" do
-          Book.find_by_slug!(book.slugs.first).should == book
+          expect(Book.find_by_slug!(book.slugs.first)).to eq(book)
         end
       end
 
       context "but no document is found" do
         it "raises a Mongoid::Errors::DocumentNotFound error" do
-          lambda {
+          expect {
             Book.find_by_slug!("Anti Oedipus")
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
     end
@@ -157,15 +157,15 @@ describe Mongoid::Slug::Criteria do
     context "(multiple)" do
       context "and all documents are found" do
         it "returns the documents as an array without duplication" do
-          Book.find_by_slug!(book.slugs + book2.slugs).should =~ [book, book2]
+          expect(Book.find_by_slug!(book.slugs + book2.slugs)).to match_array([book, book2])
         end
       end
 
       context "but not all documents are found" do
         it "raises a Mongoid::Errors::DocumentNotFound error" do
-          lambda {
+          expect {
             Book.find_by_slug!(book.slugs + ['something-nonexistent'])
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
     end
@@ -173,16 +173,16 @@ describe Mongoid::Slug::Criteria do
     context "when scoped" do
       context "and a document is found" do
         it "returns the document as an object" do
-          book.subjects.find_by_slug!(subject.slugs.first).should == subject
-          book2.subjects.find_by_slug!(subject.slugs.first).should == subject2
+          expect(book.subjects.find_by_slug!(subject.slugs.first)).to eq(subject)
+          expect(book2.subjects.find_by_slug!(subject.slugs.first)).to eq(subject2)
         end
       end
 
       context "but no document is found" do
         it "raises a Mongoid::Errors::DocumentNotFound error" do
-          lambda {
+          expect {
             book.subjects.find_by_slug!('Another Subject')
-          }.should raise_error(Mongoid::Errors::DocumentNotFound)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
     end

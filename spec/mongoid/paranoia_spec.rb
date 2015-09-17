@@ -47,13 +47,13 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
 
     context "when Mongoid::Paranoia is included" do
       subject { paranoid_doc.class }
-      it { should respond_to(:before_restore) }
-      it { should respond_to(:after_restore) }
+      it { is_expected.to respond_to(:before_restore) }
+      it { is_expected.to respond_to(:after_restore) }
     end
 
     context "when Mongoid::Paranoia not included" do
-      it { should_not respond_to(:before_restore) }
-      it { should_not respond_to(:after_restore) }
+      it { is_expected.not_to respond_to(:before_restore) }
+      it { is_expected.not_to respond_to(:after_restore) }
     end
   end
 
@@ -70,7 +70,7 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
     context "querying" do
 
       it "returns paranoid_doc for correct slug" do
-        subject.class.find(subject.slug).should eq(subject)
+        expect(subject.class.find(subject.slug)).to eq(subject)
       end
     end
 
@@ -79,8 +79,8 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
       before { subject.delete }
 
       it "retains slug value" do
-        subject.slug.should eq "slug"
-        subject.class.unscoped.find("slug").should eq subject
+        expect(subject.slug).to eq "slug"
+        expect(subject.class.unscoped.find("slug")).to eq subject
       end
     end
 
@@ -89,17 +89,17 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
       before { subject.destroy }
 
       it "unsets slug value when destroyed" do
-        subject._slugs.should eq []
-        subject.slug.should be_nil
+        expect(subject._slugs).to eq []
+        expect(subject.slug).to be_nil
       end
 
       it "persists the removed slug" do
-        subject.reload._slugs.should eq []
-        subject.reload.slug.should be_nil
+        expect(subject.reload._slugs).to eq []
+        expect(subject.reload.slug).to be_nil
       end
 
       it "persists the removed slug in the database" do
-        subject.class.unscoped.exists(_slugs: false).first.should eq subject
+        expect(subject.class.unscoped.exists(_slugs: false).first).to eq subject
         expect{subject.class.unscoped.find("slug")}.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
@@ -108,12 +108,12 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
         before { subject.save }
 
         it "should have the default slug value" do
-          subject._slugs.should eq []
-          subject.slug.should be_nil
+          expect(subject._slugs).to eq []
+          expect(subject.slug).to be_nil
         end
 
         it "the slug remains unset in the database" do
-          subject.class.unscoped.exists(_slugs: false).first.should eq subject
+          expect(subject.class.unscoped.exists(_slugs: false).first).to eq subject
           expect{subject.class.unscoped.find("slug")}.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
@@ -127,30 +127,30 @@ describe "Mongoid::Paranoia with Mongoid::Slug" do
       end
 
       it "resets slug value when restored" do
-        subject.slug.should eq "slug"
-        subject.reload.slug.should eq "slug"
+        expect(subject.slug).to eq "slug"
+        expect(subject.reload.slug).to eq "slug"
       end
     end
 
     context "multiple documents" do
 
       it "new documents should be able to use the slug of destroyed documents" do
-        subject.slug.should eq "slug"
+        expect(subject.slug).to eq "slug"
         subject.destroy
-        subject.reload.slug.should be_nil
-        other_doc.slug.should eq "slug"
+        expect(subject.reload.slug).to be_nil
+        expect(other_doc.slug).to eq "slug"
         subject.restore
-        subject.slug.should eq "slug-1"
-        subject.reload.slug.should eq "slug-1"
+        expect(subject.slug).to eq "slug-1"
+        expect(subject.reload.slug).to eq "slug-1"
       end
 
       it "should allow multiple documents to be destroyed without index conflict" do
-        subject.slug.should eq "slug"
+        expect(subject.slug).to eq "slug"
         subject.destroy
-        subject.reload.slug.should be_nil
-        other_doc.slug.should eq "slug"
+        expect(subject.reload.slug).to be_nil
+        expect(other_doc.slug).to eq "slug"
         other_doc.destroy
-        other_doc.reload.slug.should be_nil
+        expect(other_doc.reload.slug).to be_nil
       end
     end
   end
