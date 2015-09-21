@@ -5,6 +5,7 @@ require 'mongoid/slug/index'
 require 'mongoid/slug/paranoia'
 require 'mongoid/slug/unique_slug'
 require 'mongoid/slug/slug_id_strategy'
+require 'mongoid-compatibility'
 
 module Mongoid
   # Slugs your Mongoid model.
@@ -135,7 +136,8 @@ module Mongoid
       end
 
       def queryable
-        scope_stack.last || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+        scope = Mongoid::Compatibility::Version.mongoid5? ? Threaded.current_scope : scope_stack.last
+        scope || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
       end
 
       # Indicates whether or not the document includes Mongoid::Paranoia

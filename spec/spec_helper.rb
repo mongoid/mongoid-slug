@@ -12,6 +12,7 @@ require 'active_support/deprecation'
 require 'mongoid'
 require 'mongoid/paranoia'
 require 'rspec/its'
+require 'mongoid-compatibility'
 
 require File.expand_path '../../lib/mongoid/slug', __FILE__
 
@@ -36,12 +37,15 @@ end
 I18n.available_locales = [ :en, :nl ]
 
 RSpec.configure do |c|
+  c.raise_errors_for_deprecations!
+
+  c.before :all do
+    Mongoid.logger.level = Logger::INFO
+    Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5?
+  end
+
   c.before(:each) do
     Mongoid.purge!
     Mongoid::IdentityMap.clear if defined?(Mongoid::IdentityMap)
-  end
-
-  c.after(:suite) do
-    Mongoid::Threaded.sessions[:default].drop if ENV['CI']
   end
 end
