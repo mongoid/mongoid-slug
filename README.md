@@ -1,14 +1,12 @@
-*IMPORTANT:*  If you are upgrading to Mongoid Slug 1.0.0 please migrate in accordance with the instructions in https://github.com/digitalplaywright/mongoid-slug/wiki/How-to-upgrade-to-1.0.0-or-newer.
-Mongoid Slug 1.0.0  stores the slugs in a single field _slugs of array type, and all previous slugs must be migrated.
-
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on one or more fields in a
-Mongoid model. It sits idly on top of [stringex] [1], supporting non-Latin
-characters.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.png)](http://travis-ci.org/digitalplaywright/mongoid-slug) [![Dependency Status](https://gemnasium.com/digitalplaywright/mongoid-slug.png)](https://gemnasium.com/digitalplaywright/mongoid-slug) [![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.png)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
+[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.png)](http://travis-ci.org/digitalplaywright/mongoid-slug)
+[![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
+[![Dependency Status](https://gemnasium.com/digitalplaywright/mongoid-slug.png)](https://gemnasium.com/digitalplaywright/mongoid-slug)
+[![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.png)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
 
 Installation
 ------------
@@ -72,7 +70,7 @@ post = Post.find 'a-thousand-plateaus' # Finds by slugs
 post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 => ...
 ```
-[Read here] [4] for all available options.
+[Examine slug.rb](lib/mongoid/slug.rb) for all available options.
 
 Custom Slug Generation
 -------
@@ -254,7 +252,7 @@ PS! A migration is needed to use Mongoid localized fields for documents that was
 feature was off. Anything else will cause errors.
 
 Custom Find Strategies
---------------
+----------------------
 
 By default find will search for the document by the id field if the provided id
 looks like a BSON::ObjectId, and it will otherwise find by the _slugs field. However,
@@ -303,6 +301,7 @@ Mongoid::Paranoia Support
 
 The [Mongoid::Paranoia](http://github.com/simi/mongoid-paranoia) gem adds "soft-destroy" functionality to Mongoid documents.
 Mongoid::Slug contains special handling for Mongoid::Paranoia:
+
 - When destroying a paranoid document, the slug will be unset from the database.
 - When restoring a paranoid document, the slug will be rebuilt. Note that the new slug may not match the old one.
 - When resaving a destroyed paranoid document, the slug will remain unset in the database.
@@ -317,17 +316,6 @@ end
 ```
 
 The following variants of Mongoid Paranoia are officially supported:
+
 * Mongoid 3 built-in Mongoid::Paranoia
-* Mongoid 4 gem http://github.com/simi/mongoid_paranoia
-
-Mongoid 4 gem "mongoid-paranoia" (http://github.com/haihappen/mongoid-paranoia)
-is not officially supported but should also work.
-
-
-References
-----------
-
-[1]: https://github.com/rsl/stringex/
-[2]: https://secure.travis-ci.org/hakanensari/mongoid-slug.png
-[3]: http://travis-ci.org/hakanensari/mongoid-slug
-[4]: https://github.com/digitalplaywright/mongoid-slug/blob/master/lib/mongoid/slug.rb
+* Mongoid 4 or 5 gem http://github.com/simi/mongoid_paranoia
