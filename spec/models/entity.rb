@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 class Entity
   include Mongoid::Document
   include Mongoid::Slug
@@ -8,5 +8,5 @@ class Entity
   field :name
   field :user_edited_variation
 
-  slug  :user_edited_variation, :history => true
+  slug :user_edited_variation, history: true
 end

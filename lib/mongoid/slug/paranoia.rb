@@ -1,13 +1,11 @@
 module Mongoid
   module Slug
-
     # Lightweight compatibility shim which adds the :restore callback to
     # older versions of Mongoid::Paranoia
     module Paranoia
       extend ActiveSupport::Concern
 
       included do
-
         define_model_callbacks :restore
 
         def restore_with_callbacks

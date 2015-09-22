@@ -4,5 +4,5 @@ class ParanoidDocument
   include Mongoid::Slug
 
   field :title
-  slug  :title
+  slug :title
 end
