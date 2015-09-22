@@ -2,14 +2,14 @@ source 'https://rubygems.org'
 
 gemspec name: 'mongoid-slug'
 
-case version = ENV['MONGOID_VERSION'] || '~> 5.0'
-when /5/
+case version = ENV['MONGOID_VERSION'] || '5.0'
+when /^5/
   gem 'mongoid', '~> 5.0'
-  gem 'mongoid_paranoia', github: 'Aethelflaed/mongoid_paranoia', branch: 'master'
-when /4/
+  gem 'mongoid_paranoia'
+when /^4/
   gem 'mongoid', '~> 4.0'
   gem 'mongoid_paranoia'
-when /3/
+when /^3/
   gem 'mongoid', '~> 3.1'
 else
   gem 'mongoid', version

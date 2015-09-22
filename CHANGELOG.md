@@ -2,6 +2,7 @@
 
 ## Next
 
+* Deprecated name mongoid_slug has been removed ( dblock - #188 )
 * Mongoid 5 support ( dblock - #187 )
 
 ## 4.0.0
