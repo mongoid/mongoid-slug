@@ -319,3 +319,15 @@ The following variants of Mongoid Paranoia are officially supported:
 
 * Mongoid 3 built-in Mongoid::Paranoia
 * Mongoid 4 or 5 gem http://github.com/simi/mongoid_paranoia
+
+
+Contributing
+------------
+
+Mongoid-slug is work of [many of contributors](https://github.com/digitalplaywright/mongoid-slug/graphs/contributors). You're encouraged to submit [pull requests](https://github.com/digitalplaywright/mongoid-slug/pulls), [propose features, ask questions and discuss issues](https://github.com/digitalplaywright/mongoid-slug/issues). See [CONTRIBUTING](CONTRIBUTING.md) for details.
+
+Copyright & License
+-------------------
+
+Copyright (c) 2010-2015 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
+
