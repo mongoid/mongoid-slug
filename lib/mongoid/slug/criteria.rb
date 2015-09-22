@@ -60,13 +60,13 @@ module Mongoid
       # unless a :slug_id_strategy option is defined on the id field,
       # use object_id or string strategy depending on the id_type
       # otherwise default for all other id_types
-      def build_slug_strategy id_type
-        type_method = id_type.to_s.downcase.split('::').last + "_slug_strategy"
-        self.respond_to?(type_method, true) ? method(type_method) : lambda {|id| false}
+      def build_slug_strategy(id_type)
+        type_method = id_type.to_s.downcase.split('::').last + '_slug_strategy'
+        self.respond_to?(type_method, true) ? method(type_method) : ->(_id) { false }
       end
 
       # a string will not look like a slug if it looks like a legal BSON::ObjectId
-      def objectid_slug_strategy id
+      def objectid_slug_strategy(id)
         if Mongoid::Slug.mongoid3?
           Moped::BSON::ObjectId.legal? id
         else
@@ -75,20 +75,23 @@ module Mongoid
       end
 
       # a string will always look like a slug
-      def string_slug_strategy id
+      def string_slug_strategy(_id)
         true
       end
 
-
       def for_slugs(slugs)
-        #_translations
-        localized = (@klass.fields['_slugs'].options[:localize] rescue false)
+        # _translations
+        localized = (begin
+                       @klass.fields['_slugs'].options[:localize]
+                     rescue
+                       false
+                     end)
         if localized
           def_loc = I18n.default_locale
           query = { '$in' => slugs }
-          where({'$or' => [{ _slugs: query }, { "_slugs.#{def_loc}" => query }]}).limit(slugs.length)
+          where({ '$or' => [{ _slugs: query }, { "_slugs.#{def_loc}" => query }] }).limit(slugs.length)
         else
-          where({ _slugs: { '$in' => slugs } }).limit(slugs.length)
+          where(_slugs: { '$in' => slugs }).limit(slugs.length)
         end
       end
 
@@ -102,7 +105,7 @@ module Mongoid
         missing_slugs = slugs - result.map(&:slugs).flatten
 
         if !missing_slugs.blank? && Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
+          fail Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
         end
       end
     end

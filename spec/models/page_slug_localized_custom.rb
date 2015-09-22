@@ -7,5 +7,4 @@ class PageSlugLocalizedCustom
   slug :title, localize: true do |obj|
     obj.title.to_url
   end
-
 end

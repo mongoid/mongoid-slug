@@ -2,8 +2,9 @@
 
 ## Next
 
-* [#188](https://github.com/digitalplaywright/mongoid-slug/pull/188): Removed deprecated name, _mongoid_slug_ - [@dblock](https://github.com/dblock).
 * [#187](https://github.com/digitalplaywright/mongoid-slug/pull/187): Mongoid 5 support - [@dblock](https://github.com/dblock).
+* [#188](https://github.com/digitalplaywright/mongoid-slug/pull/188): Removed deprecated name, _mongoid_slug_ - [@dblock](https://github.com/dblock).
+* [#189](https://github.com/digitalplaywright/mongoid-slug/pull/189): Implemented RuboCop - [@dblock](https://github.com/dblock).
 
 ## 4.0.0
 

@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path('../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('../lib', __FILE__)
 require 'mongoid/slug/version'
 
 Gem::Specification.new do |s|
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'awesome_print'
   s.add_development_dependency 'uuid'
   s.add_development_dependency 'pry'
+  s.add_development_dependency 'rubocop', '0.34.2'
 
   s.files         = Dir.glob('lib/**/*') + %w(LICENSE README.md)
   s.test_files    = Dir.glob('spec/**/*')
