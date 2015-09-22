@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next
+
+* Your contribution here.
+
 ## 5.0.0
 
 * [#187](https://github.com/digitalplaywright/mongoid-slug/pull/187): Mongoid 5 support - [@dblock](https://github.com/dblock).
