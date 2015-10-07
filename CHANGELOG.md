@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next
+
+* Your contribution here.
+
 ## 5.1.0
 
 * [#194](https://github.com/digitalplaywright/mongoid-slug/issues/194): Fixed compatibility with Mongoid::Observer - [@dblock](https://github.com/dblock).
