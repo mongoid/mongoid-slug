@@ -8,9 +8,11 @@ require 'active_support/deprecation'
 require 'mongoid'
 require 'mongoid/paranoia'
 require 'rspec/its'
-require 'mongoid-compatibility'
+require 'mongoid/compatibility'
 
 require File.expand_path '../../lib/mongoid/slug', __FILE__
+
+require 'mongoid-observers' unless Mongoid.const_defined?(:Observer)
 
 module Mongoid
   module Slug
