@@ -267,10 +267,6 @@ module Mongoid
       cur_slug || pre_slug_string
     end
 
-    def self.mongoid3?
-      ::Mongoid.const_defined? :Observer
-    end
-
     private
 
     def append_slug(value)
