@@ -488,6 +488,54 @@ module Mongoid
       end
     end
 
+    context 'when block is configured globally' do
+      before do
+        Mongoid::Slug.configure do |c|
+          c.slug do |cur_obj|
+            slug = cur_obj.slug_builder
+            ("#{slug}-#{cur_obj.id}").to_url
+          end
+        end
+      end
+
+      after do
+        # Remove global configuration to avoid affect on
+        # other specs run after this spec
+        Mongoid::Slug.default_slug = nil
+        expect(Mongoid::Slug.default_slug).to be_nil
+      end
+
+      it 'generates a slug' do
+        expect(Mongoid::Slug.default_slug).to be_present
+        class Person
+          include Mongoid::Document
+          include Mongoid::Slug
+
+          field :name
+          slug :name
+        end
+
+        person = Person.create(name: 'John')
+        expect(person.to_param).to eql "john-#{person.id}"
+      end
+
+      it 'can be overridden at model level' do
+        expect(Mongoid::Slug.default_slug).to be_present
+        class Person
+          include Mongoid::Document
+          include Mongoid::Slug
+
+          field :name
+          slug :name do |cur_object|
+            cur_object.slug_builder.to_url
+          end
+        end
+
+        person = Person.create(name: 'John')
+        expect(person.to_param).to eql 'john'
+      end
+    end
+
     context 'when slugged field contains non-ASCII characters' do
       it 'slugs Cyrillic characters' do
         book.title = 'Капитал'
