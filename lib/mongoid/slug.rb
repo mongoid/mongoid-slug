@@ -137,7 +137,8 @@ module Mongoid
 
       def queryable
         scope = Mongoid::Compatibility::Version.mongoid5? ? Threaded.current_scope : scope_stack.last
-        scope || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+        return scope if scope && scope.is_a?(::Mongoid::Criteria)
+        Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
       end
 
       # Indicates whether or not the document includes Mongoid::Paranoia
