@@ -6,6 +6,7 @@ env:
   - MONGOID_VERSION=3
   - MONGOID_VERSION=4
   - MONGOID_VERSION=5
+  - MONGOID_VERSION=HEAD
 
 rvm:
   - jruby-19mode
