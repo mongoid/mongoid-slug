@@ -136,9 +136,7 @@ module Mongoid
       end
 
       def queryable
-        scope = Mongoid::Compatibility::Version.mongoid5? ? Threaded.current_scope : scope_stack.last
-        return scope if scope && scope.is_a?(::Mongoid::Criteria)
-        Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+        current_scope || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
       end
 
       # Indicates whether or not the document includes Mongoid::Paranoia
@@ -150,6 +148,22 @@ module Mongoid
       # @return [ Array<Document>, Document ] Whether the document is paranoid
       def is_paranoid_doc?
         !!(defined?(::Mongoid::Paranoia) && self < ::Mongoid::Paranoia)
+      end
+
+      private
+
+      if Mongoid::Compatibility::Version.mongoid5? && Threaded.method(:current_scope).arity == -1
+        def current_scope
+          Threaded.current_scope(self)
+        end
+      elsif Mongoid::Compatibility::Version.mongoid5?
+        def current_scope
+          Threaded.current_scope
+        end
+      else
+        def current_scope
+          scope_stack.last
+        end
       end
     end
 

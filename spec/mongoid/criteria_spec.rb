@@ -187,4 +187,22 @@ describe Mongoid::Slug::Criteria do
       end
     end
   end
+
+  describe '.where' do
+    let!(:artist1) { Artist.create!(name: 'Leonardo') }
+    let!(:artist2) { Artist.create!(name: 'Malevich') }
+    let!(:artwork1) { Artwork.create!(title: 'Mona Lisa', artist_ids: [artist1.id], published: true) }
+    let!(:artwork2) { Artwork.create!(title: 'Black Square', artist_ids: [artist2.id], published: false) }
+    let!(:artwork3) { Artwork.create! }
+
+    it 'counts artworks' do
+      expect(Artwork.in(artist_ids: artist1.id).count).to eq 1
+      expect(Artwork.in(artist_ids: artist2.id).count).to eq 1
+    end
+
+    it 'counts published artworks' do
+      expect(Artwork.in(artist_ids: artist1.id).published.count).to eq 1
+      expect(Artwork.in(artist_ids: artist2.id).published.count).to eq 0
+    end
+  end
 end
