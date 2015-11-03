@@ -1,9 +1,8 @@
 # CHANGELOG
 
-## Next
+## 5.1.1
 
 * [#197](https://github.com/digitalplaywright/mongoid-slug/pull/197): Compatibility with Mongoid 5.0.1, fix [MONGOID-4177](https://jira.mongodb.org/browse/MONGOID-4177) - [@dblock](https://github.com/dblock).
-* Your contribution here.
 
 ## 5.1.0
 
