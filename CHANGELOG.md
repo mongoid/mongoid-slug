@@ -2,6 +2,7 @@
 
 ## Next
 
+* [#177](https://github.com/digitalplaywright/mongoid-slug/issues/177): Added rake task to set slug for legacy data - [@anuja-joshi](https://github.com/anuja-joshi).
 * Your contribution here.
 
 ## 5.1.1

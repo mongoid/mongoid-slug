@@ -72,6 +72,16 @@ post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 ```
 [Examine slug.rb](lib/mongoid/slug.rb) for all available options.
 
+To set slugs for existing records run following rake task:
+
+```ruby
+rake mongoid_slug:set
+```
+You can pass model names as an option for which you want to set slugs:
+
+```ruby
+rake mongoid_slug:set[Model1,Model2]
+```
 Custom Slug Generation
 -------
 
