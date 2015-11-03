@@ -6,6 +6,7 @@ require 'mongoid/slug/paranoia'
 require 'mongoid/slug/unique_slug'
 require 'mongoid/slug/slug_id_strategy'
 require 'mongoid-compatibility'
+require 'mongoid/slug/railtie' if defined?(Rails)
 
 module Mongoid
   # Slugs your Mongoid model.
