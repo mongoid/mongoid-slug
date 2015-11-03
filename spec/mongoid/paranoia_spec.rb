@@ -2,64 +2,6 @@
 require 'spec_helper'
 
 describe 'Mongoid::Paranoia with Mongoid::Slug' do
-  let(:paranoid_doc)    { ParanoidDocument.create!(title: 'slug') }
-  let(:paranoid_doc_2)  { ParanoidDocument.create!(title: 'slug') }
-  let(:paranoid_perm)   { ParanoidPermanent.create!(title: 'slug') }
-  let(:paranoid_perm_2) { ParanoidPermanent.create!(title: 'slug') }
-  let(:non_paranoid_doc) { Article.create!(title: 'slug') }
-  subject { paranoid_doc }
-
-  describe '.paranoid?' do
-    context 'when Mongoid::Paranoia is included' do
-      subject { paranoid_doc.class }
-      its(:is_paranoid_doc?) { should be_truthy }
-    end
-
-    context 'when Mongoid::Paranoia not included' do
-      subject { non_paranoid_doc.class }
-      its(:is_paranoid_doc?) { should be_falsey }
-    end
-  end
-
-  describe '#paranoid_deleted?' do
-    context 'when Mongoid::Paranoia is included' do
-      context 'when not destroyed' do
-        its(:paranoid_deleted?) { should be_falsey }
-      end
-
-      context 'when destroyed' do
-        before { subject.destroy }
-        its(:paranoid_deleted?) { should be_truthy }
-      end
-    end
-
-    context 'when Mongoid::Paranoia not included' do
-      subject { non_paranoid_doc }
-      its(:paranoid_deleted?) { should be_falsey }
-    end
-  end
-
-  describe 'restore callbacks' do
-    context 'when Mongoid::Paranoia is included' do
-      subject { paranoid_doc.class }
-      it { is_expected.to respond_to(:before_restore) }
-      it { is_expected.to respond_to(:after_restore) }
-    end
-
-    context 'when Mongoid::Paranoia not included' do
-      it { is_expected.not_to respond_to(:before_restore) }
-      it { is_expected.not_to respond_to(:after_restore) }
-    end
-  end
-
-  describe 'index' do
-    before  { ParanoidDocument.create_indexes }
-    after   { ParanoidDocument.remove_indexes }
-    subject { ParanoidDocument }
-
-    it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
-  end
-
   shared_examples_for 'paranoid slugs' do
     context 'querying' do
       it 'returns paranoid_doc for correct slug' do
@@ -143,13 +85,76 @@ describe 'Mongoid::Paranoia with Mongoid::Slug' do
     end
   end
 
-  context 'non-permanent slug' do
-    subject { paranoid_doc }
-    let(:other_doc) { paranoid_doc_2 }
-    it_behaves_like 'paranoid slugs'
+  [ParanoidDocument, DocumentParanoid].each do |paranoid_klass|
+    context "#{paranoid_klass}" do
+      let(:paranoid_doc) { paranoid_klass.create!(title: 'slug') }
+      let(:non_paranoid_doc) { Article.create!(title: 'slug') }
+
+      subject { paranoid_doc }
+
+      describe '.paranoid?' do
+        context 'when Mongoid::Paranoia is included' do
+          subject { paranoid_doc.class }
+          its(:is_paranoid_doc?) { should be_truthy }
+        end
+
+        context 'when Mongoid::Paranoia not included' do
+          subject { non_paranoid_doc.class }
+          its(:is_paranoid_doc?) { should be_falsey }
+        end
+      end
+
+      describe '#paranoid_deleted?' do
+        context 'when Mongoid::Paranoia is included' do
+          context 'when not destroyed' do
+            its(:paranoid_deleted?) { should be_falsey }
+          end
+
+          context 'when destroyed' do
+            before { subject.destroy }
+            its(:paranoid_deleted?) { should be_truthy }
+          end
+        end
+
+        context 'when Mongoid::Paranoia not included' do
+          subject { non_paranoid_doc }
+          its(:paranoid_deleted?) { should be_falsey }
+        end
+      end
+
+      describe 'restore callbacks' do
+        context 'when Mongoid::Paranoia is included' do
+          subject { paranoid_doc.class }
+          it { is_expected.to respond_to(:before_restore) }
+          it { is_expected.to respond_to(:after_restore) }
+        end
+
+        context 'when Mongoid::Paranoia not included' do
+          it { is_expected.not_to respond_to(:before_restore) }
+          it { is_expected.not_to respond_to(:after_restore) }
+        end
+      end
+
+      describe 'index' do
+        before  { paranoid_klass.create_indexes }
+        after   { paranoid_klass.remove_indexes }
+        subject { paranoid_klass }
+
+        it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
+      end
+
+      context 'non-permanent slug' do
+        let(:paranoid_doc_2) { paranoid_klass.create!(title: 'slug') }
+        subject { paranoid_doc }
+        let(:other_doc) { paranoid_doc_2 }
+        it_behaves_like 'paranoid slugs'
+      end
+    end
   end
 
   context 'permanent slug' do
+    let(:paranoid_perm) { ParanoidPermanent.create!(title: 'slug') }
+    let(:paranoid_perm_2) { ParanoidPermanent.create!(title: 'slug') }
     subject { paranoid_perm }
     let(:other_doc) { paranoid_perm_2 }
     it_behaves_like 'paranoid slugs'
