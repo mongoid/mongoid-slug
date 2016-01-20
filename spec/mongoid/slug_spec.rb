@@ -348,33 +348,50 @@ module Mongoid
     end
 
     context 'when :history is passed as an argument' do
-      let(:book) do
-        Book.create(title: 'Book Title')
-      end
+      context 'true' do
+        let(:book) do
+          Book.create(title: 'Book Title')
+        end
 
-      before(:each) do
-        book.title = 'Other Book Title'
-        book.save
-      end
+        before(:each) do
+          book.title = 'Other Book Title'
+          book.save
+        end
 
-      it "saves the old slug in the owner's history" do
-        expect(book.slugs).to include('book-title')
-      end
+        it "saves the old slug in the owner's history" do
+          expect(book.slugs).to include('book-title')
+        end
 
-      it 'generates a unique slug by appending a counter to duplicate text' do
-        dup = Book.create(title: 'Book Title')
-        expect(dup.to_param).to eql 'book-title-1'
-      end
+        it 'generates a unique slug by appending a counter to duplicate text' do
+          dup = Book.create(title: 'Book Title')
+          expect(dup.to_param).to eql 'book-title-1'
+        end
 
-      it 'does not allow a BSON::ObjectId as use for a slug' do
-        bad = Book.create(title: '4ea0389f0364313d79104fb3')
-        expect(bad.to_param).not_to eql '4ea0389f0364313d79104fb3'
-      end
+        it 'does not allow a BSON::ObjectId as use for a slug' do
+          bad = Book.create(title: '4ea0389f0364313d79104fb3')
+          expect(bad.to_param).not_to eql '4ea0389f0364313d79104fb3'
+        end
 
-      it 'ensures no duplicate values are stored in history' do
-        book.update_attributes title: 'Book Title'
-        book.update_attributes title: 'Foo'
-        expect(book.slugs.find_all { |slug| slug == 'book-title' }.size).to eql 1
+        it 'ensures no duplicate values are stored in history' do
+          book.update_attributes title: 'Book Title'
+          book.update_attributes title: 'Foo'
+          expect(book.slugs.find_all { |slug| slug == 'book-title' }.size).to eql 1
+        end
+      end
+      context 'false' do
+        let(:author) do
+          Author.create(first_name: 'Gilles', last_name: 'Deleuze')
+        end
+
+        before(:each) do
+          author.first_name = 'John'
+          author.save
+        end
+
+        it "does not save the old slug in the owner's history" do
+          expect(author.slugs.count).to eq 1
+          expect(author.slugs).to_not include('gilles-deleuze')
+        end
       end
     end
 
