@@ -536,6 +536,28 @@ module Mongoid
         it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
       end
 
+      context 'with a value exceeding mongodb max index key' do
+        if Mongoid::Compatibility::Version.mongoid5?
+          it 'errors with a model without a max length' do
+            expect do
+              Book.create!(title: 't' * 1025)
+            end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
+          end
+        elsif Mongoid::Compatibility::Version.mongoid4?
+          it 'errors with a model without a max length' do
+            expect do
+              Book.create!(title: 't' * 1025)
+            end.to raise_error Moped::Errors::OperationFailure, /key too large to index/
+          end
+        end
+        it 'succeeds with a model with a max length' do
+          expect do
+            author = Author.create!(last_name: 't' * 1025)
+            expect(author.slug.length).to eq 256
+          end.to_not raise_error
+        end
+      end
+
       context 'when slug is scoped by a reference association' do
         subject { Author }
         it_should_behave_like 'does not have an index', _slugs: 1
@@ -1034,6 +1056,35 @@ module Mongoid
         page.save
         expect(page['_slugs']).to eq('en' => ['title-on-english', 'modified-title-on-english'],
                                      'nl' => ['title-on-netherlands'])
+      end
+    end
+
+    describe 'slug_max_length' do
+      before do
+        Author.create_indexes
+      end
+      after do
+        Author.remove_indexes
+      end
+      it 'can be assigned to nil' do
+        expect(Book.slug_max_length).to be nil
+      end
+      it 'defaults to MONGO_INDEX_KEY_LIMIT_BYTES - 32' do
+        expect(Article.slug_max_length).to eq Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32
+      end
+      it 'is assigned via max_length' do
+        expect(Author.slug_max_length).to eq 256
+      end
+      it 'enforces max length of slug' do
+        author1 = Author.create!(last_name: 't' * 1024)
+        expect(author1.slug.length).to eq 256
+        expect(author1.slug.ends_with?('ttt')).to be true
+        author2 = Author.create!(last_name: 't' * 1024)
+        expect(author2.slug.length).to eq 258
+        expect(author2.slug.ends_with?('tt-1')).to be true
+        author3 = Author.create!(last_name: 't' * 1024)
+        expect(author3.slug.length).to eq 258
+        expect(author3.slug.ends_with?('tt-2')).to be true
       end
     end
   end

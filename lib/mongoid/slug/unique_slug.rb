@@ -63,7 +63,7 @@ module Mongoid
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
                      :check_against_id, :reserved_words, :url_builder, :collection_name,
-                     :embedded?, :reflect_on_all_associations, :by_model_type
+                     :embedded?, :reflect_on_all_associations, :by_model_type, :slug_max_length
 
       def initialize(model)
         @model = model
@@ -82,6 +82,9 @@ module Mongoid
                    else
                      url_builder.call(model)
                    end
+
+          @_slug = @_slug[0...slug_max_length] if slug_max_length
+
           # Regular expression that matches slug, slug-1, ... slug-n
           # If slug_name field was indexed, MongoDB will utilize that
           # index to match /^.../ pattern.
