@@ -62,8 +62,8 @@ module Mongoid
       attr_reader :model, :_slug
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
-                     :check_against_id, :reserved_words, :url_builder, :collection_name,
-                     :embedded?, :reflect_on_all_associations, :by_model_type, :slug_max_length
+                     :check_against_id, :slug_reserved_words, :slug_url_builder, :collection_name,
+                     :embedded?, :reflect_on_all_associations, :slug_by_model_type, :slug_max_length
 
       def initialize(model)
         @model = model
@@ -80,7 +80,7 @@ module Mongoid
           @_slug = if attempt
                      attempt.to_url
                    else
-                     url_builder.call(model)
+                     slug_url_builder.call(model)
                    end
 
           @_slug = @_slug[0...slug_max_length] if slug_max_length
@@ -100,7 +100,7 @@ module Mongoid
             where_hash[scope] = model.try(:read_attribute, scope)
           end
 
-          if by_model_type == true
+          if slug_by_model_type == true
             where_hash[:_type] = model.try(:read_attribute, :_type)
           end
 
@@ -110,7 +110,7 @@ module Mongoid
           @state.include_slug unless model.class.look_like_slugs?([@_slug])
 
           # make sure that the slug is not equal to a reserved word
-          @state.include_slug if reserved_words.any? { |word| word === @_slug }
+          @state.include_slug if slug_reserved_words.any? { |word| word === @_slug }
 
           # only look for a new unique slug if the existing slugs contains the current slug
           # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.

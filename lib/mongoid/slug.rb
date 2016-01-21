@@ -16,12 +16,12 @@ module Mongoid
     MONGO_INDEX_KEY_LIMIT_BYTES = 1024
 
     included do
-      cattr_accessor :reserved_words,
+      cattr_accessor :slug_reserved_words,
                      :slug_scope,
                      :slugged_attributes,
-                     :url_builder,
-                     :history,
-                     :by_model_type,
+                     :slug_url_builder,
+                     :slug_history,
+                     :slug_by_model_type,
                      :slug_max_length
 
       # field :_slugs, type: Array, default: [], localize: false
@@ -76,10 +76,10 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope            = options[:scope]
-        self.reserved_words        = options[:reserve] || Set.new(%w(new edit))
+        self.slug_reserved_words   = options[:reserve] || Set.new(%w(new edit))
         self.slugged_attributes    = fields.map(&:to_s)
-        self.history               = options[:history]
-        self.by_model_type         = options[:by_model_type]
+        self.slug_history          = options[:history]
+        self.slug_by_model_type    = options[:by_model_type]
         self.slug_max_length       = options.key?(:max_length) ? options[:max_length] : MONGO_INDEX_KEY_LIMIT_BYTES - 32
 
         field :_slugs, type: Array, default: [], localize: options[:localize]
@@ -87,10 +87,10 @@ module Mongoid
 
         # Set index
         unless embedded?
-          index(*Mongoid::Slug::Index.build_index(slug_scope_key, by_model_type))
+          index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type))
         end
 
-        self.url_builder = block_given? ? block : default_slug_builder
+        self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
         #-- always create slug on create
         #-- do not create new slug on update if the slug is permanent
@@ -114,7 +114,7 @@ module Mongoid
         end
       end
 
-      def default_slug_builder
+      def default_slug_url_builder
         Mongoid::Slug.default_slug || ->(cur_object) { cur_object.slug_builder.to_url }
       end
 
@@ -213,7 +213,7 @@ module Mongoid
       # avoid duplicate slugs
       _slugs.delete(new_slug) if _slugs
 
-      if !!history && _slugs.is_a?(Array)
+      if !!slug_history && _slugs.is_a?(Array)
         append_slug(new_slug)
       else
         self._slugs = [new_slug]
