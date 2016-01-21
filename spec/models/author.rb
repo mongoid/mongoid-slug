@@ -3,7 +3,7 @@ class Author
   include Mongoid::Slug
   field :first_name
   field :last_name
-  slug :first_name, :last_name, scope: :book, history: false
+  slug :first_name, :last_name, scope: :book, history: false, max_length: 256
   belongs_to :book
   has_many :characters,
            class_name: 'Person',

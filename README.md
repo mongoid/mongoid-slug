@@ -60,7 +60,7 @@ class Post
   field :_id, type: String, slug_id_strategy: lambda {|id| id.start_with?('....')}
 
   field :name
-  slug  :name, :history => true
+  slug  :name, history: true
 end
 
 Post.fields['_id'].type
@@ -121,7 +121,7 @@ class Employee
   field :name
   referenced_in :company
 
-  slug  :name, :scope => :company
+  slug  :name, scope: :company
 end
 ```
 
@@ -143,12 +143,28 @@ class Employee
   field :name
   field :company_id
 
-  slug  :name, :scope => :company_id
+  slug  :name, scope: :company_id
 end
 ```
 
-Optionally find and create slugs per model type
--------
+Limit Slug Length
+-----------------
+
+MongoDB has a default limit around 1KB to the size of the index keys and will raise error 17280, `key too large to index` when trying to create a record that causes an index key to exceed that limit. By default slugs are of the form `text[-number]` and the text portion is limited in size to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes. You can change this limit with `max_length` or set it to `nil` if you're running MongoDB with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
+
+```ruby
+class Company
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :name
+
+  slug  :name, max_length: 24
+end
+```
+
+Optionally Find and Create Slugs per Model Type
+-----------------------------------------------
 
 By default when using STI, the scope will be around the super-class.
 
@@ -158,7 +174,7 @@ class Book
   include Mongoid::Slug
   field :title
 
-  slug  :title, :history => true
+  slug  :title, history: true
   embeds_many :subjects
   has_many :authors
 end
@@ -166,12 +182,12 @@ end
 class ComicBook < Book
 end
 
-book = Book.create(:title => "Anti Oedipus")
-comic_book = ComicBook.create(:title => "Anti Oedipus")
+book = Book.create(title: 'Anti Oedipus')
+comic_book = ComicBook.create(title: 'Anti Oedipus')
 comic_book.slugs.should_not eql(book.slugs)
 ```
 
-If you want the scope to be around the subclass, then set the option :by_model_type => true.
+If you want the scope to be around the subclass, then set the option `by_model_type: true`.
 
 ```ruby
 class Book
@@ -179,7 +195,7 @@ class Book
   include Mongoid::Slug
   field :title
 
-  slug  :title, :history => true, :by_model_type => true
+  slug  :title, history: true, by_model_type: true
   embeds_many :subjects
   has_many :authors
 end
@@ -187,8 +203,8 @@ end
 class ComicBook < Book
 end
 
-book = Book.create(:title => "Anti Oedipus")
-comic_book = ComicBook.create(:title => "Anti Oedipus")
+book = Book.create(title: 'Anti Oedipus')
+comic_book = ComicBook.create(title: 'Anti Oedipus')
 comic_book.slugs.should eql(book.slugs)
 ```
 
@@ -216,7 +232,7 @@ page = Page.new title: "Home"
 page.save
 page.update_attributes title: "Welcome"
 
-Page.find("welcome") == Page.find("home") #=> true
+Page.find("welcome") == Page.find("home") # => true
 ```
 
 Reserved Slugs
@@ -286,7 +302,7 @@ class Entity
   field :_id, type: String, slug_id_strategy: UuidIdStrategy
 
   field :user_edited_variation
-  slug  :user_edited_variation, :history => true
+  slug  :user_edited_variation, history: true
 end
 ```
 

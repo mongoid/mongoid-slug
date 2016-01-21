@@ -13,13 +13,16 @@ module Mongoid
   module Slug
     extend ActiveSupport::Concern
 
+    MONGO_INDEX_KEY_LIMIT_BYTES = 1024
+
     included do
       cattr_accessor :reserved_words,
                      :slug_scope,
                      :slugged_attributes,
                      :url_builder,
                      :history,
-                     :by_model_type
+                     :by_model_type,
+                     :slug_max_length
 
       # field :_slugs, type: Array, default: [], localize: false
       # alias_attribute :slugs, :_slugs
@@ -44,6 +47,7 @@ module Mongoid
       #   @param options :scope [Symbol] a reference association or field to
       #   scope the slug by. Embedded documents are, by default, scoped by
       #   their parent.
+      #   @param options :max_length [Integer] the maximum length of the text portion of the slug
       #   @yield If given, a block is used to build a slug.
       #
       # @example A custom builder
@@ -65,6 +69,7 @@ module Mongoid
         self.slugged_attributes    = fields.map(&:to_s)
         self.history               = options[:history]
         self.by_model_type         = options[:by_model_type]
+        self.slug_max_length       = options.key?(:max_length) ? options[:max_length] : MONGO_INDEX_KEY_LIMIT_BYTES - 32
 
         field :_slugs, type: Array, default: [], localize: options[:localize]
         alias_attribute :slugs, :_slugs
