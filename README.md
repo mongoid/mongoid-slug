@@ -355,5 +355,5 @@ Mongoid-slug is work of [many of contributors](https://github.com/digitalplaywri
 Copyright & License
 -------------------
 
-Copyright (c) 2010-2015 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
+Copyright (c) 2010-2016 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
 
