@@ -86,21 +86,41 @@ Custom Slug Generation
 -------
 
 By default Mongoid Slug generates slugs with stringex. If this is not desired you can
-define your own slug generator like this:
+define your own slug generator.
 
-```ruby
-class Caption
-  include Mongoid::Document
-  include Mongoid::Slug
+There are two ways to define slug generator.
 
-  #create a block that takes the current object as an argument
-  #and returns the slug.
-  slug do |cur_object|
-    cur_object.slug_builder.to_url
-  end
-end
-```
+### Global definition:
+
+   Configure a block in `config/initializers/mongoid_slug.rb` as follows:
+
+   ```ruby
+   Mongoid::Slug.configure do |c|
+     #create a block that takes the current object as an argument
+     #and returns the slug.
+     c.slug = proc{|cur_obj|
+       cur_object.slug_builder.to_url
+     }
+   end
+   ```
+
+### Define it on model level:
+
+   ```ruby
+   class Caption
+     include Mongoid::Document
+     include Mongoid::Slug
+
+     #create a block that takes the current object as an argument
+     #and returns the slug.
+     slug do |cur_object|
+       cur_object.slug_builder.to_url
+     end
+   end
+   ```
 You can call stringex `to_url` method.
+
+You can define a slug builder globally and/or override it per model.
 
 Scoping
 -------

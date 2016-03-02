@@ -2,6 +2,7 @@
 
 ## 5.2.1 (Next)
 
+* [#166](https://github.com/digitalplaywright/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
 * Your contribution here.
 
 ## 5.2.0 (2016/01/03)
