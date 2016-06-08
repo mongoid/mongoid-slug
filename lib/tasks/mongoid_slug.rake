@@ -11,7 +11,7 @@ namespace :mongoid_slug do
       klasses = (klasses.map(&:to_s) & models.map(&:classify)).map(&:constantize) if models.any?
       klasses.each do |klass|
         # set slug for objects having blank slug
-        klass.each { |object| object.set_slug! unless object.slugs? }
+        klass.each { |object| object.set_slug! unless object.slugs? && object.slugs.any? }
       end
     end
   end
