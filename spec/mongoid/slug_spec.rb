@@ -585,7 +585,7 @@ module Mongoid
       end
 
       context 'with a value exceeding mongodb max index key' do
-        if Mongoid::Compatibility::Version.mongoid5?
+        if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
           it 'errors with a model without a max length' do
             expect do
               Book.create!(title: 't' * 1025)
@@ -728,7 +728,7 @@ module Mongoid
         let!(:book_no_title) { Book.create }
 
         before do
-          if Mongoid::Compatibility::Version.mongoid5?
+          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
             Book.collection.insert_one(title: 'Proust and Signs')
           else
             Book.collection.insert(title: 'Proust and Signs')

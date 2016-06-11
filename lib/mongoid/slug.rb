@@ -168,11 +168,13 @@ module Mongoid
 
       private
 
-      if Mongoid::Compatibility::Version.mongoid5? && Threaded.method(:current_scope).arity == -1
+      if Mongoid::Compatibility::Version.mongoid5? ||
+         Mongoid::Compatibility::Version.mongoid6? &&
+         Threaded.method(:current_scope).arity == -1
         def current_scope
           Threaded.current_scope(self)
         end
-      elsif Mongoid::Compatibility::Version.mongoid5?
+      elsif Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
         def current_scope
           Threaded.current_scope
         end
