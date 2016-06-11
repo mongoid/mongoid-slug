@@ -4,6 +4,7 @@
 
 * [#166](https://github.com/digitalplaywright/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
 * [#209](https://github.com/digitalplaywright/mongoid-slug/issues/209): Prefixed internal `Mongoid::Slug` class attributes with `slug_` to avoid conflicts - [@dblock](https://github.com/dblock).
+* [#217](https://github.com/digitalplaywright/mongoid-slug/issues/217): Fixed `mongoid_slug:set` rake task for Mongoid 6 - [@dblock](https://github.com/dblock).
 * Your contribution here.
 
 ## 5.2.0 (2016/01/03)
