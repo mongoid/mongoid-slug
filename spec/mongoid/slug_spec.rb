@@ -586,126 +586,108 @@ module Mongoid
       end
     end
 
-    context 'when indexes are created' do
-      before do
-        Author.create_indexes
-        Book.create_indexes
+    context 'when slug is not scoped by a reference association' do
+      subject { Book }
+      it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
+    end
 
-        AuthorPolymorphic.create_indexes
-        BookPolymorphic.create_indexes
-      end
-
-      after do
-        Author.remove_indexes
-        Book.remove_indexes
-
-        AuthorPolymorphic.remove_indexes
-        BookPolymorphic.remove_indexes
-      end
-
-      context 'when slug is not scoped by a reference association' do
-        subject { Book }
-        it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
-      end
-
-      context 'with a value exceeding mongodb max index key' do
-        if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
-          it 'errors with a model without a max length' do
-            expect do
-              Book.create!(title: 't' * 1025)
-            end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
-          end
-        elsif Mongoid::Compatibility::Version.mongoid4?
-          it 'errors with a model without a max length' do
-            expect do
-              Book.create!(title: 't' * 1025)
-            end.to raise_error Moped::Errors::OperationFailure, /key too large to index/
-          end
-        end
-        it 'succeeds with a model with a max length' do
+    context 'with a value exceeding mongodb max index key' do
+      if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+        it 'errors with a model without a max length' do
           expect do
-            author = Author.create!(last_name: 't' * 1025)
-            expect(author.slug.length).to eq 256
-          end.to_not raise_error
+            Book.create!(title: 't' * 1025)
+          end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
+        end
+      elsif Mongoid::Compatibility::Version.mongoid4?
+        it 'errors with a model without a max length' do
+          expect do
+            Book.create!(title: 't' * 1025)
+          end.to raise_error Moped::Errors::OperationFailure, /key too large to index/
         end
       end
-
-      context 'when slug is scoped by a reference association' do
-        subject { Author }
-        it_should_behave_like 'does not have an index', _slugs: 1
-      end
-
-      context 'for subclass scope' do
-        context 'when slug is not scoped by a reference association' do
-          subject { BookPolymorphic }
-          it_should_behave_like 'has an index', { _type: 1, _slugs: 1 }, unique: nil, sparse: nil
-        end
-
-        context 'when slug is scoped by a reference association' do
-          subject { AuthorPolymorphic }
-          it_should_behave_like 'does not have an index', _type: 1, _slugs: 1
-        end
-
-        context 'when the object has STI' do
-          it 'scopes by the subclass' do
-            b = BookPolymorphic.create!(title: 'Book')
-            expect(b.slug).to eq('book')
-
-            b2 = BookPolymorphic.create!(title: 'Book')
-            expect(b2.slug).to eq('book-1')
-
-            c = ComicBookPolymorphic.create!(title: 'Book')
-            expect(c.slug).to eq('book')
-
-            c2 = ComicBookPolymorphic.create!(title: 'Book')
-            expect(c2.slug).to eq('book-1')
-
-            expect(BookPolymorphic.find('book')).to eq(b)
-            expect(BookPolymorphic.find('book-1')).to eq(b2)
-            expect(ComicBookPolymorphic.find('book')).to eq(c)
-            expect(ComicBookPolymorphic.find('book-1')).to eq(c2)
-          end
-        end
+      it 'succeeds with a model with a max length' do
+        expect do
+          author = Author.create!(last_name: 't' * 1025)
+          expect(author.slug.length).to eq 256
+        end.to_not raise_error
       end
     end
 
-    context 'for reserved words' do
-      context 'when the :reserve option is used on the model' do
-        it 'does not use the reserved slugs' do
-          friend1 = Friend.create(name: 'foo')
-          expect(friend1.slugs).not_to include('foo')
-          expect(friend1.slugs).to include('foo-1')
+    context 'when slug is scoped by a reference association' do
+      subject { Author }
+      it_should_behave_like 'does not have an index', _slugs: 1
+    end
 
-          friend2 = Friend.create(name: 'bar')
-          expect(friend2.slugs).not_to include('bar')
-          expect(friend2.slugs).to include('bar-1')
+    context 'for subclass scope' do
+      context 'when slug is not scoped by a reference association' do
+        subject { BookPolymorphic }
+        it_should_behave_like 'has an index', { _type: 1, _slugs: 1 }, unique: nil, sparse: nil
+      end
 
-          friend3 = Friend.create(name: 'en')
-          expect(friend3.slugs).not_to include('en')
-          expect(friend3.slugs).to include('en-1')
-        end
+      context 'when slug is scoped by a reference association' do
+        subject { AuthorPolymorphic }
+        it_should_behave_like 'does not have an index', _type: 1, _slugs: 1
+      end
 
-        it 'should start with concatenation -1' do
-          friend1 = Friend.create(name: 'foo')
-          expect(friend1.slugs).to include('foo-1')
-          friend2 = Friend.create(name: 'foo')
-          expect(friend2.slugs).to include('foo-2')
-        end
+      context 'when the object has STI' do
+        it 'scopes by the subclass' do
+          b = BookPolymorphic.create!(title: 'Book')
+          expect(b.slug).to eq('book')
 
-        %w(new edit).each do |word|
-          it "should overwrite the default reserved words allowing the word '#{word}'" do
-            friend = Friend.create(name: word)
-            expect(friend.slugs).to include word
-          end
+          b2 = BookPolymorphic.create!(title: 'Book')
+          expect(b2.slug).to eq('book-1')
+
+          c = ComicBookPolymorphic.create!(title: 'Book')
+          expect(c.slug).to eq('book')
+
+          c2 = ComicBookPolymorphic.create!(title: 'Book')
+          expect(c2.slug).to eq('book-1')
+
+          expect(BookPolymorphic.find('book')).to eq(b)
+          expect(BookPolymorphic.find('book-1')).to eq(b2)
+          expect(ComicBookPolymorphic.find('book')).to eq(c)
+          expect(ComicBookPolymorphic.find('book-1')).to eq(c2)
         end
       end
-      context 'when the model does not have any reserved words set' do
-        %w(new edit).each do |word|
-          it "does not use the default reserved word '#{word}'" do
-            book = Book.create(title: word)
-            expect(book.slugs).not_to include word
-            expect(book.slugs).to include("#{word}-1")
-          end
+    end
+  end
+
+  context 'for reserved words' do
+    context 'when the :reserve option is used on the model' do
+      it 'does not use the reserved slugs' do
+        friend1 = Friend.create(name: 'foo')
+        expect(friend1.slugs).not_to include('foo')
+        expect(friend1.slugs).to include('foo-1')
+
+        friend2 = Friend.create(name: 'bar')
+        expect(friend2.slugs).not_to include('bar')
+        expect(friend2.slugs).to include('bar-1')
+
+        friend3 = Friend.create(name: 'en')
+        expect(friend3.slugs).not_to include('en')
+        expect(friend3.slugs).to include('en-1')
+      end
+
+      it 'should start with concatenation -1' do
+        friend1 = Friend.create(name: 'foo')
+        expect(friend1.slugs).to include('foo-1')
+        friend2 = Friend.create(name: 'foo')
+        expect(friend2.slugs).to include('foo-2')
+      end
+
+      %w(new edit).each do |word|
+        it "should overwrite the default reserved words allowing the word '#{word}'" do
+          friend = Friend.create(name: word)
+          expect(friend.slugs).to include word
+        end
+      end
+    end
+    context 'when the model does not have any reserved words set' do
+      %w(new edit).each do |word|
+        it "does not use the default reserved word '#{word}'" do
+          book = Book.create(title: word)
+          expect(book.slugs).not_to include word
+          expect(book.slugs).to include("#{word}-1")
         end
       end
     end
@@ -1170,6 +1152,14 @@ module Mongoid
         author3 = Author.create!(last_name: 't' * 1024)
         expect(author3.slug.length).to eq 258
         expect(author3.slug.ends_with?('tt-2')).to be true
+      end
+    end
+
+    context 'has_many / belongs_to' do
+      let(:book) { Book.create!(title: 'War and Peace') }
+      it 'allows for duplicates with different slugs' do
+        Author.create!(first_name: 'Leo', last_name: 'Tostoy')
+        expect { book.authors.create!(first_name: 'Leo', last_name: 'Tostoy') }.to_not raise_error
       end
     end
   end

@@ -142,7 +142,7 @@ class Employee
   field :name
   referenced_in :company
 
-  slug  :name, scope: :company
+  slug :name, scope: :company
 end
 ```
 
@@ -152,7 +152,7 @@ Currently, if you have an irregular association name, you **must** specify the `
 
 Embedded objects are automatically scoped by their parent.
 
-The value of `:scope` can alternatively be a field within the model itself:
+Note that the unique index on the `Employee` collection in this example is derived from the `scope` value and is `{ _slugs: 1, company_id: 1}`. Therefore `:company` must be `referenced_in` above the definition of `slug` or it will not be able to resolve the association and mistakenly create a `{ _slugs: 1, company: 1}` index. An alternative is to scope to the field itself as follows:
 
 ```ruby
 class Employee
@@ -162,7 +162,7 @@ class Employee
   field :name
   field :company_id
 
-  slug  :name, scope: :company_id
+  slug :name, scope: :company_id
 end
 ```
 
