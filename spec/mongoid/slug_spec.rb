@@ -7,8 +7,8 @@ module Mongoid
       Book.create(title: 'A Thousand Plateaus')
     end
 
-    context 'should not persist incorrect slugs' do
-      it 'slugs should not be generated from invalid documents' do
+    context 'special cases' do
+      it 'slugs are not be generated from invalid documents' do
         # this will fail now
         x = IncorrectSlugPersistence.create!(name: 'test')
         expect(x.slug).to eq('test')
@@ -25,6 +25,16 @@ module Mongoid
 
       it 'defaults slugs for blank strings' do
         book = Book.create!(title: '')
+        expect(book.reload.slugs).to eq ['book']
+      end
+
+      it 'defaults slugs for dashes' do
+        book = Book.create!(title: '-')
+        expect(book.reload.slugs).to eq ['book']
+      end
+
+      it 'defaults slugs for underscores' do
+        book = Book.create!(title: '_')
         expect(book.reload.slugs).to eq ['book']
       end
 
