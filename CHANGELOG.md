@@ -1,15 +1,15 @@
-
 ## 5.3.0 (Next)
 
 * [#166](https://github.com/digitalplaywright/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
 * [#209](https://github.com/digitalplaywright/mongoid-slug/issues/209): Prefixed internal `Mongoid::Slug` class attributes with `slug_` to avoid conflicts - [@dblock](https://github.com/dblock).
 * [#217](https://github.com/digitalplaywright/mongoid-slug/issues/217): Fixed `mongoid_slug:set` rake task for Mongoid 6 - [@dblock](https://github.com/dblock).
 * [#219](https://github.com/digitalplaywright/mongoid-slug/pull/219): Mongoid HEAD and Rails 5.0.0.rc1 support - [@Fudoshiki](https://github.com/Fudoshiki).
+* [#224](https://github.com/digitalplaywright/mongoid-slug/pull/224): Use Danger, PR linter - [@dblock](https://github.com/dblock).
 * Your contribution here.
 
 ## 5.2.0 (2016/01/03)
 
-* [204](https://github.com/digitalplaywright/mongoid-slug/pull/204): The text portion of the slug is now truncated at `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes by default and can be set via `max_length` - [@dblock](https://github.com/dblock).
+* [#204](https://github.com/digitalplaywright/mongoid-slug/pull/204): The text portion of the slug is now truncated at `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes by default and can be set via `max_length` - [@dblock](https://github.com/dblock).
 * [#177](https://github.com/digitalplaywright/mongoid-slug/issues/177): Added `mongoid_slug:set` rake task to set slug for legacy data - [@anuja-joshi](https://github.com/anuja-joshi).
 
 ## 5.1.1
@@ -43,7 +43,7 @@
 
 ### Improvements
 
-* Bumped Mongoid 4 requirement to beta1.
+* Bumped Mongoid 4 requirement to beta1 - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ### Bugfixes
 
@@ -55,7 +55,7 @@
 
 ### Improvements
 
-* Updated stringex dependency to 2.0 or higher.
+* Updated stringex dependency to 2.0 or higher - [@digitalplaywright](https://github.com/digitalplaywright).
 * Added Mongoid 4 support - [@dblock](https://github.com/dblock).
 
 ### Bugfixes
@@ -135,7 +135,7 @@
 
 ### Minor Changes
 
-* #76 Cleanup of callback handling - [@empact](https://github.com/empact).
+* [#76](https://github.com/digitalplaywright/mongoid-slug/pull/76): Cleanup of callback handling - [@empact](https://github.com/empact).
 
 ### Major Changes (Backwards Incompatible)
 
@@ -166,48 +166,48 @@
 
 ## 0.9.0
 
-* Allowed overriding of slug at model creation time - Brian McManus.
+* [#43](https://github.com/digitalplaywright/mongoid-slug/pull/43): Allowed overriding of slug at model creation time - [@bdmac](https://github.com/bdmac).
 
 ## 0.8.3
 
-* Bumped version of Stringex dependency.
+* Bumped version of Stringex dependency - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.8.2
 
-* Generated a slug when an existing document does not have one.
+* Generated a slug when an existing document does not have one - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.8.1
 
-* No longer necessary to require library in Gemfile - Konstantin Shabanov.
+* [#27](https://github.com/digitalplaywright/mongoid-slug/pull/27): No longer necessary to require library in Gemfile - [@etehtsea](https://github.com/etehtsea).
 
 ## 0.8.0
 
-* Fix edbug concerning slugs with double-digit counters - Jean Bredeche.
-* Removed #slug!. The method is of limited value.
+* [#23](https://github.com/digitalplaywright/mongoid-slug/pull/23): Fix edbug concerning slugs with double-digit counters - [@jbredeche](https://github.com/jbredeche).
+* Removed #slug!. The method is of limited value - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.7.2
 
-* Added `#find_by_slug!` - Alex Sharp.
+* [#21](https://github.com/digitalplaywright/mongoid-slug/pull/21): Added `#find_by_slug!` - [@ajsharp](https://github.com/ajsharp).
 
 ## 0.7.1
 
-* Library no longers hit database multiple times to find unique slug when duplicates exist - [@tiendung](https://github.com/tiendung).
+* [#16](https://github.com/digitalplaywright/mongoid-slug/pull/16): Library no longers hit database multiple times to find unique slug when duplicates exist - [@tiendung](https://github.com/tiendung).
 
 ## 0.7.0
 
-* Slug now can be given an optional block to build a custom slug out of the specified fields.
+* Slug now can be given an optional block to build a custom slug out of the specified fields - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.6.4
 
-* Added :any option to use first present field when multiple fields are slugged - Nader Akhnoukh.
+* [#10](https://github.com/digitalplaywright/mongoid-slug/pull/10): Added :any option to use first present field when multiple fields are slugged - [@iamnader](https://github.com/iamnader).
 
 ## 0.6.3
 
-* Mongoid no longer requires that emmbedded_in pass :inverse_of option sporkd - Peter Gumeson.
+* [#13](https://github.com/digitalplaywright/mongoid-slug/pull/13): Mongoid no longer requires that emmbedded_in pass `:inverse_of` option - [@sporkd](https://github.com/sporkd).
 
 ## 0.6.2
 
-* Added #slug! to generate slug for an existing document.
+* Added #slug! to generate slug for an existing document - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.6.1
 
@@ -215,20 +215,20 @@
 
 ## 0.6.0
 
-* Fixed internals to work with Mongoid RC.
-* Finder is now dynamic.
+* Fixed internals to work with Mongoid RC - [@digitalplaywright](https://github.com/digitalplaywright).
+* Finder is now dynamic - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.5.1
 
 * Added support for scoping by reference association - [@ches](https://github.com/ches).
-* Brought indexing back in as an option.
+* Brought indexing back in as an option - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.5.0
 
 * Added support for non-Latin languages - [@etehtsea](https://github.com/etehtsea).
-* Removed :scoped. Embedded objects are now scoped by parent by default.
-* Added finder method.
+* Removed :scoped. Embedded objects are now scoped by parent by default - [@digitalplaywright](https://github.com/digitalplaywright).
+* Added finder method - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## Earlier tags
 
-* To be found in the dustbin of git log.
+* To be found in the dustbin of git log - [@digitalplaywright](https://github.com/digitalplaywright).

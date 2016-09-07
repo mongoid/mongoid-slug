@@ -21,3 +21,7 @@ when /^3/
 else
   gem 'mongoid', version
 end
+
+group :test do
+  gem 'mongoid-danger', '~> 0.1.0', require: false
+end
