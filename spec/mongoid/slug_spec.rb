@@ -23,9 +23,23 @@ module Mongoid
         x.save!
       end
 
-      it "doesn't persist blank strings" do
+      it 'defaults slugs for blank strings' do
         book = Book.create!(title: '')
-        expect(book.reload.slugs).to be_empty
+        expect(book.reload.slugs).to eq ['book']
+      end
+
+      it 'defaults slugs for nil strings' do
+        book = Book.create!
+        expect(book.reload.slugs).to eq ['book']
+      end
+
+      it 'works for multiple nils' do
+        expect do
+          2.times do
+            Book.create!
+          end
+        end.to_not raise_error # Mongo::Error::OperationFailure
+        expect(Book.all.map(&:slug)).to eq ['book', 'book-1']
       end
     end
 
@@ -725,24 +739,22 @@ module Mongoid
       end
 
       context 'when called on an existing record with no slug' do
-        let!(:book_no_title) { Book.create }
-
-        before do
+        let!(:book_no_slug) do
           if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
             Book.collection.insert_one(title: 'Proust and Signs')
           else
             Book.collection.insert(title: 'Proust and Signs')
           end
+          Book.where(title: 'Proust and Signs').first
         end
 
         it 'should return the id if there is no slug' do
-          book = Book.first
-          expect(book.to_param).to eq(book.id.to_s)
-          expect(book.reload.slugs).to be_empty
+          expect(book_no_slug.to_param).to eq(book_no_slug.id.to_s)
+          expect(book_no_slug.slugs).to be_empty
         end
 
         it 'should not persist the record' do
-          expect(book_no_title.to_param).to eq(book_no_title._id.to_s)
+          expect(book_no_slug.to_param).to eq(book_no_slug._id.to_s)
         end
       end
     end

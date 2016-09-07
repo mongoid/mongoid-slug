@@ -83,6 +83,7 @@ module Mongoid
                      slug_url_builder.call(model)
                    end
 
+          @_slug = @model.class.name.to_url if @_slug.blank?
           @_slug = @_slug[0...slug_max_length] if slug_max_length
 
           # Regular expression that matches slug, slug-1, ... slug-n
