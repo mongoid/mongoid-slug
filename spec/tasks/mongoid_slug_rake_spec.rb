@@ -41,7 +41,7 @@ describe 'mongoid_slug:set' do
       Rake::Task['mongoid_slug:set'].invoke('UninitalizedSlugFirst')
 
       expect(uninitalized_slug1.reload.slugs).to eq(['uninitalized-slug1'])
-      expect(uninitalized_slug2.reload.slugs).to eq []
+      expect(uninitalized_slug2.reload.slugs).to be nil
     end
   end
 

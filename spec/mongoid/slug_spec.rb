@@ -7,8 +7,8 @@ module Mongoid
       Book.create(title: 'A Thousand Plateaus')
     end
 
-    context 'should not persist incorrect slugs' do
-      it 'slugs should not be generated from invalid documents' do
+    context 'special cases' do
+      it 'slugs are not be generated from invalid documents' do
         # this will fail now
         x = IncorrectSlugPersistence.create!(name: 'test')
         expect(x.slug).to eq('test')
@@ -23,9 +23,33 @@ module Mongoid
         x.save!
       end
 
-      it "doesn't persist blank strings" do
+      it 'has no slugs for blank strings' do
         book = Book.create!(title: '')
-        expect(book.reload.slugs).to be_empty
+        expect(book.reload.slugs).to be nil
+      end
+
+      it 'has no slugs for dashes' do
+        book = Book.create!(title: '-')
+        expect(book.reload.slugs).to be nil
+      end
+
+      it 'has no slugs for underscores' do
+        book = Book.create!(title: '_')
+        expect(book.reload.slugs).to be nil
+      end
+
+      it 'has no slugs for nil strings' do
+        book = Book.create!
+        expect(book.reload.slugs).to be nil
+      end
+
+      it 'works for multiple nils' do
+        expect do
+          2.times do
+            Book.create!
+          end
+        end.to_not raise_error # Mongo::Error::OperationFailure
+        expect(Book.all.map(&:slug)).to eq Book.all.map(&:id).map(&:to_s)
       end
     end
 
@@ -715,7 +739,7 @@ module Mongoid
         let(:book) { Book.new }
 
         it 'should return nil' do
-          expect(book.to_param).to be_nil
+          expect(book.to_param).to eq book._id.to_s
         end
 
         it 'should not persist the record' do
@@ -725,24 +749,22 @@ module Mongoid
       end
 
       context 'when called on an existing record with no slug' do
-        let!(:book_no_title) { Book.create }
-
-        before do
+        let!(:book_no_slug) do
           if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
             Book.collection.insert_one(title: 'Proust and Signs')
           else
             Book.collection.insert(title: 'Proust and Signs')
           end
+          Book.where(title: 'Proust and Signs').first
         end
 
         it 'should return the id if there is no slug' do
-          book = Book.first
-          expect(book.to_param).to eq(book.id.to_s)
-          expect(book.reload.slugs).to be_empty
+          expect(book_no_slug.to_param).to eq(book_no_slug.id.to_s)
+          expect(book_no_slug.slugs).to be_nil
         end
 
         it 'should not persist the record' do
-          expect(book_no_title.to_param).to eq(book_no_title._id.to_s)
+          expect(book_no_slug.to_param).to eq(book_no_slug._id.to_s)
         end
       end
     end
@@ -786,9 +808,17 @@ module Mongoid
         end
 
         it 'ensures uniqueness' do
-          Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
-          book2 = Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
-          expect(book2.to_param).to eql 'not-what-you-expected-1'
+          book1 = Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
+          expect(book1.to_param).to eql 'not-what-you-expected'
+          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+            expect do
+              Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
+            end.to raise_error Mongo::Error::OperationFailure, /duplicate/
+          elsif Mongoid::Compatibility::Version.mongoid4?
+            expect do
+              Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
+            end.to raise_error Moped::Errors::OperationFailure, /duplicate/
+          end
         end
 
         it 'updates the slug when a new one is passed in' do
@@ -809,8 +839,15 @@ module Mongoid
           Book.create(title: 'Sleepyhead')
           book2 = Book.create(title: 'A Thousand Plateaus')
           book2.slugs.push 'sleepyhead'
-          book2.save
-          expect(book2.to_param).to eql 'sleepyhead-1'
+          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+            expect do
+              book2.save
+            end.to raise_error Mongo::Error::OperationFailure, /duplicate/
+          elsif Mongoid::Compatibility::Version.mongoid4?
+            expect do
+              book2.save
+            end.to raise_error Moped::Errors::OperationFailure, /duplicate/
+          end
         end
       end
 

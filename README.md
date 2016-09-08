@@ -8,8 +8,7 @@ Mongoid Slug generates a URL slug or permalink based on one or more fields in a 
 [![Dependency Status](https://gemnasium.com/digitalplaywright/mongoid-slug.svg)](https://gemnasium.com/digitalplaywright/mongoid-slug)
 [![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.svg)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
 
-Installation
-------------
+### Installation
 
 Add to your Gemfile:
 
@@ -17,10 +16,9 @@ Add to your Gemfile:
 gem 'mongoid-slug'
 ```
 
-Usage
------
+### Usage
 
-Set up a slug:
+### Set Up a Slug
 
 ```ruby
 class Book
@@ -32,7 +30,7 @@ class Book
 end
 ```
 
-Find a document by its slug:
+### Find a Document by its Slug
 
 ```ruby
 # GET /books/a-thousand-plateaus
@@ -41,11 +39,10 @@ book = Book.find params[:book_id]
 
 Mongoid Slug will attempt to determine whether you want to find using the `slugs` field or the `_id` field by inspecting the supplied parameters.
 
-* Mongoid Slug will perform a find based on `slugs` only if all arguments passed to `find` are of the type `String`
+* Mongoid Slug will perform a find based on `slugs` only if all arguments passed to `find` are of the type `String`.
 * If your document uses `BSON::ObjectId` identifiers, and all arguments look like valid `BSON::ObjectId`, then Mongoid Slug will perform a find based on `_id`.
 * If your document uses any other type of identifiers, and all arguments passed to `find` are of the same type, then Mongoid Slug will perform a find based on `_id`.
-* If your document uses `String` identifiers and you want to be able find by slugs or ids, to get the correct behaviour, you should add a slug_id_strategy option to your _id field definition.  This option should return something that responds to `call` (a callable) and takes one string argument, e.g. a lambda.  This callable must return true if the string looks like one of your ids.
-
+* If your document uses `String` identifiers and you want to be able find by slugs or ids, to get the correct behaviour, you should add a `slug_id_strategy` option to your `_id` field definition. This option should return something that responds to `call` (a callable) and takes one string argument, e.g. a lambda.  This callable must return true if the string looks like one of your ids.
 
 ```ruby
 Book.fields['_id'].type
@@ -57,7 +54,7 @@ class Post
   include Mongoid::Document
   include Mongoid::Slug
 
-  field :_id, type: String, slug_id_strategy: lambda {|id| id.start_with?('....')}
+  field :_id, type: String, slug_id_strategy: lambda { |id| id.start_with?('...') }
 
   field :name
   slug  :name, history: true
@@ -72,58 +69,62 @@ post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 ```
 [Examine slug.rb](lib/mongoid/slug.rb) for all available options.
 
+### Updating Existing Records
+
 To set slugs for existing records run following rake task:
 
 ```ruby
 rake mongoid_slug:set
 ```
+
 You can pass model names as an option for which you want to set slugs:
 
 ```ruby
 rake mongoid_slug:set[Model1,Model2]
 ```
-Custom Slug Generation
--------
 
-By default Mongoid Slug generates slugs with stringex. If this is not desired you can
-define your own slug generator.
+### Nil Slugs
+
+Empty slugs are possible and generate a `nil` value for the `_slugs` field. In the `Post` example above, a blank post `name` will cause the document record not to contain a `_slugs` field in the database. The default `_slugs` index is `sparse`, allowing that. If you wish to change this behavior add a custom `validates_presence_of :_slugs` validator to the document or change the database index to `sparse: false`.
+
+### Custom Slug Generation
+
+By default Mongoid Slug generates slugs with stringex. If this is not desired you can define your own slug generator.
 
 There are two ways to define slug generator.
 
-### Global definition:
+#### Globally
 
-   Configure a block in `config/initializers/mongoid_slug.rb` as follows:
+Configure a block in `config/initializers/mongoid_slug.rb` as follows:
 
-   ```ruby
-   Mongoid::Slug.configure do |c|
-     #create a block that takes the current object as an argument
-     #and returns the slug.
-     c.slug = proc{|cur_obj|
-       cur_object.slug_builder.to_url
-     }
-   end
-   ```
+```ruby
+Mongoid::Slug.configure do |c|
+  # create a block that takes the current object as an argument and return the slug
+  c.slug = proc { |cur_obj|
+    cur_object.slug_builder.to_url
+  }
+end
+```
 
-### Define it on model level:
+#### On Model
 
-   ```ruby
-   class Caption
-     include Mongoid::Document
-     include Mongoid::Slug
+```ruby
+class Caption
+  include Mongoid::Document
+  include Mongoid::Slug
 
-     #create a block that takes the current object as an argument
-     #and returns the slug.
-     slug do |cur_object|
-       cur_object.slug_builder.to_url
-     end
-   end
-   ```
-You can call stringex `to_url` method.
+  # create a block that takes the current object as an argument and returns the slug
+  slug do |cur_object|
+    cur_object.slug_builder.to_url
+  end
+end
+```
+
+The `to_url` method comes from [stringex](https://github.com/rsl/stringex).
 
 You can define a slug builder globally and/or override it per model.
 
-Scoping
--------
+### Scoping
 
 To scope a slug by a reference association, pass `:scope`:
 
@@ -145,11 +146,9 @@ class Employee
 end
 ```
 
-In this example, if you create an employee without associating it with any
-company, the scope will fall back to the root employees collection.
+In this example, if you create an employee without associating it with any company, the scope will fall back to the root employees collection.
 
-Currently, if you have an irregular association name, you **must** specify the
-`:inverse_of` option on the other side of the assocation.
+Currently, if you have an irregular association name, you **must** specify the `:inverse_of` option on the other side of the assocation.
 
 Embedded objects are automatically scoped by their parent.
 
@@ -167,8 +166,7 @@ class Employee
 end
 ```
 
-Limit Slug Length
------------------
+### Limit Slug Length
 
 MongoDB has a default limit around 1KB to the size of the index keys and will raise error 17280, `key too large to index` when trying to create a record that causes an index key to exceed that limit. By default slugs are of the form `text[-number]` and the text portion is limited in size to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes. You can change this limit with `max_length` or set it to `nil` if you're running MongoDB with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
 
@@ -183,8 +181,7 @@ class Company
 end
 ```
 
-Optionally Find and Create Slugs per Model Type
------------------------------------------------
+### Optionally Find and Create Slugs per Model Type
 
 By default when using STI, the scope will be around the super-class.
 
@@ -228,11 +225,9 @@ comic_book = ComicBook.create(title: 'Anti Oedipus')
 comic_book.slugs.should eql(book.slugs)
 ```
 
-History
--------
+### History
 
-To specify that the history of a document should be kept track of, pass
-`:history` with a value of `true`.
+Enable slug history tracking by setting `history: true`.
 
 ```ruby
 class Page
@@ -255,8 +250,7 @@ page.update_attributes title: "Welcome"
 Page.find("welcome") == Page.find("home") # => true
 ```
 
-Reserved Slugs
---------------
+### Reserved Slugs
 
 Pass words you do not want to be slugged using the `reserve` option:
 
@@ -276,10 +270,9 @@ friend.slug # => 'admin-1'
 When reserved words are not specified, the words 'new' and 'edit' are considered reserved by default.
 Specifying an array of custom reserved words will overwrite these defaults.
 
-Localize Slug
---------------
+### Localize Slugs
 
-The slug can be localized:
+The slugs can be localized:
 
 ```ruby
 class PageSlugLocalize
@@ -291,18 +284,11 @@ class PageSlugLocalize
 end
 ```
 
-This feature is built upon Mongoid localized fields, so fallbacks and localization
-works as documented in the Mongoid manual.
+This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
 
-PS! A migration is needed to use Mongoid localized fields for documents that was created when this
-feature was off. Anything else will cause errors.
+### Custom Find Strategies
 
-Custom Find Strategies
-----------------------
-
-By default find will search for the document by the id field if the provided id
-looks like a BSON::ObjectId, and it will otherwise find by the _slugs field. However,
-custom strategies can ovveride the default behavior, like e.g:
+By default find will search for the document by the id field if the provided id looks like a `BSON::ObjectId`, and it will otherwise find by the _slugs field. However, custom strategies can ovveride the default behavior, like e.g:
 
 ```ruby
 module Mongoid::Slug::UuidIdStrategy
@@ -312,7 +298,7 @@ module Mongoid::Slug::UuidIdStrategy
 end
 ```
 
-Use a custom strategy by adding the slug_id_strategy annotation to the _id field:
+Use a custom strategy by adding the `slug_id_strategy` annotation to the `_id` field:
 
 ```ruby
 class Entity
@@ -326,9 +312,7 @@ class Entity
 end
 ```
 
-
-Adhoc checking whether a string is unique on a per Model basis
---------------------------------------------------------------
+### Adhoc Checking Whether a Slug is Unique
 
 Lets say you want to have a auto-suggest function on your GUI that could provide a preview of what the url or slug could be before the form to create the record was submitted.
 
@@ -341,17 +325,16 @@ unique = Mongoid::Slug::UniqueSlug.new(Book.new).find_unique(title)
 # return some representation of unique
 ```
 
-
-Mongoid::Paranoia Support
--------------------------
+### Mongoid::Paranoia Support
 
 The [Mongoid::Paranoia](http://github.com/simi/mongoid-paranoia) gem adds "soft-destroy" functionality to Mongoid documents.
+
 Mongoid::Slug contains special handling for Mongoid::Paranoia:
 
-- When destroying a paranoid document, the slug will be unset from the database.
-- When restoring a paranoid document, the slug will be rebuilt. Note that the new slug may not match the old one.
-- When resaving a destroyed paranoid document, the slug will remain unset in the database.
-- For indexing purposes, sparse unique indexes are used. The sparse condition will ignore any destroyed paranoid documents, since their slug is not set in database.
+* When destroying a paranoid document, the slug will be unset from the database.
+* When restoring a paranoid document, the slug will be rebuilt. Note that the new slug may not match the old one.
+* When resaving a destroyed paranoid document, the slug will remain unset in the database.
+* For indexing purposes, sparse unique indexes are used. The sparse condition will ignore any destroyed paranoid documents, since their slug is not set in database.
 
 ```ruby
 class Entity
@@ -363,9 +346,8 @@ end
 
 The following variants of Mongoid Paranoia are officially supported:
 
-* Mongoid 3 built-in Mongoid::Paranoia
+* Mongoid 3 built-in `Mongoid::Paranoia`
 * Mongoid 4 or 5 gem http://github.com/simi/mongoid_paranoia
-
 
 Contributing
 ------------
@@ -376,4 +358,3 @@ Copyright & License
 -------------------
 
 Copyright (c) 2010-2016 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
-
