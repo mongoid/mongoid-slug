@@ -1,5 +1,7 @@
 ### Upgrading to 5.3.0
 
+#### Default value for _slugs is now nil
+
 Neither `_slugs` nor `slugs` default to an empty `Array` and `nil` slugs are allowed since a sparse index is used. Previously a confusing `Mongo::Error::OperationFailure: E11000 duplicate key error index` error was raised on the second record with an empty set of slugs inserted into the database.
 
 You should unset `_slugs` for any documents that have an empty array value.
@@ -10,6 +12,12 @@ Klass.where(_slugs: nil).unset(:_slugs)
 ```
 
 See [#225](https://github.com/digitalplaywright/mongoid-slug/pull/225) for more information.
+
+#### Changes in unique index definitions
+
+The `:sparse` option on the `_slugs` index is now set in all cases. The `:unique` option is set except in an edge case with Paranoid documents.
+
+See [#172](https://github.com/digitalplaywright/mongoid-slug/pull/172) and [#227](https://github.com/digitalplaywright/mongoid-slug/pull/227) for more information.
 
 ### Upgrading to 5.2.0
 
