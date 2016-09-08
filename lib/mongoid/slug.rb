@@ -82,7 +82,7 @@ module Mongoid
         self.slug_by_model_type    = options[:by_model_type]
         self.slug_max_length       = options.key?(:max_length) ? options[:max_length] : MONGO_INDEX_KEY_LIMIT_BYTES - 32
 
-        field :_slugs, type: Array, default: [], localize: options[:localize]
+        field :_slugs, type: Array, localize: options[:localize]
         alias_attribute :slugs, :_slugs
 
         # Set index

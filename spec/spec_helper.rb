@@ -50,6 +50,7 @@ RSpec.configure do |c|
 
   c.before(:each) do
     Mongoid.purge!
+    Book.create_indexes
     Mongoid::IdentityMap.clear if defined?(Mongoid::IdentityMap)
   end
 end

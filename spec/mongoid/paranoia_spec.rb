@@ -27,8 +27,8 @@ describe 'Mongoid::Paranoia with Mongoid::Slug' do
       end
 
       it 'persists the removed slug' do
-        expect(subject.reload._slugs).to eq []
-        expect(subject.reload.slug).to be_nil
+        expect(subject.reload._slugs).to be nil
+        expect(subject.reload.slug).to eq subject._id.to_s
       end
 
       it 'persists the removed slug in the database' do
@@ -67,7 +67,7 @@ describe 'Mongoid::Paranoia with Mongoid::Slug' do
       it 'new documents should be able to use the slug of destroyed documents' do
         expect(subject.slug).to eq 'slug'
         subject.destroy
-        expect(subject.reload.slug).to be_nil
+        expect(subject.reload.slug).to eq subject._id.to_s
         expect(other_doc.slug).to eq 'slug'
         subject.restore
         expect(subject.slug).to eq 'slug-1'
@@ -77,10 +77,10 @@ describe 'Mongoid::Paranoia with Mongoid::Slug' do
       it 'should allow multiple documents to be destroyed without index conflict' do
         expect(subject.slug).to eq 'slug'
         subject.destroy
-        expect(subject.reload.slug).to be_nil
+        expect(subject.reload.slug).to eq subject._id.to_s
         expect(other_doc.slug).to eq 'slug'
         other_doc.destroy
-        expect(other_doc.reload.slug).to be_nil
+        expect(other_doc.reload.slug).to eq other_doc._id.to_s
       end
     end
   end
