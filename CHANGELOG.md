@@ -6,6 +6,7 @@
 * [#219](https://github.com/digitalplaywright/mongoid-slug/pull/219): Mongoid HEAD and Rails 5.0.0.rc1 support - [@Fudoshiki](https://github.com/Fudoshiki).
 * [#224](https://github.com/digitalplaywright/mongoid-slug/pull/224): Use Danger, PR linter - [@dblock](https://github.com/dblock).
 * [#222](https://github.com/digitalplaywright/mongoid-slug/pull/225): Fix: `Mongo::Error::OperationFailure: E11000 duplicate key error index` error with blank slugs, default `_slugs` to `nil` instead of `[]` - [@dblock](https://github.com/dblock).
+* [#172](https://github.com/digitalplaywright/mongoid-slug/pull/172): Improved handling of unique and sparse index constraints - [@johnnyshields](https://github.com/johnnyshields).
 * Your contribution here.
 
 ## 5.2.0 (2016/01/03)
