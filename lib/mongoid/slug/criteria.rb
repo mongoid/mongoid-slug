@@ -62,7 +62,7 @@ module Mongoid
       # otherwise default for all other id_types
       def build_slug_strategy(id_type)
         type_method = id_type.to_s.downcase.split('::').last + '_slug_strategy'
-        self.respond_to?(type_method, true) ? method(type_method) : ->(_id) { false }
+        respond_to?(type_method, true) ? method(type_method) : ->(_id) { false }
       end
 
       # a string will not look like a slug if it looks like a legal BSON::ObjectId
@@ -99,10 +99,8 @@ module Mongoid
 
       def check_for_missing_documents_for_slugs!(result, slugs)
         missing_slugs = slugs - result.map(&:slugs).flatten
-
-        if !missing_slugs.blank? && Mongoid.raise_not_found_error
-          fail Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
-        end
+        return unless !missing_slugs.blank? && Mongoid.raise_not_found_error
+        raise Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
       end
     end
   end

@@ -295,7 +295,8 @@ module Mongoid
       let!(:author) do
         Author.create(
           first_name: 'Gilles',
-          last_name: 'Deleuze')
+          last_name: 'Deleuze'
+        )
       end
 
       it 'generates a slug' do
@@ -312,12 +313,14 @@ module Mongoid
       it 'generates a unique slug by appending a counter to duplicate text' do
         dup = Author.create(
           first_name: author.first_name,
-          last_name: author.last_name)
+          last_name: author.last_name
+        )
         expect(dup.to_param).to eql 'gilles-deleuze-1'
 
         dup2 = Author.create(
           first_name: author.first_name,
-          last_name: author.last_name)
+          last_name: author.last_name
+        )
 
         dup.save
         expect(dup2.to_param).to eql 'gilles-deleuze-2'
@@ -436,7 +439,8 @@ module Mongoid
       it 'generates a unique slug by appending a counter to duplicate text' do
         dup = book.authors.create(
           first_name: author.first_name,
-          last_name: author.last_name)
+          last_name: author.last_name
+        )
         expect(dup.to_param).to eql 'gilles-deleuze-1'
       end
 
@@ -517,7 +521,7 @@ module Mongoid
         Mongoid::Slug.configure do |c|
           c.slug do |cur_obj|
             slug = cur_obj.slug_builder
-            ("#{slug}-#{cur_obj.id}").to_url
+            "#{slug}-#{cur_obj.id}".to_url
           end
         end
       end

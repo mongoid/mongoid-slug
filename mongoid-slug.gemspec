@@ -24,8 +24,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-its'
   s.add_development_dependency 'awesome_print'
   s.add_development_dependency 'uuid'
-  s.add_development_dependency 'pry'
-  s.add_development_dependency 'rubocop', '0.34.2'
 
   s.files         = Dir.glob('lib/**/*') + %w(LICENSE README.md)
   s.test_files    = Dir.glob('spec/**/*')

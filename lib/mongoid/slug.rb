@@ -106,7 +106,7 @@ module Mongoid
         # - recreate the slug on restore
         # - force reset the slug when saving a destroyed paranoid document, to ensure it stays unset in the database
         if is_paranoid_doc?
-          send(:include, Mongoid::Slug::Paranoia) unless self.respond_to?(:before_restore)
+          send(:include, Mongoid::Slug::Paranoia) unless respond_to?(:before_restore)
           set_callback :destroy, :after,  :unset_slug!
           set_callback :restore, :before, :set_slug!
           set_callback :save,    :before, :reset_slug!, if: :paranoid_deleted?
@@ -210,7 +210,7 @@ module Mongoid
 
       # skip slug generation and use Mongoid id
       # to find document instead
-      return true if new_slug.size == 0
+      return true if new_slug.size.zero?
 
       # avoid duplicate slugs
       _slugs.delete(new_slug) if _slugs
@@ -243,7 +243,7 @@ module Mongoid
 
     # Rolls back the slug value from the Mongoid changeset.
     def reset_slug!
-      self.reset__slugs!
+      reset__slugs!
     end
 
     # Sets the slug to its default value.
@@ -353,7 +353,7 @@ module Mongoid
     # have any localized attributes at all (extreme edge case).
     def all_locales
       locales = slugged_attributes
-                .map { |attr| send("#{attr}_translations").keys if self.respond_to?("#{attr}_translations") }
+                .map { |attr| send("#{attr}_translations").keys if respond_to?("#{attr}_translations") }
                 .flatten.compact.uniq
       locales = I18n.available_locales if locales.empty?
       locales
