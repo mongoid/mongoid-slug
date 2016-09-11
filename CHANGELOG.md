@@ -1,4 +1,4 @@
-## 5.3.0 (Next)
+## 5.3.0 (2016/09/11)
 
 * [#228](https://github.com/mongoid/mongoid-slug/pull/228): Moved to the [mongoid](http://mongoid.github.io) organization - [@dblock](https://github.com/dblock), [@digitalplaywright](https://github.com/digitalplaywright).
 * [#166](https://github.com/mongoid/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
@@ -9,7 +9,6 @@
 * [#222](https://github.com/mongoid/mongoid-slug/pull/225): Fix: `Mongo::Error::OperationFailure: E11000 duplicate key error index` error with blank slugs, default `_slugs` to `nil` instead of `[]` - [@dblock](https://github.com/dblock).
 * [#172](https://github.com/mongoid/mongoid-slug/pull/172): Improved handling of unique and sparse index constraints - [@johnnyshields](https://github.com/johnnyshields).
 * [#229](https://github.com/mongoid/mongoid-slug/pull/229): Upgraded to RuboCop 0.42.0 - [@dblock](https://github.com/dblock).
-* Your contribution here.
 
 ## 5.2.0 (2016/01/03)
 
