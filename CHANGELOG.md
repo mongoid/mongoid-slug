@@ -1,3 +1,7 @@
+## 5.3.1 (Next)
+
+* Your contribution here.
+
 ## 5.3.0 (2016/09/11)
 
 * [#228](https://github.com/mongoid/mongoid-slug/pull/228): Moved to the [mongoid](http://mongoid.github.io) organization - [@dblock](https://github.com/dblock), [@digitalplaywright](https://github.com/digitalplaywright).
