@@ -9,9 +9,9 @@ module Mongoid
         # The order of field keys is intentional.
         # See: http://docs.mongodb.org/manual/core/index-compound/
         fields = {}
-        fields.merge!(_type: 1)       if by_model_type
-        fields.merge!(scope_key => 1) if scope_key
-        fields.merge!(_slugs: 1)
+        fields[:_type] = 1       if by_model_type
+        fields[scope_key] = 1 if scope_key
+        fields[:_slugs] = 1
 
         # By design, we use the unique index constraint when possible to enforce slug uniqueness.
         # When migrating legacy data to Mongoid slug, the _slugs field may be null on many records,
@@ -39,7 +39,10 @@ module Mongoid
         #      https://jira.mongodb.org/browse/SERVER-13780
         #      https://jira.mongodb.org/browse/SERVER-10403
         options = {}
-        options.merge!(unique: true, sparse: true) unless scope_key || by_model_type
+        unless scope_key || by_model_type
+          options[:unique] = true
+          options[:sparse] = true
+        end
 
         [fields, options]
       end

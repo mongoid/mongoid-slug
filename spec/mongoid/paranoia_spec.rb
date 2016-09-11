@@ -154,7 +154,7 @@ describe 'Mongoid::Paranoia with Mongoid::Slug' do
   end
 
   [ParanoidDocument, DocumentParanoid].each do |paranoid_klass|
-    context "#{paranoid_klass}" do
+    context paranoid_klass.to_s do
       let(:paranoid_doc) { paranoid_klass.create!(title: 'slug') }
       let(:non_paranoid_doc) { Article.create!(title: 'slug') }
 
