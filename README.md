@@ -3,10 +3,10 @@ Mongoid Slug
 
 Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://secure.travis-ci.org/digitalplaywright/mongoid-slug.svg)](http://travis-ci.org/digitalplaywright/mongoid-slug)
+[![Build Status](https://secure.travis-ci.org/mongoid/mongoid-slug.svg)](http://travis-ci.org/mongoid/mongoid-slug)
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
-[![Dependency Status](https://gemnasium.com/digitalplaywright/mongoid-slug.svg)](https://gemnasium.com/digitalplaywright/mongoid-slug)
-[![Code Climate](https://codeclimate.com/github/digitalplaywright/mongoid-slug.svg)](https://codeclimate.com/github/digitalplaywright/mongoid-slug)
+[![Dependency Status](https://gemnasium.com/mongoid/mongoid-slug.svg)](https://gemnasium.com/mongoid/mongoid-slug)
+[![Code Climate](https://codeclimate.com/github/mongoid/mongoid-slug.svg)](https://codeclimate.com/github/mongoid/mongoid-slug)
 
 ### Installation
 
@@ -352,7 +352,7 @@ The following variants of Mongoid Paranoia are officially supported:
 Contributing
 ------------
 
-Mongoid-slug is work of [many of contributors](https://github.com/digitalplaywright/mongoid-slug/graphs/contributors). You're encouraged to submit [pull requests](https://github.com/digitalplaywright/mongoid-slug/pulls), [propose features, ask questions and discuss issues](https://github.com/digitalplaywright/mongoid-slug/issues). See [CONTRIBUTING](CONTRIBUTING.md) for details.
+Mongoid-slug is work of [many of contributors](https://github.com/mongoid/mongoid-slug/graphs/contributors). You're encouraged to submit [pull requests](https://github.com/mongoid/mongoid-slug/pulls), [propose features, ask questions and discuss issues](https://github.com/mongoid/mongoid-slug/issues). See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 Copyright & License
 -------------------
