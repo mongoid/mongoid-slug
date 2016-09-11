@@ -1,44 +1,45 @@
 ## 5.3.0 (Next)
 
-* [#166](https://github.com/digitalplaywright/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
-* [#209](https://github.com/digitalplaywright/mongoid-slug/issues/209): Prefixed internal `Mongoid::Slug` class attributes with `slug_` to avoid conflicts - [@dblock](https://github.com/dblock).
-* [#217](https://github.com/digitalplaywright/mongoid-slug/issues/217): Fixed `mongoid_slug:set` rake task for Mongoid 6 - [@dblock](https://github.com/dblock).
-* [#219](https://github.com/digitalplaywright/mongoid-slug/pull/219): Mongoid HEAD and Rails 5.0.0.rc1 support - [@Fudoshiki](https://github.com/Fudoshiki).
-* [#224](https://github.com/digitalplaywright/mongoid-slug/pull/224): Use Danger, PR linter - [@dblock](https://github.com/dblock).
-* [#222](https://github.com/digitalplaywright/mongoid-slug/pull/225): Fix: `Mongo::Error::OperationFailure: E11000 duplicate key error index` error with blank slugs, default `_slugs` to `nil` instead of `[]` - [@dblock](https://github.com/dblock).
-* [#172](https://github.com/digitalplaywright/mongoid-slug/pull/172): Improved handling of unique and sparse index constraints - [@johnnyshields](https://github.com/johnnyshields).
+* [#228](https://github.com/mongoid/mongoid-slug/pull/228): Moved to the [mongoid](http://mongoid.github.io) organization - [@dblock](https://github.com/dblock), [@digitalplaywright](https://github.com/digitalplaywright).
+* [#166](https://github.com/mongoid/mongoid-slug/issues/166): Configure slug builder globally - [@anujaware](https://github.com/anujaware).
+* [#209](https://github.com/mongoid/mongoid-slug/issues/209): Prefixed internal `Mongoid::Slug` class attributes with `slug_` to avoid conflicts - [@dblock](https://github.com/dblock).
+* [#217](https://github.com/mongoid/mongoid-slug/issues/217): Fixed `mongoid_slug:set` rake task for Mongoid 6 - [@dblock](https://github.com/dblock).
+* [#219](https://github.com/mongoid/mongoid-slug/pull/219): Mongoid HEAD and Rails 5.0.0.rc1 support - [@Fudoshiki](https://github.com/Fudoshiki).
+* [#224](https://github.com/mongoid/mongoid-slug/pull/224): Use Danger, PR linter - [@dblock](https://github.com/dblock).
+* [#222](https://github.com/mongoid/mongoid-slug/pull/225): Fix: `Mongo::Error::OperationFailure: E11000 duplicate key error index` error with blank slugs, default `_slugs` to `nil` instead of `[]` - [@dblock](https://github.com/dblock).
+* [#172](https://github.com/mongoid/mongoid-slug/pull/172): Improved handling of unique and sparse index constraints - [@johnnyshields](https://github.com/johnnyshields).
 * Your contribution here.
 
 ## 5.2.0 (2016/01/03)
 
-* [#204](https://github.com/digitalplaywright/mongoid-slug/pull/204): The text portion of the slug is now truncated at `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes by default and can be set via `max_length` - [@dblock](https://github.com/dblock).
-* [#177](https://github.com/digitalplaywright/mongoid-slug/issues/177): Added `mongoid_slug:set` rake task to set slug for legacy data - [@anuja-joshi](https://github.com/anuja-joshi).
+* [#204](https://github.com/mongoid/mongoid-slug/pull/204): The text portion of the slug is now truncated at `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes by default and can be set via `max_length` - [@dblock](https://github.com/dblock).
+* [#177](https://github.com/mongoid/mongoid-slug/issues/177): Added `mongoid_slug:set` rake task to set slug for legacy data - [@anuja-joshi](https://github.com/anuja-joshi).
 
 ## 5.1.1
 
-* [#197](https://github.com/digitalplaywright/mongoid-slug/pull/197): Compatibility with Mongoid 5.0.1, fix [MONGOID-4177](https://jira.mongodb.org/browse/MONGOID-4177) - [@dblock](https://github.com/dblock).
+* [#197](https://github.com/mongoid/mongoid-slug/pull/197): Compatibility with Mongoid 5.0.1, fix [MONGOID-4177](https://jira.mongodb.org/browse/MONGOID-4177) - [@dblock](https://github.com/dblock).
 
 ## 5.1.0
 
-* [#194](https://github.com/digitalplaywright/mongoid-slug/issues/194): Fixed compatibility with Mongoid::Observer - [@dblock](https://github.com/dblock).
+* [#194](https://github.com/mongoid/mongoid-slug/issues/194): Fixed compatibility with Mongoid::Observer - [@dblock](https://github.com/dblock).
 
 ## 5.0.0
 
-* [#187](https://github.com/digitalplaywright/mongoid-slug/pull/187): Mongoid 5 support - [@dblock](https://github.com/dblock).
-* [#188](https://github.com/digitalplaywright/mongoid-slug/pull/188): Removed deprecated name, _mongoid_slug_ - [@dblock](https://github.com/dblock).
-* [#189](https://github.com/digitalplaywright/mongoid-slug/pull/189): Implemented RuboCop - [@dblock](https://github.com/dblock).
+* [#187](https://github.com/mongoid/mongoid-slug/pull/187): Mongoid 5 support - [@dblock](https://github.com/dblock).
+* [#188](https://github.com/mongoid/mongoid-slug/pull/188): Removed deprecated name, _mongoid_slug_ - [@dblock](https://github.com/dblock).
+* [#189](https://github.com/mongoid/mongoid-slug/pull/189): Implemented RuboCop - [@dblock](https://github.com/dblock).
 
 ## 4.0.0
 
-* [#179](https://github.com/digitalplaywright/mongoid-slug/pull/179): Renamed gem to mongoid-slug - [@nofxx](https://github.com/nofxx).
-* [#168](https://github.com/digitalplaywright/mongoid-slug/pull/168): Finding a unique slug is now threadsafe - [@jaxesn](https://github.com/jaxesn).
-* [#165](https://github.com/digitalplaywright/mongoid-slug/pull/165): Fixed compatibility with Mongoid::Paranoia - [@johnnyshields](https://github.com/johnnyshields).
+* [#179](https://github.com/mongoid/mongoid-slug/pull/179): Renamed gem to mongoid-slug - [@nofxx](https://github.com/nofxx).
+* [#168](https://github.com/mongoid/mongoid-slug/pull/168): Finding a unique slug is now threadsafe - [@jaxesn](https://github.com/jaxesn).
+* [#165](https://github.com/mongoid/mongoid-slug/pull/165): Fixed compatibility with Mongoid::Paranoia - [@johnnyshields](https://github.com/johnnyshields).
 
 ## 3.2.2
 
 ## Bugfixes
 
-* [#163](https://github.com/digitalplaywright/mongoid-slug/pull/163): Avoid scope error in tests - [@johnnyshields](https://github.com/johnnyshields).
+* [#163](https://github.com/mongoid/mongoid-slug/pull/163): Avoid scope error in tests - [@johnnyshields](https://github.com/johnnyshields).
 * Require activesupport dependencies to fix error in test on ruby 1.9.3 and Mongoid 4 - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 3.2.1
@@ -79,7 +80,7 @@
 
 ### Bugfixes
 
-* [#121](https://github.com/digitalplaywright/mongoid-slug/issues/121), [#122](https://github.com/digitalplaywright/mongoid-slug/issues/122): Do not generate empty slug - [@digitalplaywright](https://github.com/digitalplaywright).
+* [#121](https://github.com/mongoid/mongoid-slug/issues/121), [#122](https://github.com/mongoid/mongoid-slug/issues/122): Do not generate empty slug - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 3.1.0
 
@@ -137,7 +138,7 @@
 
 ### Minor Changes
 
-* [#76](https://github.com/digitalplaywright/mongoid-slug/pull/76): Cleanup of callback handling - [@empact](https://github.com/empact).
+* [#76](https://github.com/mongoid/mongoid-slug/pull/76): Cleanup of callback handling - [@empact](https://github.com/empact).
 
 ### Major Changes (Backwards Incompatible)
 
@@ -168,7 +169,7 @@
 
 ## 0.9.0
 
-* [#43](https://github.com/digitalplaywright/mongoid-slug/pull/43): Allowed overriding of slug at model creation time - [@bdmac](https://github.com/bdmac).
+* [#43](https://github.com/mongoid/mongoid-slug/pull/43): Allowed overriding of slug at model creation time - [@bdmac](https://github.com/bdmac).
 
 ## 0.8.3
 
@@ -180,20 +181,20 @@
 
 ## 0.8.1
 
-* [#27](https://github.com/digitalplaywright/mongoid-slug/pull/27): No longer necessary to require library in Gemfile - [@etehtsea](https://github.com/etehtsea).
+* [#27](https://github.com/mongoid/mongoid-slug/pull/27): No longer necessary to require library in Gemfile - [@etehtsea](https://github.com/etehtsea).
 
 ## 0.8.0
 
-* [#23](https://github.com/digitalplaywright/mongoid-slug/pull/23): Fix edbug concerning slugs with double-digit counters - [@jbredeche](https://github.com/jbredeche).
+* [#23](https://github.com/mongoid/mongoid-slug/pull/23): Fix edbug concerning slugs with double-digit counters - [@jbredeche](https://github.com/jbredeche).
 * Removed #slug!. The method is of limited value - [@digitalplaywright](https://github.com/digitalplaywright).
 
 ## 0.7.2
 
-* [#21](https://github.com/digitalplaywright/mongoid-slug/pull/21): Added `#find_by_slug!` - [@ajsharp](https://github.com/ajsharp).
+* [#21](https://github.com/mongoid/mongoid-slug/pull/21): Added `#find_by_slug!` - [@ajsharp](https://github.com/ajsharp).
 
 ## 0.7.1
 
-* [#16](https://github.com/digitalplaywright/mongoid-slug/pull/16): Library no longers hit database multiple times to find unique slug when duplicates exist - [@tiendung](https://github.com/tiendung).
+* [#16](https://github.com/mongoid/mongoid-slug/pull/16): Library no longers hit database multiple times to find unique slug when duplicates exist - [@tiendung](https://github.com/tiendung).
 
 ## 0.7.0
 
@@ -201,11 +202,11 @@
 
 ## 0.6.4
 
-* [#10](https://github.com/digitalplaywright/mongoid-slug/pull/10): Added :any option to use first present field when multiple fields are slugged - [@iamnader](https://github.com/iamnader).
+* [#10](https://github.com/mongoid/mongoid-slug/pull/10): Added :any option to use first present field when multiple fields are slugged - [@iamnader](https://github.com/iamnader).
 
 ## 0.6.3
 
-* [#13](https://github.com/digitalplaywright/mongoid-slug/pull/13): Mongoid no longer requires that emmbedded_in pass `:inverse_of` option - [@sporkd](https://github.com/sporkd).
+* [#13](https://github.com/mongoid/mongoid-slug/pull/13): Mongoid no longer requires that emmbedded_in pass `:inverse_of` option - [@sporkd](https://github.com/sporkd).
 
 ## 0.6.2
 
