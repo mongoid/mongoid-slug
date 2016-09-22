@@ -1,6 +1,7 @@
 ## 5.3.1 (Next)
 
-* Upgraded mongoid to 6.0.0 - [@moodlemags](https://github.com/moodlemags)
+* Upgraded mongoid to 6.0.0 - [@moodlemags](https://github.com/moodlemags).
+* Your contribution here.
 
 ## 5.3.0 (2016/09/11)
 
