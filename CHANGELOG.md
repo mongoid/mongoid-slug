@@ -1,5 +1,6 @@
 ## 5.3.1 (Next)
 
+* [#234](https://github.com/mongoid/mongoid-slug/pull/234): Compatibility with Mongoid 6 - [@moodlemags](https://github.com/moodlemags), [@dblock](https://github.com/dblock).
 * Your contribution here.
 
 ## 5.3.0 (2016/09/11)
