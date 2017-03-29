@@ -16,12 +16,13 @@ module Mongoid
           @existing_slugs = []
           @existing_history_slugs = []
           @sorted_existing = []
+          regexp_pattern = Regexp.new(@pattern)
           @documents.each do |doc|
             history_slugs = doc._slugs
             next if history_slugs.nil?
-            existing_slugs.push(*history_slugs.find_all { |cur_slug| cur_slug =~ @pattern })
-            last_entered_slug.push(*history_slugs.last) if history_slugs.last =~ @pattern
-            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all { |cur_slug| cur_slug =~ @pattern })
+            existing_slugs.push(*history_slugs.find_all { |cur_slug| cur_slug =~ regexp_pattern })
+            last_entered_slug.push(*history_slugs.last) if history_slugs.last =~ regexp_pattern
+            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all { |cur_slug| cur_slug =~ regexp_pattern })
           end
         end
 
@@ -85,13 +86,8 @@ module Mongoid
 
           @_slug = @_slug[0...slug_max_length] if slug_max_length
 
-          # Regular expression that matches slug, slug-1, ... slug-n
-          # If slug_name field was indexed, MongoDB will utilize that
-          # index to match /^.../ pattern.
-          pattern = /^#{Regexp.escape(@_slug)}(?:-(\d+))?$/
-
           where_hash = {}
-          where_hash[:_slugs.all] = [pattern]
+          where_hash[:_slugs.all] = [regex_for_slug]
           where_hash[:_id.ne]     = model._id
 
           if (scope = slug_scope) && reflect_on_association(scope).nil?
@@ -100,11 +96,11 @@ module Mongoid
             where_hash[scope] = model.try(:read_attribute, scope)
           end
 
-          if slug_by_model_type == true
+          if slug_by_model_type
             where_hash[:_type] = model.try(:read_attribute, :_type)
           end
 
-          @state = SlugState.new @_slug, uniqueness_scope.unscoped.where(where_hash), pattern
+          @state = SlugState.new @_slug, uniqueness_scope.unscoped.where(where_hash), escaped_pattern
 
           # do not allow a slug that can be interpreted as the current document id
           @state.include_slug unless model.class.look_like_slugs?([@_slug])
@@ -119,6 +115,22 @@ module Mongoid
             @_slug += "-#{highest.succ}"
           end
           @_slug
+        end
+      end
+
+      def escaped_pattern
+        "^#{Regexp.escape(@_slug)}(?:-(\\d+))?$"
+      end
+
+      # Regular expression that matches slug, slug-1, ... slug-n
+      # If slug_name field was indexed, MongoDB will utilize that
+      # index to match /^.../ pattern.
+      # Use Regexp::Raw to avoid the multiline option when querying the server.
+      def regex_for_slug
+        if embedded? || Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
+          Regexp.new(escaped_pattern)
+        else
+          Regexp::Raw.new(escaped_pattern)
         end
       end
 
