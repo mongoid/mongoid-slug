@@ -1,7 +1,7 @@
 module Mongoid
   module Slug
     class Criteria < Mongoid::Criteria
-      # Find the matchind document(s) in the criteria for the provided ids or slugs.
+      # Find the matching document(s) in the criteria for the provided ids or slugs.
       #
       # If the document _ids are of the type BSON::ObjectId, and all the supplied parameters are
       # convertible to BSON::ObjectId (via BSON::ObjectId#from_string), finding will be
