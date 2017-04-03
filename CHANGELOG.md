@@ -1,8 +1,9 @@
-## 5.3.1 (Next)
+## 5.3.2 (Next)
+* Your contribution here.
 
+## 5.3.1 (2017/04/03)
 * [#234](https://github.com/mongoid/mongoid-slug/pull/234): Compatibility with Mongoid 6 - [@moodlemags](https://github.com/moodlemags), [@dblock](https://github.com/dblock).
 * [#238](https://github.com/mongoid/mongoid-slug/pull/238): Using BSON::Regexp::Raw instead of Ruby's Regexp to avoid a performance hit - [@mzikherman](https://github.com/mzikherman).
-* Your contribution here.
 
 ## 5.3.0 (2016/09/11)
 
