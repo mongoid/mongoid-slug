@@ -1,10 +1,12 @@
 ## 5.3.2 (Next)
-* [#240](https://github.com/mongoid/mongoid-slug/pull/240): Ensure we find the correct Regexp::Raw class - [@artfuldodger](https://github.com/artfuldodger).
+
+* [#240](https://github.com/mongoid/mongoid-slug/pull/240): Fix: ensure we find the correct `BSON::Regexp::Raw` class - [@artfuldodger](https://github.com/artfuldodger).
 * Your contribution here.
 
 ## 5.3.1 (2017/04/03)
+
 * [#234](https://github.com/mongoid/mongoid-slug/pull/234): Compatibility with Mongoid 6 - [@moodlemags](https://github.com/moodlemags), [@dblock](https://github.com/dblock).
-* [#238](https://github.com/mongoid/mongoid-slug/pull/238): Using BSON::Regexp::Raw instead of Ruby's Regexp to avoid a performance hit - [@mzikherman](https://github.com/mzikherman).
+* [#238](https://github.com/mongoid/mongoid-slug/pull/238): Use `BSON::Regexp::Raw` instead of Ruby's Regexp to avoid a performance hit - [@mzikherman](https://github.com/mzikherman).
 
 ## 5.3.0 (2016/09/11)
 
