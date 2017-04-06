@@ -1,4 +1,5 @@
 ## 5.3.2 (Next)
+* [#240](https://github.com/mongoid/mongoid-slug/pull/240): Ensure we find the correct Regexp::Raw class - [@artfuldodger](https://github.com/artfuldodger).
 * Your contribution here.
 
 ## 5.3.1 (2017/04/03)

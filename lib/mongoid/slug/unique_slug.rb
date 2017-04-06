@@ -130,7 +130,7 @@ module Mongoid
         if embedded? || Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
           Regexp.new(escaped_pattern)
         else
-          Regexp::Raw.new(escaped_pattern)
+          BSON::Regexp::Raw.new(escaped_pattern)
         end
       end
 
