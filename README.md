@@ -357,4 +357,4 @@ Mongoid-slug is work of [many of contributors](https://github.com/mongoid/mongoi
 Copyright & License
 -------------------
 
-Copyright (c) 2010-2016 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
+Copyright (c) 2010-2017 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
