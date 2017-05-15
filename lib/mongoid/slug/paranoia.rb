@@ -5,15 +5,15 @@ module Mongoid
     module Paranoia
       extend ActiveSupport::Concern
 
+      def restore
+        run_callbacks(:restore) do
+          super
+        end
+      end
+
       included do
         define_model_callbacks :restore
-
-        def restore_with_callbacks
-          run_callbacks(:restore) do
-            restore_without_callbacks
-          end
-        end
-        alias_method_chain :restore, :callbacks
+        self.class.prepend(Mongoid::Slug::Paranoia)
       end
     end
   end
