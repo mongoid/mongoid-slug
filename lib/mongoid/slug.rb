@@ -87,7 +87,14 @@ module Mongoid
 
         # Set index
         unless embedded?
-          index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type))
+          case options[:localize]
+          when true
+            index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type, ::I18n.default_locale))
+          when Array
+            options[:localize].each { |locale| index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type, locale)) }
+          else
+            index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type))
+          end
         end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder

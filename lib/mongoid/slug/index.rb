@@ -3,15 +3,20 @@ module Mongoid
     module Index
       # @param [ String or Symbol ] scope_key The optional scope key for the index
       # @param [ Boolean ] by_model_type Whether or not
+      # @param [ String or Symbol ] locale The locale for localized index field
       #
       # @return [ Array(Hash, Hash) ] the indexable fields and index options.
-      def self.build_index(scope_key = nil, by_model_type = false)
+      def self.build_index(scope_key = nil, by_model_type = false, locale = nil)
         # The order of field keys is intentional.
         # See: http://docs.mongodb.org/manual/core/index-compound/
         fields = {}
         fields[:_type] = 1       if by_model_type
         fields[scope_key] = 1 if scope_key
-        fields[:_slugs] = 1
+        if locale
+          fields["_slugs.#{locale}"] = 1
+        else
+          fields[:_slugs] = 1
+        end
 
         # By design, we use the unique index constraint when possible to enforce slug uniqueness.
         # When migrating legacy data to Mongoid slug, the _slugs field may be null on many records,

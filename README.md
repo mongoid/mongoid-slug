@@ -285,6 +285,9 @@ end
 ```
 
 This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
+By specifying `localize: true`, the slug index will be created on the I18n::default_locale only.  You can specify all the locales
+you intend to support by providing a list of locales, for example `localize: [:en, :es, :de]`.  This will create a separate index
+for each locale listed.
 
 ### Custom Find Strategies
 
