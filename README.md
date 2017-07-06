@@ -284,10 +284,19 @@ class PageSlugLocalize
 end
 ```
 
-This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
-By specifying `localize: true`, the slug index will be created on the I18n::default_locale only.  You can specify all the locales
-you intend to support by providing a list of locales, for example `localize: [:en, :es, :de]`.  This will create a separate index
-for each locale listed.
+This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.  By specifying `localize: true`, the slug index will be created on the default locale field only.  
+So with the [i18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) set to `:en`, the index spec generated will be as follows:
+```ruby
+  index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
+```
+_Scopes and index options may vary depending on other slug specifications_
+
+If you are supporting multiple locales, you can specify the list of locales to create indices on, for example `localize: [:en, :es, :de]`.  This will create a separate index for each locale supported:
+```ruby
+  index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
+  index({ '_slugs.es' => 1 }, { unique: true, sparse: true })
+  index({ '_slugs.de' => 1 }, { unique: true, sparse: true })
+```
 
 ### Custom Find Strategies
 

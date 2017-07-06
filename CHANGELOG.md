@@ -1,6 +1,7 @@
 ## 5.3.4 (Next)
 
-* [#241](https://github.com/mongoid/mongoid-slug/pull/240): Fix: ensure localized slugs index expected localized slug fields - [@onomated](https://github.com/onomated)
+* Your contribution here.
+* [#243](https://github.com/mongoid/mongoid-slug/pull/243): Fix: ensure localized slugs index expected localized slug fields - [@onomated](https://github.com/onomated).
 
 ## 5.3.3 (2017/04/06)
 
