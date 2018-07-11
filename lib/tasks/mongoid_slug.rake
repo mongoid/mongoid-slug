@@ -1,4 +1,3 @@
-require 'byebug'
 namespace :mongoid_slug do
   desc 'Goes though all documents and sets slug if not already set'
   task set: :environment do |_, args|
