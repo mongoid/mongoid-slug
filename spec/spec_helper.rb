@@ -6,13 +6,10 @@ require 'awesome_print'
 require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
-require 'mongoid/paranoia'
 require 'rspec/its'
 require 'mongoid/compatibility'
 
 require File.expand_path '../../lib/mongoid/slug', __FILE__
-
-require 'mongoid-observers' unless Mongoid.const_defined?(:Observer)
 
 module Mongoid
   module Slug
@@ -43,7 +40,7 @@ RSpec.configure do |c|
 
   c.before :all do
     Mongoid.logger.level = Logger::INFO
-    if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+    if Mongoid::Compatibility::Version.mongoid5_or_newer?
       Mongo::Logger.logger.level = Logger::INFO
     end
   end

@@ -596,7 +596,7 @@ module Mongoid
     end
 
     context 'with a value exceeding mongodb max index key' do
-      if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+      if Mongoid::Compatibility::Version.mongoid5_or_newer?
         it 'errors with a model without a max length' do
           expect do
             Book.create!(title: 't' * 1025)
@@ -736,7 +736,7 @@ module Mongoid
 
       context 'when called on an existing record with no slug' do
         let!(:book_no_slug) do
-          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+          if Mongoid::Compatibility::Version.mongoid5_or_newer?
             Book.collection.insert_one(title: 'Proust and Signs')
           else
             Book.collection.insert(title: 'Proust and Signs')
@@ -796,7 +796,7 @@ module Mongoid
         it 'ensures uniqueness' do
           book1 = Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
           expect(book1.to_param).to eql 'not-what-you-expected'
-          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+          if Mongoid::Compatibility::Version.mongoid5_or_newer?
             expect do
               Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
             end.to raise_error Mongo::Error::OperationFailure, /duplicate/
@@ -825,7 +825,7 @@ module Mongoid
           Book.create(title: 'Sleepyhead')
           book2 = Book.create(title: 'A Thousand Plateaus')
           book2.slugs.push 'sleepyhead'
-          if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+          if Mongoid::Compatibility::Version.mongoid5_or_newer?
             expect do
               book2.save
             end.to raise_error Mongo::Error::OperationFailure, /duplicate/
@@ -916,17 +916,17 @@ module Mongoid
         page = PageSlugLocalized.new
         page.title_translations = { 'en' => 'Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
       it 'exact same title multiple langauges' do
         page = PageSlugLocalized.new
         page.title_translations = { 'en' => 'Title on English', 'nl' => 'Title on English' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-english'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-english'])
 
         page = PageSlugLocalized.create(title_translations: { 'en' => 'Title on English2', 'nl' => 'Title on English2' })
-        expect(page['_slugs']).to eq('en' => ['title-on-english2'], 'nl' => ['title-on-english2'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english2'], 'nl' => ['title-on-english2'])
       end
 
       it 'does not produce duplicate slugs' do
@@ -944,7 +944,7 @@ module Mongoid
         I18n.locale = old_locale
         page.title = 'Title on English'
         expect(page.title_translations).to eq('en' => 'Title on English', 'nl' => 'Title on Netherlands')
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when one has changed' do
@@ -964,8 +964,8 @@ module Mongoid
         page.save
         expect(page.title_translations).to eq('en' => 'Modified Title on English',
                                               'nl' => 'Title on Netherlands')
-        expect(page['_slugs']).to eq('en' => ['modified-title-on-english'],
-                                     'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['modified-title-on-english'],
+                                               'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when transactions are set directly' do
@@ -974,7 +974,7 @@ module Mongoid
         page.save
         page.title_translations = { 'en' => 'Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when transactions are set directly and one has changed' do
@@ -984,15 +984,15 @@ module Mongoid
         page.title_translations = { 'en' => 'Modified Title on English',
                                     'nl' => 'Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['modified-title-on-english'],
-                                     'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['modified-title-on-english'],
+                                               'nl' => ['title-on-netherlands'])
       end
 
       it 'works with a custom slug strategy' do
         page = PageSlugLocalizedCustom.new
         page.title = 'a title for the slug'
         page.save
-        expect(page['_slugs']).to eq('en' => ['a-title-for-the-slug'], 'nl' => ['a-title-for-the-slug'])
+        expect(page._slugs_translations).to eq('en' => ['a-title-for-the-slug'], 'nl' => ['a-title-for-the-slug'])
       end
     end
 
@@ -1067,8 +1067,8 @@ module Mongoid
         page.title_translations = { 'en' => 'Modified Title on English',
                                     'nl' => 'Modified Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english', 'modified-title-on-english'],
-                                     'nl' => ['title-on-netherlands', 'modified-title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+                                               'nl' => ['title-on-netherlands', 'modified-title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs' do
@@ -1086,7 +1086,7 @@ module Mongoid
         I18n.locale = old_locale
         page.title = 'Title on English'
         expect(page.title_translations).to eq('en' => 'Title on English', 'nl' => 'Title on Netherlands')
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when one has changed' do
@@ -1106,8 +1106,8 @@ module Mongoid
         page.save
         expect(page.title_translations).to eq('en' => 'Modified Title on English',
                                               'nl' => 'Title on Netherlands')
-        expect(page['_slugs']).to eq('en' => ['title-on-english', 'modified-title-on-english'],
-                                     'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+                                               'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when transactions are set directly' do
@@ -1116,7 +1116,7 @@ module Mongoid
         page.save
         page.title_translations = { 'en' => 'Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
       it 'does not produce duplicate slugs when transactions are set directly and one has changed' do
@@ -1125,8 +1125,8 @@ module Mongoid
         page.save
         page.title_translations = { 'en' => 'Modified Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page['_slugs']).to eq('en' => ['title-on-english', 'modified-title-on-english'],
-                                     'nl' => ['title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+                                               'nl' => ['title-on-netherlands'])
       end
     end
 
