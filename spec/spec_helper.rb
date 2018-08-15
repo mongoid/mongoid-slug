@@ -49,7 +49,6 @@ RSpec.configure do |c|
   end
 
   c.before(:each) do
-    Mongoid.purge!
     Author.create_indexes
     Book.create_indexes
     AuthorPolymorphic.create_indexes
@@ -57,7 +56,7 @@ RSpec.configure do |c|
     Mongoid::IdentityMap.clear if defined?(Mongoid::IdentityMap)
   end
 
-  c.after(:all) do
+  c.after(:each) do
     if Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
       Mongoid.default_session.drop
     else
