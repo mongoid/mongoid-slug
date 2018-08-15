@@ -64,7 +64,8 @@ module Mongoid
 
       def_delegators :@model, :slug_scope, :reflect_on_association, :read_attribute,
                      :check_against_id, :slug_reserved_words, :slug_url_builder, :collection_name,
-                     :embedded?, :reflect_on_all_associations, :slug_by_model_type, :slug_max_length
+                     :embedded?, :reflect_on_all_associations, :reflect_on_all_association,
+                     :slug_by_model_type, :slug_max_length
 
       def initialize(model)
         @model = model
@@ -73,7 +74,13 @@ module Mongoid
       end
 
       def metadata
-        @model.respond_to?(:relation_metadata) ? @model.relation_metadata : @model.metadata
+        if @model.respond_to?(:_association)
+          @model.send(:_association)
+        elsif @model.respond_to?(:relation_metadata)
+          @model.relation_metadata
+        else
+          @model.metadata
+        end
       end
 
       def find_unique(attempt = nil)
@@ -150,7 +157,11 @@ module Mongoid
         end
 
         if embedded?
-          parent_metadata = reflect_on_all_associations(:embedded_in)[0]
+          parent_metadata = if Mongoid::Compatibility::Version.mongoid7_or_newer?
+                              reflect_on_all_association(:embedded_in)[0]
+                            else
+                              reflect_on_all_associations(:embedded_in)[0]
+                            end
           return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 

@@ -28,12 +28,6 @@ module Mongoid
         #    irrespective of how STI is defined in Mongoid, i.e. ANY child index will be applied to EVERY child.
         #    This can cause collisions using various combinations of scopes.
         #
-        # 3) Paranoid docs rely on sparse indexes to exclude paranoid-deleted records
-        #    from the unique index constraint (i.e. when _slugs is unset.) However, when
-        #    using compound keys (`by_model_type` or `scope_key`), paranoid-deleted records
-        #    can become inadvertently indexed when _slugs is unset, causing duplicates. This
-        #    is already covered by #1 and #2 above.
-        #
         # In the future, MongoDB may implement partial indexes or improve sparse index behavior.
         # See: https://jira.mongodb.org/browse/SERVER-785
         #      https://jira.mongodb.org/browse/SERVER-13780

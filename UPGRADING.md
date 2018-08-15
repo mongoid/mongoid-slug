@@ -1,3 +1,9 @@
+### Upgrading to 6.0.0
+
+#### Support dropped for mongoid_paranoia
+
+Due to the library not being updated, mongoid_paranoia is no longer supported.
+
 ### Upgrading to 5.3.0
 
 #### Default value for _slugs is now nil

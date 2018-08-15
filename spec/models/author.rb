@@ -3,7 +3,7 @@ class Author
   include Mongoid::Slug
   field :first_name
   field :last_name
-  if Mongoid::Compatibility::Version.mongoid6?
+  if Mongoid::Compatibility::Version.mongoid6_or_newer?
     belongs_to :book, required: false
   else
     belongs_to :book

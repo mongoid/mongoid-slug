@@ -325,30 +325,6 @@ unique = Mongoid::Slug::UniqueSlug.new(Book.new).find_unique(title)
 # return some representation of unique
 ```
 
-### Mongoid::Paranoia Support
-
-The [Mongoid::Paranoia](http://github.com/simi/mongoid-paranoia) gem adds "soft-destroy" functionality to Mongoid documents.
-
-Mongoid::Slug contains special handling for Mongoid::Paranoia:
-
-* When destroying a paranoid document, the slug will be unset from the database.
-* When restoring a paranoid document, the slug will be rebuilt. Note that the new slug may not match the old one.
-* When resaving a destroyed paranoid document, the slug will remain unset in the database.
-* For indexing purposes, sparse unique indexes are used. The sparse condition will ignore any destroyed paranoid documents, since their slug is not set in database.
-
-```ruby
-class Entity
-  include Mongoid::Document
-  include Mongoid::Slug
-  include Mongoid::Paranoia
-end
-```
-
-The following variants of Mongoid Paranoia are officially supported:
-
-* Mongoid 3 built-in `Mongoid::Paranoia`
-* Mongoid 4 or 5 gem http://github.com/simi/mongoid_paranoia
-
 Contributing
 ------------
 
