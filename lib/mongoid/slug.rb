@@ -75,7 +75,7 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope            = options[:scope]
-        self.slug_reserved_words   = options[:reserve] || Set.new(%w(new edit))
+        self.slug_reserved_words   = options[:reserve] || Set.new(%w[new edit])
         self.slugged_attributes    = fields.map(&:to_s)
         self.slug_history          = options[:history]
         self.slug_by_model_type    = options[:by_model_type]
@@ -85,9 +85,7 @@ module Mongoid
         alias_attribute :slugs, :_slugs
 
         # Set index
-        unless embedded?
-          index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type))
-        end
+        index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type)) unless embedded?
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
@@ -307,7 +305,7 @@ module Mongoid
 
     def localized?
       fields['_slugs'].options[:localize]
-    rescue
+    rescue StandardError
       false
     end
 

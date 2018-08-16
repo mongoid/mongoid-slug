@@ -103,9 +103,7 @@ module Mongoid
             where_hash[scope] = model.try(:read_attribute, scope)
           end
 
-          if slug_by_model_type
-            where_hash[:_type] = model.try(:read_attribute, :_type)
-          end
+          where_hash[:_type] = model.try(:read_attribute, :_type) if slug_by_model_type
 
           @state = SlugState.new @_slug, uniqueness_scope.unscoped.where(where_hash), escaped_pattern
 
@@ -167,9 +165,7 @@ module Mongoid
 
         # unless embedded or slug scope, return the deepest document superclass
         appropriate_class = model.class
-        while appropriate_class.superclass.include?(Mongoid::Document)
-          appropriate_class = appropriate_class.superclass
-        end
+        appropriate_class = appropriate_class.superclass while appropriate_class.superclass.include?(Mongoid::Document)
         appropriate_class
       end
     end
