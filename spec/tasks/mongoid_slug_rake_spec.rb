@@ -3,7 +3,7 @@ require 'rake'
 
 describe 'mongoid_slug:set' do
   before :all do
-    load File.expand_path('../../../lib/tasks/mongoid_slug.rake', __FILE__)
+    load File.expand_path('../../lib/tasks/mongoid_slug.rake', __dir__)
     Rake::Task.define_task(:environment)
   end
 

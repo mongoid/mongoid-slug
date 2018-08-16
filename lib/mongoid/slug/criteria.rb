@@ -79,7 +79,7 @@ module Mongoid
         # _translations
         localized = (begin
                        @klass.fields['_slugs'].options[:localize]
-                     rescue
+                     rescue StandardError
                        false
                      end)
         if localized

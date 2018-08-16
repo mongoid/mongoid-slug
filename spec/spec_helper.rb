@@ -9,7 +9,7 @@ require 'mongoid'
 require 'rspec/its'
 require 'mongoid/compatibility'
 
-require File.expand_path '../../lib/mongoid/slug', __FILE__
+require File.expand_path '../lib/mongoid/slug', __dir__
 
 module Mongoid
   module Slug
@@ -29,20 +29,18 @@ Mongoid.configure do |config|
   config.connect_to database_id
 end
 
-%w(models shared).each do |dir|
+%w[models shared].each do |dir|
   Dir["./spec/#{dir}/*.rb"].each { |f| require f }
 end
 
-I18n.available_locales = [:en, :nl]
+I18n.available_locales = %i[en nl]
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
 
   c.before :all do
     Mongoid.logger.level = Logger::INFO
-    if Mongoid::Compatibility::Version.mongoid5_or_newer?
-      Mongo::Logger.logger.level = Logger::INFO
-    end
+    Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5_or_newer?
   end
 
   c.before(:each) do

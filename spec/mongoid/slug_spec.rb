@@ -1,4 +1,3 @@
-# encoding: utf-8
 require 'spec_helper'
 
 module Mongoid
@@ -679,7 +678,7 @@ module Mongoid
         expect(friend2.slugs).to include('foo-2')
       end
 
-      %w(new edit).each do |word|
+      %w[new edit].each do |word|
         it "should overwrite the default reserved words allowing the word '#{word}'" do
           friend = Friend.create(name: word)
           expect(friend.slugs).to include word
@@ -687,7 +686,7 @@ module Mongoid
       end
     end
     context 'when the model does not have any reserved words set' do
-      %w(new edit).each do |word|
+      %w[new edit].each do |word|
         it "does not use the default reserved word '#{word}'" do
           book = Book.create(title: word)
           expect(book.slugs).not_to include word
@@ -885,13 +884,13 @@ module Mongoid
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
         I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-        ::I18n.fallbacks[:nl] = [:nl, :en]
+        ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
                           PageSlugLocalized.find(fallback_slug)
-                        rescue
+                        rescue StandardError
                           nil
                         end
         expect(fallback_page).to eq(page)
@@ -1048,13 +1047,13 @@ module Mongoid
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
         I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-        ::I18n.fallbacks[:nl] = [:nl, :en]
+        ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
                           PageSlugLocalizedHistory.find(fallback_slug)
-                        rescue
+                        rescue StandardError
                           nil
                         end
         expect(fallback_page).to eq(page)
