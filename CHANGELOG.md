@@ -1,6 +1,7 @@
 ## 6.0.1 (Next)
 
 * Your contribution here.
+* [#251](https://github.com/mongoid/mongoid-slug/pull/251): Use Mongoid::Config.models to get the list of all available models in mongoid_slug.rake - [@syzspectroom](https://github.com/syzspectroom).
 
 ## 6.0.0 (2018/09/17)
 
