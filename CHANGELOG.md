@@ -1,6 +1,7 @@
 ## 6.0.1 (Next)
 
 * Your contribution here.
+* [#255](https://github.com/mongoid/mongoid-slug/pull/255): Use mongoid::config#models in rake task, resolves #247 - [@kailan](https://github.com/kailan).
 
 ## 6.0.0 (2018/09/17)
 
