@@ -1,7 +1,10 @@
-## 6.0.0 (Next)
+## 6.0.1 (Next)
+
+* Your contribution here.
+
+## 6.0.0 (2018/09/17)
 
 * [#252](https://github.com/mongoid/mongoid-slug/pull/252): Compatibility with Mongoid 7.0.0+ - [@kailan](https://github.com/kailan).
-* Your contribution here.
 
 ## 5.3.3 (2017/04/06)
 
