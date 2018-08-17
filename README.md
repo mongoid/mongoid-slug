@@ -5,7 +5,6 @@ Mongoid Slug generates a URL slug or permalink based on one or more fields in a 
 
 [![Build Status](https://secure.travis-ci.org/mongoid/mongoid-slug.svg)](http://travis-ci.org/mongoid/mongoid-slug)
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
-[![Dependency Status](https://gemnasium.com/mongoid/mongoid-slug.svg)](https://gemnasium.com/mongoid/mongoid-slug)
 [![Code Climate](https://codeclimate.com/github/mongoid/mongoid-slug.svg)](https://codeclimate.com/github/mongoid/mongoid-slug)
 
 ### Installation
