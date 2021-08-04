@@ -1,0 +1,84 @@
+name: CI RSpec Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: >-
+      ${{ matrix.ruby }}
+    env:
+      CI: true
+      TESTOPTS: -v
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby: [2.3, 2.4, 2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
+        experimental: [false]
+        mongoid: [7]
+        include:
+          - ruby: 1.9
+            experimental: true
+            mongoid: 3
+          - ruby: 2.0
+            experimental: true
+            mongoid: 3
+          - ruby: 2.1
+            experimental: true
+            mongoid: 3
+          - ruby: 2.2
+            experimental: true
+            mongoid: 3
+          - ruby: 2.3
+            experimental: true
+            mongoid: 3
+          - ruby: 2.3
+            experimental: true
+            mongoid: 4
+          - ruby: 2.3
+            experimental: true
+            mongoid: 5
+          - ruby: 2.3
+            experimental: true
+            mongoid: 6
+          - ruby: head
+            experimental: true
+            mongoid: 7
+          - ruby: jruby-head
+            experimental: true
+            mongoid: 7
+          - ruby: truffleruby-head
+            experimental: true
+            mongoid: 7
+
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v2
+
+      - name: start mongodb
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: 4.4
+          mongodb-replica-set: rs0
+
+      - name: load ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: 2
+
+      - name: bundle install
+        run:  bundle install --jobs 4 --retry 3
+
+      - name: rubocop
+        timeout-minutes: 5
+        run: bundle exec rubocop
+        continue-on-error: ${{ matrix.experimental }}
+
+      - name: test
+        timeout-minutes: 10
+        run: bundle exec rake spec
+        continue-on-error: ${{ matrix.experimental }}
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
