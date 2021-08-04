@@ -248,8 +248,7 @@ module Mongoid
 
     # @return [String] the slug, or nil if the document does not have a slug.
     def slug
-      return _slugs.last if _slugs
-      _id.to_s
+      _slugs.last if _slugs
     end
 
     def slug_builder
