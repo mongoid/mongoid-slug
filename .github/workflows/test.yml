@@ -80,5 +80,5 @@ jobs:
         timeout-minutes: 10
         run: bundle exec rake spec
         continue-on-error: ${{ matrix.experimental }}
-        env:
-          MONGOID_VERSION: ${{ matrix.mongoid }}
+        # env:
+        #   MONGOID_VERSION: ${{ matrix.mongoid }}
