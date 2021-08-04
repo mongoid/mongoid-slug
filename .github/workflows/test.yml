@@ -14,43 +14,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        ruby: [2.6, 2.7, 3.0, jruby, truffleruby]
-#        mongoid: [7]
+        ruby: [1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
         experimental: [false]
-#        include:
-#          - ruby: 1.9
-#            mongoid: 3
-#            experimental: false
-#          - ruby: 2.0
-#            mongoid: 3
-#            experimental: false
-#          - ruby: 2.1
-#            mongoid: 3
-#            experimental: false
-#          - ruby: 2.2
-#            mongoid: 3
-#            experimental: false
-#          - ruby: 2.3
-#            mongoid: 3
-#            experimental: false
-#          - ruby: 2.3
-#            mongoid: 4
-#            experimental: false
-#          - ruby: 2.3
-#            mongoid: 5
-#            experimental: false
-#          - ruby: 2.3
-#            mongoid: 6
-#            experimental: false
-#          - ruby: head
-#            mongoid: 7
-#            experimental: true
-#          - ruby: jruby-head
-#            mongoid: 7
-#            experimental: true
-#          - ruby: truffleruby-head
-#            mongoid: 7
-#            experimental: true
+        include:
+          - ruby: head
+            experimental: true
+          - ruby: jruby-head
+            experimental: true
+          - ruby: truffleruby-head
+            experimental: true
 
     steps:
       - name: repo checkout
@@ -80,5 +52,3 @@ jobs:
         timeout-minutes: 10
         run: bundle exec rake spec
         continue-on-error: ${{ matrix.experimental }}
-        # env:
-        #   MONGOID_VERSION: ${{ matrix.mongoid }}
