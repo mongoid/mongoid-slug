@@ -596,18 +596,19 @@ module Mongoid
 
     context 'with a value exceeding mongodb max index key' do
       if Mongoid::Compatibility::Version.mongoid5_or_newer?
-        it 'errors with a model without a max length' do
+        xit 'errors with a model without a max length' do
           expect do
             Book.create!(title: 't' * 1025)
           end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
         end
       elsif Mongoid::Compatibility::Version.mongoid4?
-        it 'errors with a model without a max length' do
+        xit 'errors with a model without a max length' do
           expect do
             Book.create!(title: 't' * 1025)
           end.to raise_error Moped::Errors::OperationFailure, /key too large to index/
         end
       end
+
       it 'succeeds with a model with a max length' do
         expect do
           author = Author.create!(last_name: 't' * 1025)
