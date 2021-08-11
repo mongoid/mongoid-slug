@@ -6,7 +6,7 @@ describe Mongoid::Slug::IndexBuilder do
   let(:by_model_type) { false }
   let(:default_locale) { :en }
   let(:locales) { nil }
-  subject { doc.index_specifications.map {|spec| [spec.key, spec.options] } }
+  subject { doc.index_specifications.map { |spec| [spec.key, spec.options] } }
 
   before do
     allow(I18n).to receive(:default_locale).and_return(default_locale)

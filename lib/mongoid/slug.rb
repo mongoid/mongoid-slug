@@ -85,9 +85,7 @@ module Mongoid
         alias_attribute :slugs, :_slugs
 
         # Set indexes
-        unless embedded?
-          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize])
-        end
+        Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize]) unless embedded?
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
