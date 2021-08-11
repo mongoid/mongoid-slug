@@ -1,9 +1,10 @@
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model.
+It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://secure.travis-ci.org/mongoid/mongoid-slug.svg)](http://travis-ci.org/mongoid/mongoid-slug)
+[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?query=branch%3Amaster)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.ym?query=branch%3Amaster)
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
 [![Code Climate](https://codeclimate.com/github/mongoid/mongoid-slug.svg)](https://codeclimate.com/github/mongoid/mongoid-slug)
 
