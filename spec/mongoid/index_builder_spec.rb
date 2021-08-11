@@ -9,7 +9,7 @@ describe Mongoid::Slug::IndexBuilder do
 
   subject do
     if Mongoid::Compatibility::Version.mongoid3?
-      subject.index_options.to_a
+      doc.index_options.to_a
     else
       doc.index_specifications.map { |spec| [spec.key, spec.options] }
     end
