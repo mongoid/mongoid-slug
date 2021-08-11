@@ -8,6 +8,9 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Style/DoubleNegation:
+  Enabled: false
+
 Style/ModuleFunction:
   EnforcedStyle: extend_self
 

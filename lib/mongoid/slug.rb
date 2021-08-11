@@ -188,7 +188,7 @@ module Mongoid
       # avoid duplicate slugs
       _slugs&.delete(new_slug)
 
-      if !slug_history.nil? && _slugs.is_a?(Array)
+      if !!slug_history && _slugs.is_a?(Array)
         append_slug(new_slug)
       else
         self._slugs = [new_slug]
