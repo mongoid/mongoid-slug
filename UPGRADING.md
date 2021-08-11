@@ -1,3 +1,9 @@
+### Upgrading to 7.0.0
+
+#### Support dropped for Mongoid < 7 and Ruby < 2.5
+
+Please upgrade to at least Mongoid 7.0 and Ruby 2.5.
+
 ### Upgrading to 6.0.0
 
 #### Support dropped for mongoid_paranoia

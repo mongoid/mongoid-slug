@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 
 require 'rspec'
 require 'uuid'
-require 'awesome_print'
 require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
@@ -30,7 +31,7 @@ Mongoid.configure do |config|
 end
 
 %w[models shared].each do |dir|
-  Dir["./spec/#{dir}/*.rb"].each { |f| require f }
+  Dir["./spec/#{dir}/*.rb"].sort.each { |f| require f }
 end
 
 I18n.available_locales = %i[en nl]

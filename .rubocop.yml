@@ -1,6 +1,9 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
-  Exclude:
-    - vendor/**/*
+  TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
 
 Style/Documentation:
   Enabled: false
@@ -8,4 +11,9 @@ Style/Documentation:
 Style/ModuleFunction:
   EnforcedStyle: extend_self
 
-inherit_from: .rubocop_todo.yml
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Style/Semicolon:
+  Exclude:
+    - 'spec/**/*.rb'

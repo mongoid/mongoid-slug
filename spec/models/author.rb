@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Author
   include Mongoid::Document
   include Mongoid::Slug

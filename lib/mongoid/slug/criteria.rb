@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mongoid
   module Slug
     class Criteria < Mongoid::Criteria
@@ -50,6 +52,7 @@ module Mongoid
 
       def look_like_slugs?(args)
         return false unless args.all? { |id| id.is_a?(String) }
+
         id_field = @klass.fields['_id']
         @slug_strategy ||= id_field.options[:slug_id_strategy] || build_slug_strategy(id_field.type)
         args.none? { |id| @slug_strategy.call(id) }
@@ -61,7 +64,7 @@ module Mongoid
       # use object_id or string strategy depending on the id_type
       # otherwise default for all other id_types
       def build_slug_strategy(id_type)
-        type_method = id_type.to_s.downcase.split('::').last + '_slug_strategy'
+        type_method = "#{id_type.to_s.downcase.split('::').last}_slug_strategy"
         respond_to?(type_method, true) ? method(type_method) : ->(_id) { false }
       end
 
@@ -78,10 +81,10 @@ module Mongoid
       def for_slugs(slugs)
         # _translations
         localized = (begin
-                       @klass.fields['_slugs'].options[:localize]
-                     rescue StandardError
-                       false
-                     end)
+          @klass.fields['_slugs'].options[:localize]
+        rescue StandardError
+          false
+        end)
         if localized
           def_loc = I18n.default_locale
           query = { '$in' => slugs }
@@ -100,6 +103,7 @@ module Mongoid
       def check_for_missing_documents_for_slugs!(result, slugs)
         missing_slugs = slugs - result.map(&:slugs).flatten
         return unless !missing_slugs.blank? && Mongoid.raise_not_found_error
+
         raise Errors::DocumentNotFound.new(klass, slugs, missing_slugs)
       end
     end

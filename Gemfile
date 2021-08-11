@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 gemspec name: 'mongoid-slug'
@@ -13,5 +15,6 @@ end
 
 group :test do
   gem 'mongoid-danger', '~> 0.1.0', require: false
-  gem 'rubocop', '1.18.4'
+  gem 'rubocop', '~> 1.18.4'
+  gem 'rubocop-rspec'
 end

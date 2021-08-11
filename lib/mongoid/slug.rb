@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid'
 require 'stringex'
 require 'mongoid/slug/criteria'
@@ -29,6 +31,7 @@ module Mongoid
 
     class << self
       attr_accessor :default_slug
+
       def configure(&block)
         instance_eval(&block)
       end
@@ -85,7 +88,10 @@ module Mongoid
         alias_attribute :slugs, :_slugs
 
         # Set indexes
-        Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize]) unless embedded?
+        unless embedded?
+          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type,
+                                                    options[:localize])
+        end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
@@ -111,6 +117,7 @@ module Mongoid
       # @return [ Array<Document>, Document ]
       def slug_scope_key
         return nil unless slug_scope
+
         reflect_on_association(slug_scope).try(:key) || slug_scope
       end
 
@@ -180,9 +187,9 @@ module Mongoid
       return true if new_slug.size.zero?
 
       # avoid duplicate slugs
-      _slugs.delete(new_slug) if _slugs
+      _slugs&.delete(new_slug)
 
-      if !!slug_history && _slugs.is_a?(Array)
+      if !slug_history.nil? && _slugs.is_a?(Array)
         append_slug(new_slug)
       else
         self._slugs = [new_slug]
@@ -245,6 +252,7 @@ module Mongoid
     # @return [String] the slug, or nil if the document does not have a slug.
     def slug
       return _slugs.last if _slugs
+
       _id.to_s
     end
 

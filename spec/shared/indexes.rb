@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_context 'with an index' do |key|
   let(:index) { subject.index_specifications.detect { |spec| spec.key == key } }
   let(:index_keys) { index.key }

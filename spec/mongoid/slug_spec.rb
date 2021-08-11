@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Mongoid
@@ -67,7 +69,8 @@ module Mongoid
         expect(entity0.to_param).to eql 'pelham-1-2-3'
 
         5.times do |x|
-          dup = Entity.create(_id: UUID.generate, name: entity0.name, user_edited_variation: entity0.user_edited_variation)
+          dup = Entity.create(_id: UUID.generate, name: entity0.name,
+                              user_edited_variation: entity0.user_edited_variation)
           expect(dup.to_param).to eql "pelham-1-2-3-#{x.succ}"
         end
       end
@@ -761,16 +764,16 @@ module Mongoid
     end
 
     describe 'when regular expression matches, but document does not' do
-      let!(:book_1) { Book.create(title: 'book-1') }
-      let!(:book_2) { Book.create(title: 'book') }
-      let!(:book_3) { Book.create(title: 'book') }
+      let!(:book1) { Book.create(title: 'book-1') }
+      let!(:book2) { Book.create(title: 'book') }
+      let!(:book3) { Book.create(title: 'book') }
 
-      it 'book_2 should have the user supplied title without -1 after it' do
-        expect(book_2.to_param).to eql 'book'
+      it 'book2 should have the user supplied title without -1 after it' do
+        expect(book2.to_param).to eql 'book'
       end
 
-      it 'book_3 should have a generated slug' do
-        expect(book_3.to_param).to eql 'book-2'
+      it 'book3 should have a generated slug' do
+        expect(book3.to_param).to eql 'book-2'
       end
     end
 
@@ -860,16 +863,16 @@ module Mongoid
 
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
-        I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+        I18n::Backend::Simple.include I18n::Backend::Fallbacks
         ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
-                          PageSlugLocalized.find(fallback_slug)
-                        rescue StandardError
-                          nil
-                        end
+          PageSlugLocalized.find(fallback_slug)
+        rescue StandardError
+          nil
+        end
         expect(fallback_page).to eq(page)
 
         # Restore fallback for next tests
@@ -901,7 +904,8 @@ module Mongoid
         page.save
         expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-english'])
 
-        page = PageSlugLocalized.create(title_translations: { 'en' => 'Title on English2', 'nl' => 'Title on English2' })
+        page = PageSlugLocalized.create(title_translations: { 'en' => 'Title on English2',
+                                                              'nl' => 'Title on English2' })
         expect(page._slugs_translations).to eq('en' => ['title-on-english2'], 'nl' => ['title-on-english2'])
       end
 
@@ -1023,16 +1027,16 @@ module Mongoid
 
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
-        I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+        I18n::Backend::Simple.include I18n::Backend::Fallbacks
         ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
-                          PageSlugLocalizedHistory.find(fallback_slug)
-                        rescue StandardError
-                          nil
-                        end
+          PageSlugLocalizedHistory.find(fallback_slug)
+        rescue StandardError
+          nil
+        end
         expect(fallback_page).to eq(page)
       end
 
@@ -1043,8 +1047,8 @@ module Mongoid
         page.title_translations = { 'en' => 'Modified Title on English',
                                     'nl' => 'Modified Title on Netherlands' }
         page.save
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
-                                               'nl' => ['title-on-netherlands', 'modified-title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
+                                               'nl' => %w[title-on-netherlands modified-title-on-netherlands])
       end
 
       it 'does not produce duplicate slugs' do
@@ -1082,7 +1086,7 @@ module Mongoid
         page.save
         expect(page.title_translations).to eq('en' => 'Modified Title on English',
                                               'nl' => 'Title on Netherlands')
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
                                                'nl' => ['title-on-netherlands'])
       end
 
@@ -1101,7 +1105,7 @@ module Mongoid
         page.save
         page.title_translations = { 'en' => 'Modified Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
                                                'nl' => ['title-on-netherlands'])
       end
     end

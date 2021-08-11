@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PageLocalize
   include Mongoid::Document
   include Mongoid::Slug

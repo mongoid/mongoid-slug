@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 # Can use e.g. Mongoid::Slug::UniqueSlug.new(ModelClass.new).find_unique "slug-1" for auto-suggest ui
@@ -20,9 +22,12 @@ module Mongoid
           @documents.each do |doc|
             history_slugs = doc._slugs
             next if history_slugs.nil?
+
             existing_slugs.push(*history_slugs.find_all { |cur_slug| cur_slug =~ regexp_pattern })
             last_entered_slug.push(*history_slugs.last) if history_slugs.last =~ regexp_pattern
-            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all { |cur_slug| cur_slug =~ regexp_pattern })
+            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all do |cur_slug|
+                                          cur_slug =~ regexp_pattern
+                                        end)
           end
         end
 
@@ -111,7 +116,7 @@ module Mongoid
           @state.include_slug unless model.class.look_like_slugs?([@_slug])
 
           # make sure that the slug is not equal to a reserved word
-          @state.include_slug if slug_reserved_words.any? { |word| word === @_slug }
+          @state.include_slug if slug_reserved_words.any? { |word| word == @_slug }
 
           # only look for a new unique slug if the existing slugs contains the current slug
           # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.
