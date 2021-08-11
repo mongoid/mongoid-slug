@@ -26,9 +26,9 @@ jobs:
           - ruby: 2.3
             mongoid: 3
             experimental: false
-          - ruby: 2.3
-            mongoid: 4
-            experimental: false
+#          - ruby: 2.3
+#            mongoid: 4
+#            experimental: false
           - ruby: 2.3
             mongoid: 5
             experimental: false
