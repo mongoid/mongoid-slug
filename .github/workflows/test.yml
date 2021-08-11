@@ -71,6 +71,8 @@ jobs:
         timeout-minutes: 5
         run: bundle exec rubocop
         continue-on-error: ${{ matrix.experimental }}
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
 
       - name: test
         timeout-minutes: 10
