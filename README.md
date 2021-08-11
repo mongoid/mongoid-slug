@@ -287,10 +287,9 @@ class PageSlugLocalize
 end
 ```
 
-By specifying `localize: true`, the slug index will be created on the default locale field only.
-
-For example, if the [I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api)
-is set to `:en`, the index spec generated will be as follows:
+By specifying `localize: true`, the slug index will be created on the
+[I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) field only.
+For example, if `I18n.default_locale` is `:en`, the index will be generated as follows:
 
 ```ruby
 slug :title, localize: true
@@ -299,7 +298,7 @@ slug :title, localize: true
 index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
 ```
 
-If you are supporting multiple locales, you can specify the list of locales on which
+If you are supporting multiple locales, you may specify the list of locales on which
 to create indexes as an `Array`.
 
 ```ruby
