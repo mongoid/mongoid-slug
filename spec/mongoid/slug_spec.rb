@@ -1134,18 +1134,23 @@ module Mongoid
       before do
         Author.create_indexes
       end
+
       after do
         Author.remove_indexes
       end
+
       it 'can be assigned to nil' do
         expect(Book.slug_max_length).to be nil
       end
+
       it 'defaults to MONGO_INDEX_KEY_LIMIT_BYTES - 32' do
         expect(Article.slug_max_length).to eq Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32
       end
+
       it 'is assigned via max_length' do
         expect(Author.slug_max_length).to eq 256
       end
+
       it 'enforces max length of slug' do
         author1 = Author.create!(last_name: 't' * 1024)
         expect(author1.slug.length).to eq 256

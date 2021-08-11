@@ -21,5 +21,5 @@ end
 
 group :test do
   gem 'mongoid-danger', '~> 0.1.0', require: false
-  gem 'rubocop', '0.58.2'
+  gem 'rubocop', '0.57.2'
 end

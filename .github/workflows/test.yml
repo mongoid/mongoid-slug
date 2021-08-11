@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
-      fail-fast: true
       matrix:
         ruby: [2.3, 2.4, 2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
         mongoid: [7]
@@ -27,9 +26,9 @@ jobs:
           - ruby: 2.3
             mongoid: 3
             experimental: false
-          - ruby: 2.3
-            mongoid: 4
-            experimental: false
+          # - ruby: 2.3
+          #   mongoid: 4
+          #   experimental: false
           - ruby: 2.3
             mongoid: 5
             experimental: false
@@ -64,11 +63,15 @@ jobs:
 
       - name: bundle install
         run:  bundle install --jobs 4 --retry 3
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
 
       - name: rubocop
         timeout-minutes: 5
         run: bundle exec rubocop
         continue-on-error: ${{ matrix.experimental }}
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
 
       - name: test
         timeout-minutes: 10
