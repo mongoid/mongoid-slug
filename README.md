@@ -8,6 +8,12 @@ It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting n
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
 [![Code Climate](https://codeclimate.com/github/mongoid/mongoid-slug.svg)](https://codeclimate.com/github/mongoid/mongoid-slug)
 
+### Version Support
+
+Mongoid Slug 7.x requires at least Mongoid 7.0.0 and Ruby 2.5.0.
+
+For earlier Mongoid and Ruby version support, please use an earlier version of Mongoid Slug.
+
 ### Installation
 
 Add to your Gemfile:

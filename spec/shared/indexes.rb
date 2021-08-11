@@ -1,13 +1,7 @@
 shared_context 'with an index' do |key|
-  if Mongoid::Compatibility::Version.mongoid3?
-    let(:index) { subject.index_options[key] }
-    let(:index_keys) { key }
-    let(:index_options) { index }
-  else
-    let(:index) { subject.index_specifications.detect { |spec| spec.key == key } }
-    let(:index_keys) { index.key }
-    let(:index_options) { index.options }
-  end
+  let(:index) { subject.index_specifications.detect { |spec| spec.key == key } }
+  let(:index_keys) { index.key }
+  let(:index_options) { index.options }
 end
 
 shared_examples 'has an index' do |key, options|

@@ -141,17 +141,13 @@ module Mongoid
 
       private
 
-      if Mongoid::Compatibility::Version.mongoid5_or_newer? && Threaded.method(:current_scope).arity == -1
+      if Threaded.method(:current_scope).arity == -1
         def current_scope
           Threaded.current_scope(self)
         end
-      elsif Mongoid::Compatibility::Version.mongoid5_or_newer?
-        def current_scope
-          Threaded.current_scope
-        end
       else
         def current_scope
-          scope_stack.last
+          Threaded.current_scope
         end
       end
     end

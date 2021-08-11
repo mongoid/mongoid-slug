@@ -7,19 +7,11 @@ when 'HEAD'
   gem 'mongoid', github: 'mongodb/mongoid'
 when /^7/
   gem 'mongoid', '~> 7'
-when /^6/
-  gem 'mongoid', '~> 6'
-when /^5/
-  gem 'mongoid', '~> 5'
-when /^4/
-  gem 'mongoid', '~> 4'
-when /^3/
-  gem 'mongoid', '~> 3'
 else
   gem 'mongoid', version
 end
 
 group :test do
   gem 'mongoid-danger', '~> 0.1.0', require: false
-  gem 'rubocop', '0.57.2'
+  gem 'rubocop', '1.18.4'
 end

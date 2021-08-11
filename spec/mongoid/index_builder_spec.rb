@@ -7,13 +7,7 @@ describe Mongoid::Slug::IndexBuilder do
   let(:default_locale) { :en }
   let(:locales) { nil }
 
-  subject do
-    if Mongoid::Compatibility::Version.mongoid3?
-      doc.index_options.to_a
-    else
-      doc.index_specifications.map { |spec| [spec.key, spec.options] }
-    end
-  end
+  subject { doc.index_specifications.map { |spec| [spec.key, spec.options] } }
 
   before do
     allow(I18n).to receive(:default_locale).and_return(default_locale)

@@ -12,9 +12,7 @@ Gem::Specification.new do |s|
   s.description = 'Mongoid URL slug or permalink generator'
   s.license     = 'MIT'
 
-  s.rubyforge_project = 'mongoid-slug'
-
-  s.add_dependency 'mongoid', '>= 3.0'
+  s.add_dependency 'mongoid', '>= 7.0'
   s.add_dependency 'mongoid-compatibility'
   s.add_dependency 'stringex', '~> 2.0'
   s.add_development_dependency 'awesome_print'

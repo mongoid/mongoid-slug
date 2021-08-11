@@ -132,7 +132,7 @@ module Mongoid
       # index to match /^.../ pattern.
       # Use Regexp::Raw to avoid the multiline option when querying the server.
       def regex_for_slug
-        if embedded? || Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
+        if embedded?
           Regexp.new(escaped_pattern)
         else
           BSON::Regexp::Raw.new(escaped_pattern)
@@ -155,11 +155,7 @@ module Mongoid
         end
 
         if embedded?
-          parent_metadata = if Mongoid::Compatibility::Version.mongoid7_or_newer?
-                              reflect_on_all_association(:embedded_in)[0]
-                            else
-                              reflect_on_all_associations(:embedded_in)[0]
-                            end
+          parent_metadata = reflect_on_all_association(:embedded_in)[0]
           return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 

@@ -1,6 +1,6 @@
-## 6.0.2 (Next)
+## 7.0.0 (Next)
 
-* Your contribution here.
+* [#268](https://github.com/mongoid/mongoid-slug/pull/268): Ensure localized slugs index expected localized slug fields - [@johnnyshields](https://github.com/johnnyshields).
 
 ## 6.0.1 (2021/08/12)
 

@@ -67,7 +67,7 @@ module Mongoid
 
       # a string will not look like a slug if it looks like a legal BSON::ObjectId
       def objectid_slug_strategy(id)
-        Mongoid::Compatibility::ObjectId.legal?(id)
+        BSON::ObjectId.legal?(id)
       end
 
       # a string will always look like a slug
