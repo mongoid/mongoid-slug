@@ -4,7 +4,7 @@
 
 ## 6.0.1 (2021/08/12)
 
-* [#243](https://github.com/mongoid/mongoid-slug/pull/266): Ensure localized slugs index expected localized slug fields - [@onomated](https://github.com/onomated), [@johnnyshields](https://github.com/johnnyshields).
+* [#266](https://github.com/mongoid/mongoid-slug/pull/266): Ensure localized slugs index expected localized slug fields - [@onomated](https://github.com/onomated), [@johnnyshields](https://github.com/johnnyshields).
 * [#265](https://github.com/mongoid/mongoid-slug/pull/265): Add Github Actions and remove Travis CI - [@johnnyshields](https://github.com/kailan).
 * [#255](https://github.com/mongoid/mongoid-slug/pull/255): Use mongoid::config#models in rake task, resolves #247 - [@kailan](https://github.com/kailan).
 
