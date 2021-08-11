@@ -29,14 +29,17 @@ jobs:
           # - ruby: 2.3
           #   mongoid: 4
           #   experimental: false
-          - ruby: 2.3
-            mongoid: 5
-            experimental: false
-          - ruby: 2.3
-            mongoid: 6
-            experimental: false
+          - ruby: 2.7
+            mongoid: HEAD
+            experimental: true
+          - ruby: 3.0
+            mongoid: HEAD
+            experimental: true
           - ruby: head
             mongoid: 7
+            experimental: true
+          - ruby: head
+            mongoid: HEAD
             experimental: true
           - ruby: jruby-head
             mongoid: 7
