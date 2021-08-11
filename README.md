@@ -295,7 +295,7 @@ For example, if `I18n.default_locale` is `:en`, the index will be generated as f
 ```ruby
 slug :title, localize: true
 
-# The following indexes is auto-generated:
+# The following index is auto-generated:
 index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
 ```
 
