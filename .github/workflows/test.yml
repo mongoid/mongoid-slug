@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
-      fail-fast: true
       matrix:
         ruby: [2.3, 2.4, 2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
         mongoid: [7]
