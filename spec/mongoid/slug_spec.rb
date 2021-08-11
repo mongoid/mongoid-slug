@@ -598,21 +598,6 @@ module Mongoid
       it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
     end
 
-    context 'with a value exceeding mongodb max index key' do
-      xit 'errors with a model without a max length' do
-        expect do
-          Book.create!(title: 't' * 1025)
-        end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
-      end
-
-      it 'succeeds with a model with a max length' do
-        expect do
-          author = Author.create!(last_name: 't' * 1025)
-          expect(author.slug.length).to eq 256
-        end.to_not raise_error
-      end
-    end
-
     context 'when slug is scoped by a reference association' do
       subject { Author }
       it_should_behave_like 'does not have an index', _slugs: 1
@@ -1133,6 +1118,8 @@ module Mongoid
         expect(Author.slug_max_length).to eq 256
       end
 
+      # TODO: the max length should be strictly enforced to be X chars
+      # including the numbers. Currently numbers make it go over X.
       it 'enforces max length of slug' do
         author1 = Author.create!(last_name: 't' * 1024)
         expect(author1.slug.length).to eq 256
@@ -1143,6 +1130,18 @@ module Mongoid
         author3 = Author.create!(last_name: 't' * 1024)
         expect(author3.slug.length).to eq 258
         expect(author3.slug.ends_with?('tt-2')).to be true
+      end
+
+      it 'does not enforce max length if not set' do
+        book1 = Book.create!(title: 't' * 1024)
+        expect(book1.slug.length).to eq 1024
+        expect(book1.slug.ends_with?('ttt')).to be true
+        book2 = Book.create!(title: 't' * 1024)
+        expect(book2.slug.length).to eq 1026
+        expect(book2.slug.ends_with?('tt-1')).to be true
+        book3 = Book.create!(title: 't' * 1024)
+        expect(book3.slug.length).to eq 1026
+        expect(book3.slug.ends_with?('tt-2')).to be true
       end
     end
 

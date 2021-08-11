@@ -11,8 +11,10 @@ It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting n
 ### Version Support
 
 Mongoid Slug 7.x requires at least Mongoid 7.0.0 and Ruby 2.5.0.
-
 For earlier Mongoid and Ruby version support, please use an earlier version of Mongoid Slug.
+
+Mongoid Slug is compatible with all MongoDB versions which Mongoid supports,
+however, please see "Slug Max Length" section below for MongoDB 4.0 and earlier.
 
 ### Installation
 
@@ -175,9 +177,16 @@ class Employee
 end
 ```
 
-### Limit Slug Length
+### Slug Max Length
 
-MongoDB has a default limit around 1KB to the size of the index keys and will raise error 17280, `key too large to index` when trying to create a record that causes an index key to exceed that limit. By default slugs are of the form `text[-number]` and the text portion is limited in size to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes. You can change this limit with `max_length` or set it to `nil` if you're running MongoDB with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
+MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)
+"4.0" and earlier applies an [Index Key Limit](https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Index-Key-Limit)
+which limits the total size of an index entry to around 1KB and will raise error,
+`17280 - key too large to index` when trying to create a record that causes an index key to exceed that limit.
+By default slugs are of the form `text[-number]` and the text portion is limited in size
+to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes.
+You can change this limit with `max_length` or set it to `nil` if you're running MongoDB
+with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
 
 ```ruby
 class Company
