@@ -46,6 +46,7 @@ Mongoid Slug will attempt to determine whether you want to find using the `slugs
 ```ruby
 Book.fields['_id'].type
 => String
+
 book = Book.find 'a-thousand-plateaus' # Finds by slugs
 => ...
 
@@ -61,8 +62,10 @@ end
 
 Post.fields['_id'].type
 => String
+
 post = Post.find 'a-thousand-plateaus' # Finds by slugs
 => ...
+
 post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 => ...
 ```
@@ -271,7 +274,8 @@ Specifying an array of custom reserved words will overwrite these defaults.
 
 ### Localize Slugs
 
-The slugs can be localized:
+The slugs can be localized. This feature is built upon Mongoid localized fields,
+so fallbacks and localization works as documented in the Mongoid manual.
 
 ```ruby
 class PageSlugLocalize
@@ -283,7 +287,28 @@ class PageSlugLocalize
 end
 ```
 
-This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
+By specifying `localize: true`, the slug index will be created on the
+[I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) field only.
+For example, if `I18n.default_locale` is `:en`, the index will be generated as follows:
+
+```ruby
+slug :title, localize: true
+
+# The following indexes is auto-generated:
+index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
+```
+
+If you are supporting multiple locales, you may specify the list of locales on which
+to create indexes as an `Array`.
+
+```ruby
+slug :title, localize: [:fr, :es, :de]
+
+# The following indexes are auto-generated:
+index({ '_slugs.fr' => 1 }, { unique: true, sparse: true })
+index({ '_slugs.es' => 1 }, { unique: true, sparse: true })
+index({ '_slugs.de' => 1 }, { unique: true, sparse: true })
+```
 
 ### Custom Find Strategies
 

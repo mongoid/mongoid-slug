@@ -1,7 +1,7 @@
 require 'mongoid'
 require 'stringex'
 require 'mongoid/slug/criteria'
-require 'mongoid/slug/index'
+require 'mongoid/slug/index_builder'
 require 'mongoid/slug/unique_slug'
 require 'mongoid/slug/slug_id_strategy'
 require 'mongoid-compatibility'
@@ -84,8 +84,8 @@ module Mongoid
         field :_slugs, type: Array, localize: options[:localize]
         alias_attribute :slugs, :_slugs
 
-        # Set index
-        index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type)) unless embedded?
+        # Set indexes
+        Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize]) unless embedded?
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
