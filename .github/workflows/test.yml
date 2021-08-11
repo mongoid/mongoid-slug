@@ -29,6 +29,12 @@ jobs:
           # - ruby: 2.3
           #   mongoid: 4
           #   experimental: false
+          - ruby: 2.3
+            mongoid: 5
+            experimental: false
+          - ruby: 2.3
+            mongoid: 6
+            experimental: false
           - ruby: 2.7
             mongoid: HEAD
             experimental: true
