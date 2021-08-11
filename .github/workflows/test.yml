@@ -64,6 +64,8 @@ jobs:
 
       - name: bundle install
         run:  bundle install --jobs 4 --retry 3
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
 
       - name: rubocop
         timeout-minutes: 5
