@@ -116,7 +116,7 @@ module Mongoid
           @state.include_slug unless model.class.look_like_slugs?([@_slug])
 
           # make sure that the slug is not equal to a reserved word
-          @state.include_slug if slug_reserved_words.any? { |word| word == @_slug }
+          @state.include_slug if slug_reserved_words.any? { |word| word === @_slug }
 
           # only look for a new unique slug if the existing slugs contains the current slug
           # - e.g if the slug 'foo-2' is taken, but 'foo' is available, the user can use 'foo'.

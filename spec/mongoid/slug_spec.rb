@@ -407,6 +407,7 @@ module Mongoid
           expect(book.slugs.find_all { |slug| slug == 'book-title' }.size).to eql 1
         end
       end
+
       context 'false' do
         let(:author) do
           Author.create(first_name: 'Gilles', last_name: 'Deleuze')
@@ -681,6 +682,7 @@ module Mongoid
         end
       end
     end
+
     context 'when the model does not have any reserved words set' do
       %w[new edit].each do |word|
         it "does not use the default reserved word '#{word}'" do

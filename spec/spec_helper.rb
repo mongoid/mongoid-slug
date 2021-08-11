@@ -3,12 +3,11 @@
 require 'bundler/setup'
 
 require 'rspec'
+require 'rspec/its'
 require 'uuid'
 require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
-require 'rspec/its'
-require 'mongoid/compatibility'
 
 require File.expand_path '../lib/mongoid/slug', __dir__
 
