@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module Mongoid
@@ -67,7 +69,8 @@ module Mongoid
         expect(entity0.to_param).to eql 'pelham-1-2-3'
 
         5.times do |x|
-          dup = Entity.create(_id: UUID.generate, name: entity0.name, user_edited_variation: entity0.user_edited_variation)
+          dup = Entity.create(_id: UUID.generate, name: entity0.name,
+                              user_edited_variation: entity0.user_edited_variation)
           expect(dup.to_param).to eql "pelham-1-2-3-#{x.succ}"
         end
       end
@@ -121,7 +124,7 @@ module Mongoid
       end
 
       it 'does not allow a BSON::ObjectId as use for a slug' do
-        bson_id = Mongoid::Compatibility::Version.mongoid3? ? Moped::BSON::ObjectId.new.to_s : BSON::ObjectId.new.to_s
+        bson_id = BSON::ObjectId.new.to_s
         bad = Book.create(title: bson_id)
         expect(bad.slugs).not_to include(bson_id)
       end
@@ -404,6 +407,7 @@ module Mongoid
           expect(book.slugs.find_all { |slug| slug == 'book-title' }.size).to eql 1
         end
       end
+
       context 'false' do
         let(:author) do
           Author.create(first_name: 'Gilles', last_name: 'Deleuze')
@@ -594,29 +598,6 @@ module Mongoid
       it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
     end
 
-    context 'with a value exceeding mongodb max index key' do
-      if Mongoid::Compatibility::Version.mongoid5_or_newer?
-        xit 'errors with a model without a max length' do
-          expect do
-            Book.create!(title: 't' * 1025)
-          end.to raise_error Mongo::Error::OperationFailure, /key too large to index/
-        end
-      elsif Mongoid::Compatibility::Version.mongoid4?
-        xit 'errors with a model without a max length' do
-          expect do
-            Book.create!(title: 't' * 1025)
-          end.to raise_error Moped::Errors::OperationFailure, /key too large to index/
-        end
-      end
-
-      it 'succeeds with a model with a max length' do
-        expect do
-          author = Author.create!(last_name: 't' * 1025)
-          expect(author.slug.length).to eq 256
-        end.to_not raise_error
-      end
-    end
-
     context 'when slug is scoped by a reference association' do
       subject { Author }
       it_should_behave_like 'does not have an index', _slugs: 1
@@ -686,6 +667,7 @@ module Mongoid
         end
       end
     end
+
     context 'when the model does not have any reserved words set' do
       %w[new edit].each do |word|
         it "does not use the default reserved word '#{word}'" do
@@ -736,11 +718,7 @@ module Mongoid
 
       context 'when called on an existing record with no slug' do
         let!(:book_no_slug) do
-          if Mongoid::Compatibility::Version.mongoid5_or_newer?
-            Book.collection.insert_one(title: 'Proust and Signs')
-          else
-            Book.collection.insert(title: 'Proust and Signs')
-          end
+          Book.collection.insert_one(title: 'Proust and Signs')
           Book.where(title: 'Proust and Signs').first
         end
 
@@ -773,16 +751,16 @@ module Mongoid
     end
 
     describe 'when regular expression matches, but document does not' do
-      let!(:book_1) { Book.create(title: 'book-1') }
-      let!(:book_2) { Book.create(title: 'book') }
-      let!(:book_3) { Book.create(title: 'book') }
+      let!(:book1) { Book.create(title: 'book-1') }
+      let!(:book2) { Book.create(title: 'book') }
+      let!(:book3) { Book.create(title: 'book') }
 
-      it 'book_2 should have the user supplied title without -1 after it' do
-        expect(book_2.to_param).to eql 'book'
+      it 'book2 should have the user supplied title without -1 after it' do
+        expect(book2.to_param).to eql 'book'
       end
 
-      it 'book_3 should have a generated slug' do
-        expect(book_3.to_param).to eql 'book-2'
+      it 'book3 should have a generated slug' do
+        expect(book3.to_param).to eql 'book-2'
       end
     end
 
@@ -796,15 +774,9 @@ module Mongoid
         it 'ensures uniqueness' do
           book1 = Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
           expect(book1.to_param).to eql 'not-what-you-expected'
-          if Mongoid::Compatibility::Version.mongoid5_or_newer?
-            expect do
-              Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
-            end.to raise_error Mongo::Error::OperationFailure, /duplicate/
-          elsif Mongoid::Compatibility::Version.mongoid4?
-            expect do
-              Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
-            end.to raise_error Moped::Errors::OperationFailure, /duplicate/
-          end
+          expect do
+            Book.create(title: 'A Thousand Plateaus', slugs: ['not-what-you-expected'])
+          end.to raise_error Mongo::Error::OperationFailure, /duplicate/
         end
 
         it 'updates the slug when a new one is passed in' do
@@ -825,15 +797,9 @@ module Mongoid
           Book.create(title: 'Sleepyhead')
           book2 = Book.create(title: 'A Thousand Plateaus')
           book2.slugs.push 'sleepyhead'
-          if Mongoid::Compatibility::Version.mongoid5_or_newer?
-            expect do
-              book2.save
-            end.to raise_error Mongo::Error::OperationFailure, /duplicate/
-          elsif Mongoid::Compatibility::Version.mongoid4?
-            expect do
-              book2.save
-            end.to raise_error Moped::Errors::OperationFailure, /duplicate/
-          end
+          expect do
+            book2.save
+          end.to raise_error Mongo::Error::OperationFailure, /duplicate/
         end
       end
 
@@ -884,16 +850,16 @@ module Mongoid
 
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
-        I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+        I18n::Backend::Simple.include I18n::Backend::Fallbacks
         ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
-                          PageSlugLocalized.find(fallback_slug)
-                        rescue StandardError
-                          nil
-                        end
+          PageSlugLocalized.find(fallback_slug)
+        rescue StandardError
+          nil
+        end
         expect(fallback_page).to eq(page)
 
         # Restore fallback for next tests
@@ -925,7 +891,8 @@ module Mongoid
         page.save
         expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-english'])
 
-        page = PageSlugLocalized.create(title_translations: { 'en' => 'Title on English2', 'nl' => 'Title on English2' })
+        page = PageSlugLocalized.create(title_translations: { 'en' => 'Title on English2',
+                                                              'nl' => 'Title on English2' })
         expect(page._slugs_translations).to eq('en' => ['title-on-english2'], 'nl' => ['title-on-english2'])
       end
 
@@ -1047,16 +1014,16 @@ module Mongoid
 
         # Turn on i18n fallback
         require 'i18n/backend/fallbacks'
-        I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+        I18n::Backend::Simple.include I18n::Backend::Fallbacks
         ::I18n.fallbacks[:nl] = %i[nl en]
         expect(page.slug).to eql 'title-on-english'
         fallback_slug = page.slug
 
         fallback_page = begin
-                          PageSlugLocalizedHistory.find(fallback_slug)
-                        rescue StandardError
-                          nil
-                        end
+          PageSlugLocalizedHistory.find(fallback_slug)
+        rescue StandardError
+          nil
+        end
         expect(fallback_page).to eq(page)
       end
 
@@ -1067,8 +1034,8 @@ module Mongoid
         page.title_translations = { 'en' => 'Modified Title on English',
                                     'nl' => 'Modified Title on Netherlands' }
         page.save
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
-                                               'nl' => ['title-on-netherlands', 'modified-title-on-netherlands'])
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
+                                               'nl' => %w[title-on-netherlands modified-title-on-netherlands])
       end
 
       it 'does not produce duplicate slugs' do
@@ -1106,7 +1073,7 @@ module Mongoid
         page.save
         expect(page.title_translations).to eq('en' => 'Modified Title on English',
                                               'nl' => 'Title on Netherlands')
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
                                                'nl' => ['title-on-netherlands'])
       end
 
@@ -1125,7 +1092,7 @@ module Mongoid
         page.save
         page.title_translations = { 'en' => 'Modified Title on English', 'nl' => 'Title on Netherlands' }
         page.save
-        expect(page._slugs_translations).to eq('en' => ['title-on-english', 'modified-title-on-english'],
+        expect(page._slugs_translations).to eq('en' => %w[title-on-english modified-title-on-english],
                                                'nl' => ['title-on-netherlands'])
       end
     end
@@ -1151,6 +1118,8 @@ module Mongoid
         expect(Author.slug_max_length).to eq 256
       end
 
+      # TODO: the max length should be strictly enforced to be X chars
+      # including the numbers. Currently numbers make it go over X.
       it 'enforces max length of slug' do
         author1 = Author.create!(last_name: 't' * 1024)
         expect(author1.slug.length).to eq 256
@@ -1161,6 +1130,18 @@ module Mongoid
         author3 = Author.create!(last_name: 't' * 1024)
         expect(author3.slug.length).to eq 258
         expect(author3.slug.ends_with?('tt-2')).to be true
+      end
+
+      it 'does not enforce max length if not set' do
+        book1 = Book.create!(title: 't' * 1024)
+        expect(book1.slug.length).to eq 1024
+        expect(book1.slug.ends_with?('ttt')).to be true
+        book2 = Book.create!(title: 't' * 1024)
+        expect(book2.slug.length).to eq 1026
+        expect(book2.slug.ends_with?('tt-1')).to be true
+        book3 = Book.create!(title: 't' * 1024)
+        expect(book3.slug.length).to eq 1026
+        expect(book3.slug.ends_with?('tt-2')).to be true
       end
     end
 

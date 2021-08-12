@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Relationship
   include Mongoid::Document
   include Mongoid::Slug

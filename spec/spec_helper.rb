@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 
 require 'rspec'
+require 'rspec/its'
 require 'uuid'
-require 'awesome_print'
 require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
-require 'rspec/its'
-require 'mongoid/compatibility'
 
 require File.expand_path '../lib/mongoid/slug', __dir__
 
@@ -30,7 +30,7 @@ Mongoid.configure do |config|
 end
 
 %w[models shared].each do |dir|
-  Dir["./spec/#{dir}/*.rb"].each { |f| require f }
+  Dir["./spec/#{dir}/*.rb"].sort.each { |f| require f }
 end
 
 I18n.available_locales = %i[en nl]
@@ -40,7 +40,7 @@ RSpec.configure do |c|
 
   c.before :all do
     Mongoid.logger.level = Logger::INFO
-    Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5_or_newer?
+    Mongo::Logger.logger.level = Logger::INFO
   end
 
   c.before(:each) do
@@ -48,14 +48,9 @@ RSpec.configure do |c|
     Book.create_indexes
     AuthorPolymorphic.create_indexes
     BookPolymorphic.create_indexes
-    Mongoid::IdentityMap.clear if defined?(Mongoid::IdentityMap)
   end
 
   c.after(:each) do
-    if Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
-      Mongoid.default_session.drop
-    else
-      Mongoid::Clients.default.database.drop
-    end
+    Mongoid::Clients.default.database.drop
   end
 end
