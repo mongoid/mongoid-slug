@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.push File.expand_path('lib', __dir__)
 require 'mongoid/slug/version'
 
@@ -12,13 +14,10 @@ Gem::Specification.new do |s|
   s.description = 'Mongoid URL slug or permalink generator'
   s.license     = 'MIT'
 
-  s.rubyforge_project = 'mongoid-slug'
+  s.required_ruby_version = '>= 2.5'
 
-  s.add_dependency 'mongoid', '>= 3.0'
-  s.add_dependency 'mongoid-compatibility'
+  s.add_dependency 'mongoid', '>= 7.0'
   s.add_dependency 'stringex', '~> 2.0'
-  s.add_development_dependency 'awesome_print'
-  s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rspec-its'

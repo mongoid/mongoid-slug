@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 
 # Can use e.g. Mongoid::Slug::UniqueSlug.new(ModelClass.new).find_unique "slug-1" for auto-suggest ui
@@ -20,9 +22,12 @@ module Mongoid
           @documents.each do |doc|
             history_slugs = doc._slugs
             next if history_slugs.nil?
+
             existing_slugs.push(*history_slugs.find_all { |cur_slug| cur_slug =~ regexp_pattern })
             last_entered_slug.push(*history_slugs.last) if history_slugs.last =~ regexp_pattern
-            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all { |cur_slug| cur_slug =~ regexp_pattern })
+            existing_history_slugs.push(*history_slugs.first(history_slugs.length - 1).find_all do |cur_slug|
+                                          cur_slug =~ regexp_pattern
+                                        end)
           end
         end
 
@@ -132,7 +137,7 @@ module Mongoid
       # index to match /^.../ pattern.
       # Use Regexp::Raw to avoid the multiline option when querying the server.
       def regex_for_slug
-        if embedded? || Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
+        if embedded?
           Regexp.new(escaped_pattern)
         else
           BSON::Regexp::Raw.new(escaped_pattern)
@@ -155,11 +160,7 @@ module Mongoid
         end
 
         if embedded?
-          parent_metadata = if Mongoid::Compatibility::Version.mongoid7_or_newer?
-                              reflect_on_all_association(:embedded_in)[0]
-                            else
-                              reflect_on_all_associations(:embedded_in)[0]
-                            end
+          parent_metadata = reflect_on_all_association(:embedded_in)[0]
           return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 

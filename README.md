@@ -1,11 +1,18 @@
 Mongoid Slug
 ============
 
-Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model.
+It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://secure.travis-ci.org/mongoid/mongoid-slug.svg)](http://travis-ci.org/mongoid/mongoid-slug)
+[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?query=branch%3Amaster)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.ym?query=branch%3Amaster)
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
 [![Code Climate](https://codeclimate.com/github/mongoid/mongoid-slug.svg)](https://codeclimate.com/github/mongoid/mongoid-slug)
+
+### Version Support
+
+Mongoid Slug 7.x requires at least Mongoid 7.0.0 and Ruby 2.5.0. For earlier Mongoid and Ruby version support, please use an earlier version of Mongoid Slug.
+
+Mongoid Slug is compatible with all MongoDB versions which Mongoid supports, however, please see "Slug Max Length" section below for MongoDB 4.0 and earlier.
 
 ### Installation
 
@@ -46,6 +53,7 @@ Mongoid Slug will attempt to determine whether you want to find using the `slugs
 ```ruby
 Book.fields['_id'].type
 => String
+
 book = Book.find 'a-thousand-plateaus' # Finds by slugs
 => ...
 
@@ -61,8 +69,10 @@ end
 
 Post.fields['_id'].type
 => String
+
 post = Post.find 'a-thousand-plateaus' # Finds by slugs
 => ...
+
 post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 => ...
 ```
@@ -165,9 +175,16 @@ class Employee
 end
 ```
 
-### Limit Slug Length
+### Slug Max Length
 
-MongoDB has a default limit around 1KB to the size of the index keys and will raise error 17280, `key too large to index` when trying to create a record that causes an index key to exceed that limit. By default slugs are of the form `text[-number]` and the text portion is limited in size to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes. You can change this limit with `max_length` or set it to `nil` if you're running MongoDB with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
+MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)
+"4.0" and earlier applies an [Index Key Limit](https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Index-Key-Limit)
+which limits the total size of an index entry to around 1KB and will raise error,
+`17280 - key too large to index` when trying to create a record that causes an index key to exceed that limit.
+By default slugs are of the form `text[-number]` and the text portion is limited in size
+to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes.
+You can change this limit with `max_length` or set it to `nil` if you're running MongoDB
+with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
 
 ```ruby
 class Company
@@ -271,7 +288,8 @@ Specifying an array of custom reserved words will overwrite these defaults.
 
 ### Localize Slugs
 
-The slugs can be localized:
+The slugs can be localized. This feature is built upon Mongoid localized fields,
+so fallbacks and localization works as documented in the Mongoid manual.
 
 ```ruby
 class PageSlugLocalize
@@ -283,7 +301,28 @@ class PageSlugLocalize
 end
 ```
 
-This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
+By specifying `localize: true`, the slug index will be created on the
+[I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) field only.
+For example, if `I18n.default_locale` is `:en`, the index will be generated as follows:
+
+```ruby
+slug :title, localize: true
+
+# The following index is auto-generated:
+index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
+```
+
+If you are supporting multiple locales, you may specify the list of locales on which
+to create indexes as an `Array`.
+
+```ruby
+slug :title, localize: [:fr, :es, :de]
+
+# The following indexes are auto-generated:
+index({ '_slugs.fr' => 1 }, { unique: true, sparse: true })
+index({ '_slugs.es' => 1 }, { unique: true, sparse: true })
+index({ '_slugs.de' => 1 }, { unique: true, sparse: true })
+```
 
 ### Custom Find Strategies
 

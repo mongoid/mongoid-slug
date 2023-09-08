@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'mongoid'
 require 'stringex'
 require 'mongoid/slug/criteria'
-require 'mongoid/slug/index'
+require 'mongoid/slug/index_builder'
 require 'mongoid/slug/unique_slug'
 require 'mongoid/slug/slug_id_strategy'
-require 'mongoid-compatibility'
 require 'mongoid/slug/railtie' if defined?(Rails)
 
 module Mongoid
@@ -29,6 +30,7 @@ module Mongoid
 
     class << self
       attr_accessor :default_slug
+
       def configure(&block)
         instance_eval(&block)
       end
@@ -84,8 +86,11 @@ module Mongoid
         field :_slugs, type: Array, localize: options[:localize]
         alias_attribute :slugs, :_slugs
 
-        # Set index
-        index(*Mongoid::Slug::Index.build_index(slug_scope_key, slug_by_model_type)) unless embedded?
+        # Set indexes
+        unless embedded?
+          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type,
+                                                    options[:localize])
+        end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
 
@@ -111,6 +116,7 @@ module Mongoid
       # @return [ Array<Document>, Document ]
       def slug_scope_key
         return nil unless slug_scope
+
         reflect_on_association(slug_scope).try(:key) || slug_scope
       end
 
@@ -141,17 +147,13 @@ module Mongoid
 
       private
 
-      if Mongoid::Compatibility::Version.mongoid5_or_newer? && Threaded.method(:current_scope).arity == -1
+      if Threaded.method(:current_scope).arity == -1
         def current_scope
           Threaded.current_scope(self)
         end
-      elsif Mongoid::Compatibility::Version.mongoid5_or_newer?
-        def current_scope
-          Threaded.current_scope
-        end
       else
         def current_scope
-          scope_stack.last
+          Threaded.current_scope
         end
       end
     end
@@ -184,7 +186,7 @@ module Mongoid
       return true if new_slug.size.zero?
 
       # avoid duplicate slugs
-      _slugs.delete(new_slug) if _slugs
+      _slugs&.delete(new_slug)
 
       if !!slug_history && _slugs.is_a?(Array)
         append_slug(new_slug)

@@ -1,0 +1,72 @@
+name: CI RSpec Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: >-
+      ${{ matrix.ruby }}
+    env:
+      CI: true
+      TESTOPTS: -v
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      matrix:
+        ruby: [2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
+        mongoid: [7]
+        experimental: [false]
+        include:
+          - ruby: 2.7
+            mongoid: HEAD
+            experimental: true
+          - ruby: 3.0
+            mongoid: HEAD
+            experimental: true
+          - ruby: head
+            mongoid: 7
+            experimental: true
+          - ruby: head
+            mongoid: HEAD
+            experimental: true
+          - ruby: jruby-head
+            mongoid: 7
+            experimental: true
+          - ruby: truffleruby-head
+            mongoid: 7
+            experimental: true
+
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v2
+
+      - name: start mongodb
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: 4.4
+          mongodb-replica-set: rs0
+
+      - name: load ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: 2
+
+      - name: bundle install
+        run:  bundle install --jobs 4 --retry 3
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
+
+      - name: rubocop
+        timeout-minutes: 5
+        run: bundle exec rubocop
+        continue-on-error: ${{ matrix.experimental }}
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}
+
+      - name: test
+        timeout-minutes: 10
+        run: bundle exec rake spec
+        continue-on-error: ${{ matrix.experimental }}
+        env:
+          MONGOID_VERSION: ${{ matrix.mongoid }}

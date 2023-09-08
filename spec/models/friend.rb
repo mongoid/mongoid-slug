@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Friend
   include Mongoid::Document
   include Mongoid::Slug

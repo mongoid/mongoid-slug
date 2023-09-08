@@ -1,17 +1,41 @@
+# frozen_string_literal: true
+
 module Mongoid
   module Slug
-    module Index
-      # @param [ String or Symbol ] scope_key The optional scope key for the index
-      # @param [ Boolean ] by_model_type Whether or not
+    module IndexBuilder
+      extend self
+
+      # Creates indexes on a document for a given slug scope
+      #
+      # @param [ Mongoid::Document ] doc The document on which to create the index(es)
+      # @param [ String or Symbol ] scope_key The optional scope key for the index(es)
+      # @param [ Boolean ] by_model_type Whether or not to use single table inheritance
+      # @param [ Boolean or Array ] localize The locale for localized index field
       #
       # @return [ Array(Hash, Hash) ] the indexable fields and index options.
-      def self.build_index(scope_key = nil, by_model_type = false)
+      def build_indexes(doc, scope_key = nil, by_model_type = false, locales = nil)
+        if locales.is_a?(Array)
+          locales.each { |locale| build_index(doc, scope_key, by_model_type, locale) }
+        else
+          build_index(doc, scope_key, by_model_type, locales)
+        end
+      end
+
+      private
+
+      def build_index(doc, scope_key = nil, by_model_type = false, locale = nil)
         # The order of field keys is intentional.
         # See: http://docs.mongodb.org/manual/core/index-compound/
         fields = {}
-        fields[:_type] = 1       if by_model_type
+        fields[:_type] = 1 if by_model_type
         fields[scope_key] = 1 if scope_key
-        fields[:_slugs] = 1
+
+        locale = ::I18n.default_locale if locale.is_a?(TrueClass)
+        if locale
+          fields[:"_slugs.#{locale}"] = 1
+        else
+          fields[:_slugs] = 1
+        end
 
         # By design, we use the unique index constraint when possible to enforce slug uniqueness.
         # When migrating legacy data to Mongoid slug, the _slugs field may be null on many records,
@@ -38,7 +62,7 @@ module Mongoid
           options[:sparse] = true
         end
 
-        [fields, options]
+        doc.index(fields, options)
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mongoid
   module Slug
     class Railtie < Rails::Railtie
