@@ -18,6 +18,7 @@ module Mongoid
     included do
       cattr_accessor :slug_reserved_words,
                      :slug_scope,
+                     :slug_index,
                      :slugged_attributes,
                      :slug_url_builder,
                      :slug_history,
@@ -77,6 +78,7 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope            = options[:scope]
+        self.slug_index            = options[:index].nil? ? true : options[:index]
         self.slug_reserved_words   = options[:reserve] || Set.new(%w[new edit])
         self.slugged_attributes    = fields.map(&:to_s)
         self.slug_history          = options[:history]
@@ -87,7 +89,7 @@ module Mongoid
         alias_attribute :slugs, :_slugs
 
         # Set indexes
-        unless embedded?
+        if slug_index && !embedded?
           Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type,
                                                     options[:localize])
         end
