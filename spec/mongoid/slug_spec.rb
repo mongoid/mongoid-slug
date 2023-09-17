@@ -598,6 +598,11 @@ module Mongoid
       it_should_behave_like 'has an index', { _slugs: 1 }, unique: true, sparse: true
     end
 
+    context 'when slug index is skipped' do
+      subject { NoIndex }
+      it_should_behave_like 'does not have an index', _slugs: 1
+    end
+
     context 'when slug is scoped by a reference association' do
       subject { Author }
       it_should_behave_like 'does not have an index', _slugs: 1
