@@ -39,10 +39,8 @@ RSpec.configure do |c|
   c.raise_errors_for_deprecations!
 
   c.before(:all) do
-    if defined?(Logger::INFO)
-      Mongoid.logger.level = Logger::INFO
-      Mongo::Logger.logger.level = Logger::INFO
-    end
+    Mongoid.logger.level = Logger::INFO
+    Mongo::Logger.logger.level = Logger::INFO
   end
 
   c.before(:each) do
