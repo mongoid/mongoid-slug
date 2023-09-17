@@ -4,17 +4,18 @@ source 'https://rubygems.org'
 
 gemspec name: 'mongoid-slug'
 
-case version = ENV['MONGOID_VERSION'] || '7'
+case (version = ENV['MONGOID_VERSION'] || '8')
 when 'HEAD'
   gem 'mongoid', github: 'mongodb/mongoid'
-when /^7/
-  gem 'mongoid', '~> 7'
+when /\A\d+\z/
+  gem 'mongoid', "~> #{version}.0"
 else
   gem 'mongoid', version
 end
 
-group :test do
-  gem 'mongoid-danger', '~> 0.1.0', require: false
-  gem 'rubocop', '~> 1.18.4'
-  gem 'rubocop-rspec'
-end
+gem 'rake'
+gem 'rspec'
+gem 'rspec-its'
+gem 'rubocop'
+gem 'rubocop-rspec'
+gem 'uuid'

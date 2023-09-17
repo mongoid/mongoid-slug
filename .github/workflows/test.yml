@@ -12,15 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
-        ruby: [2.5, 2.6, 2.7, 3.0, jruby, truffleruby]
-        mongoid: [7]
+        ruby: [2.7, 3.0, 3.1, 3.2, truffleruby]
+        mongoid: [7, 8]
         experimental: [false]
         include:
-          - ruby: 2.7
-            mongoid: HEAD
-            experimental: true
-          - ruby: 3.0
+          - ruby: 3.2
             mongoid: HEAD
             experimental: true
           - ruby: head
@@ -28,9 +26,12 @@ jobs:
             experimental: true
           - ruby: head
             mongoid: HEAD
+            experimental: true
+          - ruby: jruby
+            mongoid: 8
             experimental: true
           - ruby: jruby-head
-            mongoid: 7
+            mongoid: 8
             experimental: true
           - ruby: truffleruby-head
             mongoid: 7

@@ -38,7 +38,7 @@ I18n.available_locales = %i[en nl]
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
 
-  c.before :all do
+  c.before(:all) do
     Mongoid.logger.level = Logger::INFO
     Mongo::Logger.logger.level = Logger::INFO
   end
