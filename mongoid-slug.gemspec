@@ -14,16 +14,12 @@ Gem::Specification.new do |s|
   s.description = 'Mongoid URL slug or permalink generator'
   s.license     = 'MIT'
 
-  s.required_ruby_version = '>= 2.5'
+  s.required_ruby_version = '>= 2.7'
 
   s.add_dependency 'mongoid', '>= 7.0'
   s.add_dependency 'stringex', '~> 2.0'
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'rspec-its'
-  s.add_development_dependency 'uuid'
 
   s.files         = Dir.glob('lib/**/*') + %w[LICENSE README.md]
-  s.test_files    = Dir.glob('spec/**/*')
   s.require_paths = ['lib']
+  s.metadata['rubygems_mfa_required'] = 'true'
 end

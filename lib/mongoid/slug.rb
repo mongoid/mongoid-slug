@@ -183,7 +183,7 @@ module Mongoid
 
       # skip slug generation and use Mongoid id
       # to find document instead
-      return true if new_slug.size.zero?
+      return true if new_slug.empty?
 
       # avoid duplicate slugs
       _slugs&.delete(new_slug)
