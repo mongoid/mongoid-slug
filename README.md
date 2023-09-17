@@ -76,6 +76,7 @@ post = Post.find 'a-thousand-plateaus' # Finds by slugs
 post = Post.find '50b1386a0482939864000001' # Finds by bson ids
 => ...
 ```
+
 [Examine slug.rb](lib/mongoid/slug.rb) for all available options.
 
 ### Updating Existing Records
@@ -132,6 +133,23 @@ end
 The `to_url` method comes from [stringex](https://github.com/rsl/stringex).
 
 You can define a slug builder globally and/or override it per model.
+
+### Indexing
+
+By default, Mongoid Slug will automatically generate an index for the slug, which will be created when you run `rake db:create_indexes`. This index will take into account scoping and other options described below.
+
+To skip this index generation, you may set `index: false` as follows:
+
+```ruby
+class Employee
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :name
+
+  slug :name, index: :false
+end
+```
 
 ### Scoping
 
