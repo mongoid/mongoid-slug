@@ -112,10 +112,7 @@ module Mongoid
         if __slug_paranoid_doc? # rubocop:disable Style/GuardClause
           set_callback :destroy, :after,  :unset_slug!
           set_callback :restore, :before, :set_slug!
-          # TODO investigate if this should be used
-          # set_callback :save,    :before, :clear_slug!, if: :slug_paranoid_deleted?
-          set_callback :save,    :before, :reset_slug!, if: :paranoid_deleted?
-          set_callback :save,    :after,  :clear_slug!, if: :paranoid_deleted?
+          set_callback :save,    :before, :clear_slug!, if: :slug_paranoid_deleted?
         end
       end
 
