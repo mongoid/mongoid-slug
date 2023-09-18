@@ -30,7 +30,8 @@ module Mongoid
     end
 
     class << self
-      attr_accessor :default_slug
+      attr_accessor :default_slug,
+                    :use_paranoia
 
       def configure(&block)
         instance_eval(&block)
@@ -103,6 +104,17 @@ module Mongoid
         else
           set_callback :save, :before, :build_slug, if: :slug_should_be_rebuilt?
         end
+
+        # If paranoid document:
+        # - unset slugs on soft-destroy
+        # - recreate the slug on restore
+        # - force reset the slug when saving a destroyed paranoid document, to ensure it stays unset in the database
+        if __slug_paranoid_doc? # rubocop:disable Style/GuardClause
+          set_callback :destroy, :after,  :unset_slug!
+          set_callback :restore, :before, :set_slug!
+          set_callback :save,    :before, :reset_slug!, if: :slug_paranoid_deleted?
+          set_callback :save,    :after,  :clear_slug!, if: :slug_paranoid_deleted?
+        end
       end
 
       def default_slug_url_builder
@@ -145,6 +157,16 @@ module Mongoid
 
       def queryable
         current_scope || Criteria.new(self) # Use Mongoid::Slug::Criteria for slugged documents.
+      end
+
+      # Returns whether to use paranoid functionality for this document.
+      #
+      # @return [ true | false ] Whether to use paranoid functionality
+      #   for this document.
+      #
+      # @api private
+      def __slug_paranoid_doc?
+        !!(Mongoid::Slug.use_paranoia && defined?(::Mongoid::Paranoia) && self < ::Mongoid::Paranoia)
       end
 
       private
@@ -237,7 +259,11 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? || _slugs_changed? || slugged_attributes_changed?
+      (new_record? || _slugs_changed? || slugged_attributes_changed?) && !slug_paranoid_deleted?
+    end
+
+    def slug_paranoid_deleted?
+      !!(self.class.__slug_paranoid_doc? && !deleted_at.nil?)
     end
 
     def slugged_attributes_changed?
