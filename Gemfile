@@ -13,6 +13,7 @@ else
   gem 'mongoid', version
 end
 
+gem 'mongoid_paranoia', '>= 0.6'
 gem 'rake'
 gem 'rspec'
 gem 'rspec-its'

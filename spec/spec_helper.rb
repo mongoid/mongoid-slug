@@ -8,6 +8,7 @@ require 'uuid'
 require 'active_support'
 require 'active_support/deprecation'
 require 'mongoid'
+require 'mongoid/paranoia'
 
 require File.expand_path '../lib/mongoid/slug', __dir__
 
