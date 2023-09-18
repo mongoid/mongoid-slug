@@ -381,6 +381,19 @@ unique = Mongoid::Slug::UniqueSlug.new(Book.new).find_unique(title)
 # return some representation of unique
 ```
 
+### Compatibility with Mongoid::Paranoia
+
+The [Mongoid::Paranoia](https://github.com/simi/mongoid_paranoia) gem provides soft-delete
+functionality. If you are using this gem, please enable the global `use_paranoia` option.
+This will automatically ensure that slugs will be cleared when soft-deleting a document,
+and re-set when restoring a document.
+
+```ruby
+Mongoid::Slug.configure do |c|
+  c.use_paranoia = true
+end
+```
+
 Contributing
 ------------
 

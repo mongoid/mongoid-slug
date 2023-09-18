@@ -1,6 +1,10 @@
-## 7.0.1 (Next)
+## 7.1.1 (Next)
 
 * Your contribution here.
+
+## 7.1.0 (2023/09/18)
+
+* [#273](https://github.com/mongoid/mongoid-slug/pull/273): Add optional Mongoid::Paranoia support - [@johnnyshields](https://github.com/johnnyshields)
 
 ## 7.0.0 (2023/09/18)
 
