@@ -19,13 +19,16 @@ jobs:
         experimental: [false]
         include:
           - ruby: 3.2
-            mongoid: HEAD
+            mongoid: head
             experimental: true
           - ruby: head
             mongoid: 7
             experimental: true
           - ruby: head
-            mongoid: HEAD
+            mongoid: head
+            experimental: true
+          - ruby: jruby
+            mongoid: 7
             experimental: true
           - ruby: jruby
             mongoid: 8
@@ -55,13 +58,6 @@ jobs:
 
       - name: bundle install
         run:  bundle install --jobs 4 --retry 3
-        env:
-          MONGOID_VERSION: ${{ matrix.mongoid }}
-
-      - name: rubocop
-        timeout-minutes: 5
-        run: bundle exec rubocop
-        continue-on-error: ${{ matrix.experimental }}
         env:
           MONGOID_VERSION: ${{ matrix.mongoid }}
 
