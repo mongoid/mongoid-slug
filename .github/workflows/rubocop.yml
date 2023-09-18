@@ -16,7 +16,5 @@ jobs:
         with:
           ruby-version: 3.2
           bundler-cache: true
-      - name: bundle install
-        run: bundle install --jobs 4 --retry 3
       - name: Run Rubocop
         run: bundle exec rubocop --parallel
