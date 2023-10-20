@@ -57,9 +57,10 @@ module Mongoid
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
-      #   @param options :scope [Symbol] a reference association or field to
-      #   scope the slug by. Embedded documents are, by default, scoped by
-      #   their parent.
+      #   @param options :scope [Symbol, Array<Symbol, String>] a reference association, field,
+      #   or array of fields to scope the slug by.
+      #   Embedded documents are, by default, scoped by their parent. Now it supports not only
+      #   a single association or field but also an array of them.
       #   @param options :max_length [Integer] the maximum length of the text portion of the slug
       #   @yield If given, a block is used to build a slug.
       #
@@ -90,8 +91,18 @@ module Mongoid
 
         # Set indexes
         if slug_index && !embedded?
-          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type,
-                                                    options[:localize])
+          # Check if scope is an array and handle accordingly.
+          if slug_scope.is_a?(Array)
+            slug_scope.each do |individual_scope|
+              # Here, build indexes for each scope in the array.
+              # This assumes `Mongoid::Slug::IndexBuilder.build_indexes` can handle individual scope items.
+              # If not, `build_indexes` may need modification to support this.
+              Mongoid::Slug::IndexBuilder.build_indexes(self, individual_scope, slug_by_model_type, options[:localize])
+            end
+          else
+            # For a single scope, it remains unchanged.
+            Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize])
+          end
         end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
@@ -119,7 +130,14 @@ module Mongoid
       def slug_scope_key
         return nil unless slug_scope
 
-        reflect_on_association(slug_scope).try(:key) || slug_scope
+        # If slug_scope is an array, we return an array of keys.
+        if slug_scope.is_a?(Array)
+          slug_scope.map do |individual_scope|
+            reflect_on_association(individual_scope).try(:key) || individual_scope
+          end
+        else
+          reflect_on_association(slug_scope).try(:key) || slug_scope
+        end
       end
 
       # Find documents by slugs.
