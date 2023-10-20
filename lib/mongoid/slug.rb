@@ -57,7 +57,7 @@ module Mongoid
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
-      #   @param options :scope [Symbol, Array<Symbol, String>] a reference association, field,
+      #   @param options :scope [Symbol, Array<Symbol>] a reference association, field,
       #   or array of fields to scope the slug by.
       #   Embedded documents are, by default, scoped by their parent. Now it supports not only
       #   a single association or field but also an array of them.

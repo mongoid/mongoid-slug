@@ -168,20 +168,17 @@ module Mongoid
               next
             end
 
-            # Determine the inverse association or use the collection name as a fallback.
+            # Make sure doc is actually associated with something, and that
+            # some referenced docs have been persisted to the parent
+            #
+            # TODO: we need better reflection for reference associations,
+            # like association_name instead of forcing collection_name here
+            # -- maybe in the forthcoming Mongoid refactorings?
             inverse = metadata.inverse_of || collection_name
             next unless parent.respond_to?(inverse)
 
             # Add the associated records of the parent (based on the inverse) to our results.
             scope_results << parent.send(inverse)
-
-            # Handle cases where the expected inverse method doesn't exist on the parent.
-            # Depending on your situation, you might want to raise an error or just skip this scope.
-
-            # If there's no reflection for this association, it implies a potential issue with the model's definition.
-            # This else block is where you'd handle non-association fields or unexpected conditions.
-            # We're skipping here, but you should implement appropriate handling based on your application's
-            # expectations.
           end
 
           # After iterating through all scopes, we need to decide how to combine the results (if there are multiple).
