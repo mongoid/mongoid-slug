@@ -193,6 +193,26 @@ class Employee
 end
 ```
 
+Sometimes, system constraints prevent using relation-based scoping. When this happens, you can scope slugs using multiple fields, addressing needs like database structure or performance issues.
+
+Here's a quick setup for multi-field scoping:
+
+```ruby
+class Employee
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :name
+  field :company_id
+  field :department_id
+
+  # Scope slug uniqueness by a combination of company and department
+  slug :name, scope: %i[company_id department_id]
+end
+```
+
+Note: This approach creates multiple indexes, differing from single-field scoping, and impacting database performance and storage.
+
 ### Slug Max Length
 
 MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)
