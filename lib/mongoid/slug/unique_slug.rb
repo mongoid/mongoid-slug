@@ -101,8 +101,7 @@ module Mongoid
           where_hash[:_id.ne]     = model._id
 
           if (scope = slug_scope)
-            scopes = scope.is_a?(Array) ? scope : [scope] # Wrap single scope into an array for uniform handling
-            scopes.each do |individual_scope|
+            Array(scope).each do |individual_scope|
               next unless reflect_on_association(individual_scope).nil?
 
               # scope is not an association, so it's scoped to a local field
@@ -150,13 +149,10 @@ module Mongoid
       def uniqueness_scope
         # If slug_scope is present, we need to handle whether it's a single scope or multiple scopes.
         if slug_scope
-          # Convert the scope to an array if it's a single symbol for uniform processing.
-          scopes = slug_scope.is_a?(Array) ? slug_scope : [slug_scope]
-
           # We'll track individual scope results in an array.
           scope_results = []
 
-          scopes.each do |individual_scope|
+          Array(slug_scope).each do |individual_scope|
             next unless (metadata = reflect_on_association(individual_scope))
 
             # For each scope, we identify its association metadata and fetch the parent record.
