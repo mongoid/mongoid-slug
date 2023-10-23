@@ -100,14 +100,12 @@ module Mongoid
           where_hash[:_slugs.all] = [regex_for_slug]
           where_hash[:_id.ne]     = model._id
 
-          if (scope = slug_scope)
-            Array(scope).each do |individual_scope|
-              next unless reflect_on_association(individual_scope).nil?
+          Array(slug_scope).each do |individual_scope|
+            next unless reflect_on_association(individual_scope).nil?
 
-              # scope is not an association, so it's scoped to a local field
-              # (e.g. an association id in a denormalized db design)
-              where_hash[individual_scope] = model.try(:read_attribute, individual_scope)
-            end
+            # scope is not an association, so it's scoped to a local field
+            # (e.g. an association id in a denormalized db design)
+            where_hash[individual_scope] = model.try(:read_attribute, individual_scope)
           end
 
           where_hash[:_type] = model.try(:read_attribute, :_type) if slug_by_model_type

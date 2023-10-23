@@ -8,7 +8,7 @@ module Mongoid
       # Creates indexes on a document for a given slug scope
       #
       # @param [ Mongoid::Document ] doc The document on which to create the index(es)
-      # @param [ String or Symbol ] scope_key The optional scope key for the index(es)
+      # @param [ String or Symbol or Array<String, Symbol> ] scope_key The optional scope key for the index(es)
       # @param [ Boolean ] by_model_type Whether or not to use single table inheritance
       # @param [ Boolean or Array ] localize The locale for localized index field
       #
@@ -28,7 +28,8 @@ module Mongoid
         # See: http://docs.mongodb.org/manual/core/index-compound/
         fields = {}
         fields[:_type] = 1 if by_model_type
-        fields[scope_key] = 1 if scope_key
+
+        Array(scope_key).each { |key| fields[key] = 1 }
 
         locale = ::I18n.default_locale if locale.is_a?(TrueClass)
         if locale

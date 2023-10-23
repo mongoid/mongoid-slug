@@ -211,7 +211,7 @@ class Employee
 end
 ```
 
-Note: This approach creates multiple indexes, differing from single-field scoping, and impacting database performance and storage.
+Note: this approach creates multiple indexes, differing from single-field scoping, and impacting database performance and storage.
 
 ### Slug Max Length
 

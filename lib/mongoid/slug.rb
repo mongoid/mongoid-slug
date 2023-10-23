@@ -91,14 +91,7 @@ module Mongoid
 
         # Set indexes
         if slug_index && !embedded?
-          # Even if the slug_scope is nil, we need to proceed.
-          slug_scopes = slug_scope.nil? ? [slug_scope_key] : Array(slug_scope)
-
-          # Here, build indexes for each scope in the array.
-          slug_scopes.each do |individual_scope|
-            Mongoid::Slug::IndexBuilder.build_indexes(self, individual_scope, slug_by_model_type,
-                                                      options[:localize])
-          end
+          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize])
         end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
@@ -120,15 +113,23 @@ module Mongoid
         with_default_scope.look_like_slugs?(*args)
       end
 
+      def slug_scopes
+        # If slug_scope is set (i.e., not nil), we convert it to an array to ensure we can handle it consistently.
+        # If it's not set, we use an array with a single nil element, signifying no specific scope.
+        slug_scope ? Array(slug_scope) : [nil]
+      end
+
       # Returns the scope key for indexing, considering associations
       #
       # @return [ Array<Document>, Document ]
       def slug_scope_key
-        keys = Array(slug_scope).map do |individual_scope|
+        return nil unless slug_scope
+
+        # If slug_scope is an array, we map over its elements to get each individual scope's key.
+        slug_scopes.map do |individual_scope|
+          # Attempt to find the association and get its key. If no association is found, use the scope as-is.
           reflect_on_association(individual_scope).try(:key) || individual_scope
         end
-
-        keys.empty? ? nil : keys
       end
 
       # Find documents by slugs.
