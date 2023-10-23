@@ -100,10 +100,12 @@ module Mongoid
           where_hash[:_slugs.all] = [regex_for_slug]
           where_hash[:_id.ne]     = model._id
 
-          if (scope = slug_scope) && reflect_on_association(scope).nil?
+          Array(slug_scope).each do |individual_scope|
+            next unless reflect_on_association(individual_scope).nil?
+
             # scope is not an association, so it's scoped to a local field
             # (e.g. an association id in a denormalized db design)
-            where_hash[scope] = model.try(:read_attribute, scope)
+            where_hash[individual_scope] = model.try(:read_attribute, individual_scope)
           end
 
           where_hash[:_type] = model.try(:read_attribute, :_type) if slug_by_model_type
@@ -143,26 +145,59 @@ module Mongoid
       end
 
       def uniqueness_scope
-        if slug_scope && (metadata = reflect_on_association(slug_scope))
+        # If slug_scope is present, we need to handle whether it's a single scope or multiple scopes.
+        if slug_scope
+          # We'll track individual scope results in an array.
+          scope_results = []
 
-          parent = model.send(metadata.name)
+          Array(slug_scope).each do |individual_scope|
+            next unless (metadata = reflect_on_association(individual_scope))
 
-          # Make sure doc is actually associated with something, and that
-          # some referenced docs have been persisted to the parent
-          #
-          # TODO: we need better reflection for reference associations,
-          # like association_name instead of forcing collection_name here
-          # -- maybe in the forthcoming Mongoid refactorings?
-          inverse = metadata.inverse_of || collection_name
-          return parent.respond_to?(inverse) ? parent.send(inverse) : model.class
+            # For each scope, we identify its association metadata and fetch the parent record.
+            parent = model.send(metadata.name)
+
+            # It's important to handle nil cases if the parent record doesn't exist.
+            if parent.nil?
+              # You might want to handle this scenario differently based on your application's logic.
+              next
+            end
+
+            # Make sure doc is actually associated with something, and that
+            # some referenced docs have been persisted to the parent
+            #
+            # TODO: we need better reflection for reference associations,
+            # like association_name instead of forcing collection_name here
+            # -- maybe in the forthcoming Mongoid refactorings?
+            inverse = metadata.inverse_of || collection_name
+            next unless parent.respond_to?(inverse)
+
+            # Add the associated records of the parent (based on the inverse) to our results.
+            scope_results << parent.send(inverse)
+          end
+
+          # After iterating through all scopes, we need to decide how to combine the results (if there are multiple).
+          # This part depends on how your application should treat multiple scopes.
+          # Here, we'll simply return the first non-empty scope result as an example.
+          scope_results.each do |result|
+            return result if result.present? # or any other logic for selecting among multiple scope results
+          end
+
+          # If we reach this point, it means no valid parent scope was found (all were nil or didn't match the
+          # conditions).
+          # You might want to raise an error, return a default scope, or handle this scenario based on your
+          # application's logic.
+          # For this example, we're returning the model's class as a default.
+          return model.class
         end
 
+        # The rest of your method remains unchanged, handling cases where slug_scope isn't defined.
+        # This is your existing logic for embedded models or deeper superclass retrieval.
         if embedded?
           parent_metadata = reflect_on_all_association(:embedded_in)[0]
           return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 
-        # unless embedded or slug scope, return the deepest document superclass
+        # Unless embedded or slug scope, return the deepest document superclass.
         appropriate_class = model.class
         appropriate_class = appropriate_class.superclass while appropriate_class.superclass.include?(Mongoid::Document)
         appropriate_class

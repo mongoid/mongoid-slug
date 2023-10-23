@@ -163,6 +163,54 @@ module Mongoid
       end
     end
 
+    context 'when the object has multiple scopes' do
+      let(:category1) { 'category1' }
+      let(:category2) { 'category2' }
+      let(:sub_category1) { 'sub_category1' }
+      let(:sub_category2) { 'sub_category2' }
+      let(:common_title) { 'Common Title' }
+
+      context 'when pages have the same title and different categories' do
+        it 'creates pages with the same slug' do
+          page1 = PageWithCategories.create!(title: common_title, page_category: category1)
+          page2 = PageWithCategories.create!(title: common_title, page_category: category2)
+
+          expect(page1.slug).to eq(page2.slug)
+        end
+      end
+
+      context 'when pages have the same title and same category but different sub-categories' do
+        it 'creates pages with the same slug' do
+          page1 = PageWithCategories.create!(title: common_title, page_category: category1,
+                                             page_sub_category: sub_category1)
+          page2 = PageWithCategories.create!(title: common_title, page_category: category1,
+                                             page_sub_category: sub_category2)
+
+          expect(page1.slug).to eq(page2.slug)
+        end
+      end
+
+      context 'when pages have the same title, same category, and same sub-category' do
+        it 'creates pages with different slugs' do
+          page1 = PageWithCategories.create!(title: common_title, page_category: category1,
+                                             page_sub_category: sub_category1)
+          page2 = PageWithCategories.create!(title: common_title, page_category: category1,
+                                             page_sub_category: sub_category1)
+
+          expect(page1.slug).not_to eq(page2.slug)
+        end
+      end
+
+      context 'when pages have the same title and same category, without sub-categories' do
+        it 'creates pages with different slugs' do
+          page1 = PageWithCategories.create!(title: common_title, page_category: category1)
+          page2 = PageWithCategories.create!(title: common_title, page_category: category1)
+
+          expect(page1.slug).not_to eq(page2.slug)
+        end
+      end
+    end
+
     context 'when the object is embedded' do
       let(:subject) do
         book.subjects.create(name: 'Psychoanalysis')

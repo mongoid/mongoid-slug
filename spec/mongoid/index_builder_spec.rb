@@ -51,6 +51,35 @@ describe Mongoid::Slug::IndexBuilder do
     end
   end
 
+  context 'when scope_key is set and is array' do
+    let(:doc) do
+      Class.new do
+        include Mongoid::Document
+        field :title, type: String
+        field :page_category, type: String
+        field :page_sub_category, type: String
+      end
+    end
+    let(:scope_key) { %i[page_category page_sub_category] }
+
+    before do
+      doc.field :page_category, type: String
+      doc.field :page_sub_category, type: String
+
+      Mongoid::Slug::IndexBuilder.build_indexes(doc, scope_key, by_model_type, locales)
+    end
+
+    context 'when by_model_type is true' do
+      let(:by_model_type) { true }
+
+      it { is_expected.to eq [[{ _slugs: 1, page_category: 1, page_sub_category: 1, _type: 1 }, {}]] }
+    end
+
+    context 'when by_model_type is false' do
+      it { is_expected.to eq [[{ _slugs: 1, page_category: 1, page_sub_category: 1 }, {}]] }
+    end
+  end
+
   context 'when scope_key is not set' do
     context 'when by_model_type is true' do
       let(:by_model_type) { true }

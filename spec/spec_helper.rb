@@ -48,6 +48,7 @@ RSpec.configure do |c|
     Book.create_indexes
     AuthorPolymorphic.create_indexes
     BookPolymorphic.create_indexes
+    PageWithCategories.create_indexes
   end
 
   c.after(:each) do
