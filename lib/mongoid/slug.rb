@@ -91,7 +91,7 @@ module Mongoid
 
         # Set indexes
         if slug_index && !embedded?
-          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type, options[:localize])
+          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_keys, slug_by_model_type, options[:localize])
         end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
@@ -119,10 +119,10 @@ module Mongoid
         slug_scope ? Array(slug_scope) : [nil]
       end
 
-      # Returns the scope key for indexing, considering associations
+      # Returns the scope keys for indexing, considering associations
       #
       # @return [ Array<Document>, Document ]
-      def slug_scope_key
+      def slug_scope_keys
         return nil unless slug_scope
 
         # If slug_scope is an array, we map over its elements to get each individual scope's key.
