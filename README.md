@@ -211,8 +211,6 @@ class Employee
 end
 ```
 
-Note: this approach creates multiple indexes, differing from single-field scoping, and impacting database performance and storage.
-
 ### Slug Max Length
 
 MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)
