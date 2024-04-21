@@ -1,5 +1,6 @@
-## 7.0.1 (Next)
+## 7.1.0 (Next)
 
+* [#274](https://github.com/mongoid/mongoid-slug/pull/274): Added support for scoping slugs by multiple fields - [@mikekosulin](https://github.com/mikekosulin)
 * Your contribution here.
 
 ## 7.0.0 (2023/09/18)

@@ -193,6 +193,22 @@ class Employee
 end
 ```
 
+You may scope slugs using multiple fields as per the following example:
+
+```ruby
+class Employee
+  include Mongoid::Document
+  include Mongoid::Slug
+
+  field :name
+  field :company_id
+  field :department_id
+
+  # Scope slug uniqueness by a combination of company and department
+  slug :name, scope: %i[company_id department_id]
+end
+```
+
 ### Slug Max Length
 
 MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)

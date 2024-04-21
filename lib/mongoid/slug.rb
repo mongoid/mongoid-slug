@@ -57,9 +57,10 @@ module Mongoid
       #   @param options [Boolean] :permanent Whether the slug should be
       #   immutable. Defaults to `false`.
       #   @param options [Array] :reserve` A list of reserved slugs
-      #   @param options :scope [Symbol] a reference association or field to
-      #   scope the slug by. Embedded documents are, by default, scoped by
-      #   their parent.
+      #   @param options :scope [Symbol, Array<Symbol>] a reference association, field,
+      #   or array of fields to scope the slug by.
+      #   Embedded documents are, by default, scoped by their parent. Now it supports not only
+      #   a single association or field but also an array of them.
       #   @param options :max_length [Integer] the maximum length of the text portion of the slug
       #   @yield If given, a block is used to build a slug.
       #
@@ -90,8 +91,7 @@ module Mongoid
 
         # Set indexes
         if slug_index && !embedded?
-          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_key, slug_by_model_type,
-                                                    options[:localize])
+          Mongoid::Slug::IndexBuilder.build_indexes(self, slug_scope_keys, slug_by_model_type, options[:localize])
         end
 
         self.slug_url_builder = block_given? ? block : default_slug_url_builder
@@ -113,13 +113,23 @@ module Mongoid
         with_default_scope.look_like_slugs?(*args)
       end
 
-      # Returns the scope key for indexing, considering associations
+      def slug_scopes
+        # If slug_scope is set (i.e., not nil), we convert it to an array to ensure we can handle it consistently.
+        # If it's not set, we use an array with a single nil element, signifying no specific scope.
+        slug_scope ? Array(slug_scope) : [nil]
+      end
+
+      # Returns the scope keys for indexing, considering associations
       #
       # @return [ Array<Document>, Document ]
-      def slug_scope_key
+      def slug_scope_keys
         return nil unless slug_scope
 
-        reflect_on_association(slug_scope).try(:key) || slug_scope
+        # If slug_scope is an array, we map over its elements to get each individual scope's key.
+        slug_scopes.map do |individual_scope|
+          # Attempt to find the association and get its key. If no association is found, use the scope as-is.
+          reflect_on_association(individual_scope).try(:key) || individual_scope
+        end
       end
 
       # Find documents by slugs.
@@ -297,7 +307,7 @@ module Mongoid
     def persisted_with_slug_changes?
       if localized?
         changes = _slugs_change
-        return (persisted? && false) if changes.nil?
+        return false if changes.nil?
 
         # ensure we check for changes only between the same locale
         original = changes.first.try(:fetch, I18n.locale.to_s, nil)
