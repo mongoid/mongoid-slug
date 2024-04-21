@@ -193,9 +193,7 @@ class Employee
 end
 ```
 
-Sometimes, system constraints prevent using relation-based scoping. When this happens, you can scope slugs using multiple fields, addressing needs like database structure or performance issues.
-
-Here's a quick setup for multi-field scoping:
+You may scope slugs using multiple fields as per the following example:
 
 ```ruby
 class Employee
