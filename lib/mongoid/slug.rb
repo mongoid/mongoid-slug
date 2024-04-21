@@ -307,7 +307,7 @@ module Mongoid
     def persisted_with_slug_changes?
       if localized?
         changes = _slugs_change
-        return (persisted? && false) if changes.nil?
+        return false if changes.nil?
 
         # ensure we check for changes only between the same locale
         original = changes.first.try(:fetch, I18n.locale.to_s, nil)
