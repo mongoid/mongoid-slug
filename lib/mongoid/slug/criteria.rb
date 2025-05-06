@@ -26,11 +26,13 @@ module Mongoid
       # @example Find by multiple slugs.
       #   criteria.find([ 'some-slug', 'some-other-slug' ])
       #
-      # @param [ Array<Object> ] args The ids or slugs to search for.
+      # @param [ Array<Object> ] slugs The ids or slugs to search for.
       #
       # @return [ Array<Document>, Document ] The matching document(s).
-      def find(*args)
-        look_like_slugs?(args.__find_args__) ? find_by_slug!(*args) : super
+      def find(*slugs)
+        return find_by_slug!(*slugs) if look_like_slugs?(*slugs)
+
+        super
       end
 
       # Find the matchind document(s) in the criteria for the provided slugs.
@@ -41,21 +43,22 @@ module Mongoid
       # @example Find by multiple slugs.
       #   criteria.find([ 'some-slug', 'some-other-slug' ])
       #
-      # @param [ Array<Object> ] args The slugs to search for.
+      # @param [ Array<Object>... ] slugs The slugs to search for.
       #
       # @return [ Array<Document>, Document ] The matching document(s).
-      def find_by_slug!(*args)
-        slugs = args.__find_args__
+      def find_by_slug!(*slugs)
+        slugs = find_args(slugs)
         raise_invalid if slugs.any?(&:nil?)
-        for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
+        for_slugs(slugs).execute_or_raise_for_slugs(slugs)
       end
 
-      def look_like_slugs?(args)
-        return false unless args.all? { |id| id.is_a?(String) }
+      def look_like_slugs?(*slugs)
+        slugs = find_args(slugs)
+        return false unless slugs.all?(String)
 
         id_field = @klass.fields['_id']
         @slug_strategy ||= id_field.options[:slug_id_strategy] || build_slug_strategy(id_field.type)
-        args.none? { |id| @slug_strategy.call(id) }
+        slugs.none? { |slug| @slug_strategy.call(slug) }
       end
 
       protected
@@ -94,10 +97,16 @@ module Mongoid
         end
       end
 
-      def execute_or_raise_for_slugs(slugs, multi)
+      def find_args(args)
+        args = args.flatten
+        args.uniq!(&:to_s)
+        args
+      end
+
+      def execute_or_raise_for_slugs(slugs)
         result = uniq
         check_for_missing_documents_for_slugs!(result, slugs)
-        multi ? result : result.first
+        slugs.size == 1 ? result.first : result
       end
 
       def check_for_missing_documents_for_slugs!(result, slugs)
