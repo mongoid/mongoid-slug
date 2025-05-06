@@ -44,9 +44,8 @@ module Mongoid
 
         def sort_existing_slugs
           # remove the slug part and leave the absolute integer part and sort
-          re = /^#{Regexp.escape(@slug)}/
           @sorted_existing = existing_slugs.map do |s|
-            s.sub(re, '').to_i.abs
+            s.delete_prefix(@slug).to_i.abs
           end.sort
         end
 
