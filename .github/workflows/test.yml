@@ -18,8 +18,7 @@ jobs:
         run: bundle exec rubocop --parallel
 
   build:
-    name: >-
-      "${{ matrix.ruby }} mongoid-${{ matrix.mongoid }}"
+    name: "${{ matrix.ruby }} mongoid-${{ matrix.mongoid }}"
     env:
       CI: true
       TESTOPTS: -v
