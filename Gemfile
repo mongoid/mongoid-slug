@@ -7,7 +7,7 @@ gemspec name: 'mongoid-slug'
 case (version = ENV['MONGOID_VERSION'] || '8').downcase
 when 'head'
   gem 'mongoid', github: 'mongodb/mongoid'
-when /\A\d+\z/
+when /\A\d+(?:\.\d+)?\z/
   gem 'mongoid', "~> #{version}.0"
 else
   gem 'mongoid', version
