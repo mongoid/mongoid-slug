@@ -4,12 +4,12 @@ source 'https://rubygems.org'
 
 gemspec name: 'mongoid-slug'
 
-case (version = ENV['MONGOID_VERSION'] || '8').downcase
+case (version = ENV['MONGOID_VERSION'])&.downcase
 when 'head'
   gem 'mongoid', github: 'mongodb/mongoid'
 when /\A\d+(?:\.\d+)?\z/
   gem 'mongoid', "~> #{version}.0"
-else
+when String
   gem 'mongoid', version
 end
 
