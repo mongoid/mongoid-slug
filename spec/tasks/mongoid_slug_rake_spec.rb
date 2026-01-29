@@ -13,11 +13,13 @@ describe 'mongoid_slug:set' do
     before :all do
       UninitalizedSlugFirst = Class.new do
         include Mongoid::Document
+
         field :name, type: String
         store_in collection: 'uninitalized_slug_first'
       end
       UninitalizedSlugSecond = Class.new do
         include Mongoid::Document
+
         field :name, type: String
         store_in collection: 'uninitalized_slug_second'
       end
@@ -29,10 +31,12 @@ describe 'mongoid_slug:set' do
 
       UninitalizedSlugFirst.class_eval do
         include Mongoid::Slug
+
         slug :name
       end
       UninitalizedSlugSecond.class_eval do
         include Mongoid::Slug
+
         slug :name
       end
 
@@ -51,6 +55,7 @@ describe 'mongoid_slug:set' do
     before :all do
       UninitalizedSlugThird = Class.new do
         include Mongoid::Document
+
         field :name, type: String
         store_in collection: 'uninitalized_slug_third'
       end
@@ -61,6 +66,7 @@ describe 'mongoid_slug:set' do
 
       UninitalizedSlugThird.class_eval do
         include Mongoid::Slug
+
         slug :name
       end
 

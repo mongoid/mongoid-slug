@@ -3,6 +3,7 @@
 class Author
   include Mongoid::Document
   include Mongoid::Slug
+
   field :first_name
   field :last_name
   belongs_to :book, required: false
