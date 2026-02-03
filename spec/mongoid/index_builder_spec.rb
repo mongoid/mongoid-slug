@@ -55,6 +55,7 @@ describe Mongoid::Slug::IndexBuilder do
     let(:doc) do
       Class.new do
         include Mongoid::Document
+
         field :title, type: String
         field :page_category, type: String
         field :page_sub_category, type: String

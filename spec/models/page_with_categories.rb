@@ -3,6 +3,7 @@
 class PageWithCategories
   include Mongoid::Document
   include Mongoid::Slug
+
   field :title
   field :content
 

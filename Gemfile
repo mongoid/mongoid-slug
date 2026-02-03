@@ -13,6 +13,9 @@ else
   gem 'mongoid', version
 end
 
+gem 'danger', require: false
+gem 'danger-changelog', require: false
+gem 'danger-pr-comment', require: false
 gem 'rake'
 gem 'rspec'
 gem 'rspec-its'

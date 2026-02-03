@@ -3,6 +3,7 @@
 class Caption
   include Mongoid::Document
   include Mongoid::Slug
+
   field :my_identity, type: String
   field :title
   field :medium

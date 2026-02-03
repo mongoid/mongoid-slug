@@ -79,7 +79,7 @@ module Mongoid
         options = fields.extract_options!
 
         self.slug_scope            = options[:scope]
-        self.slug_index            = options[:index].nil? ? true : options[:index]
+        self.slug_index            = options[:index].nil? || options[:index]
         self.slug_reserved_words   = options[:reserve] || Set.new(%w[new edit])
         self.slugged_attributes    = fields.map(&:to_s)
         self.slug_history          = options[:history]
