@@ -2,6 +2,7 @@
 
 * [#277](https://github.com/mongoid/mongoid-slug/pull/277): Migrate Danger to use danger-pr-comment workflow - [@dblock](https://github.com/dblock).
 * [#274](https://github.com/mongoid/mongoid-slug/pull/274): Added support for scoping slugs by multiple fields - [@mikekosulin](https://github.com/mikekosulin).
+* [#279](https://github.com/mongoid/mongoid-slug/pull/279): Replace deprecated `__find_args__` with `Array#flatten` - [@samiFakhfakhScalingo](https://github.com/samiFakhfakhScalingo), [@aurelien-reeves-scalingo](https://github.com/aurelien-reeves-scalingo).
 * Your contribution here.
 
 ## 7.0.0 (2023/09/18)
