@@ -36,10 +36,7 @@ jobs:
           - ruby-3.4
           - ruby-4.0
           - truffleruby
-        mongoid:
-          - '8.0'
-          - '8.1'
-          - '9.0'
+        mongoid: [8, 9]
         experimental: [false]
         include:
           - ruby: ruby-3.2
