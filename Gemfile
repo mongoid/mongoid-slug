@@ -16,6 +16,7 @@ end
 gem 'danger', require: false
 gem 'danger-changelog', require: false
 gem 'danger-pr-comment', require: false
+gem 'ostruct'
 gem 'rake'
 gem 'rspec'
 gem 'rspec-its'

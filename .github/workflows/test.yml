@@ -3,9 +3,22 @@ name: CI RSpec Test
 on: [push, pull_request]
 
 jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby 3.4
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4
+          bundler-cache: true
+      - name: Run RuboCop
+        run: bundle exec rubocop --parallel
+
   build:
-    name: >-
-      ${{ matrix.ruby }}
+    name: "${{ matrix.ruby }} mongoid-${{ matrix.mongoid }}"
     env:
       CI: true
       TESTOPTS: -v
@@ -14,24 +27,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: [2.7, 3.0, 3.1, 3.2]
-        mongoid: [7, 8]
+        ruby:
+          - ruby-2.7
+          - ruby-3.0
+          - ruby-3.1
+          - ruby-3.2
+          - ruby-3.3
+          - ruby-3.4
+          - ruby-4.0
+          - truffleruby
+        mongoid:
+          - '8.0'
+          - '8.1'
+          - '9.0'
         experimental: [false]
         include:
-          - ruby: 3.2
-            mongoid: HEAD
+          - ruby: ruby-3.2
+            mongoid: head
             experimental: true
-          - ruby: head
+          - ruby: ruby-head
             mongoid: 7
             experimental: true
-          - ruby: head
-            mongoid: HEAD
+          - ruby: ruby-head
+            mongoid: head
             experimental: true
           - ruby: jruby
             mongoid: 8
             experimental: true
           - ruby: jruby-head
             mongoid: 8
+            experimental: true
+          - ruby: truffleruby-head
+            mongoid: 7
             experimental: true
 
     steps:
@@ -52,13 +79,6 @@ jobs:
 
       - name: bundle install
         run:  bundle install --jobs 4 --retry 3
-        env:
-          MONGOID_VERSION: ${{ matrix.mongoid }}
-
-      - name: rubocop
-        timeout-minutes: 5
-        run: bundle exec rubocop
-        continue-on-error: ${{ matrix.experimental }}
         env:
           MONGOID_VERSION: ${{ matrix.mongoid }}
 
