@@ -35,18 +35,11 @@ jobs:
           - ruby-3.3
           - ruby-3.4
           - ruby-4.0
-          - truffleruby
         mongoid: [8, 9]
         experimental: [false]
         include:
-          - ruby: ruby-3.2
-            mongoid: head
-            experimental: true
           - ruby: ruby-head
             mongoid: 7
-            experimental: true
-          - ruby: ruby-head
-            mongoid: head
             experimental: true
           - ruby: jruby
             mongoid: 8
