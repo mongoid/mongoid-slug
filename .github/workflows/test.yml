@@ -38,8 +38,14 @@ jobs:
         mongoid: [8, 9]
         experimental: [false]
         include:
+          - ruby: ruby-3.2
+            mongoid: HEAD
+            experimental: true
           - ruby: ruby-head
             mongoid: 7
+            experimental: true
+          - ruby: ruby-head
+            mongoid: HEAD
             experimental: true
           - ruby: jruby
             mongoid: 8
