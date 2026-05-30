@@ -144,6 +144,11 @@ module Mongoid
       end
 
       def uniqueness_scope
+        if embedded?
+          parent_metadata = reflect_on_all_association(:embedded_in)[0]
+          return model._parent.send(parent_metadata.inverse_of || metadata.name)
+        end
+
         # If slug_scope is present, we need to handle whether it's a single scope or multiple scopes.
         if slug_scope
           # We'll track individual scope results in an array.
@@ -187,13 +192,6 @@ module Mongoid
           # application's logic.
           # For this example, we're returning the model's class as a default.
           return model.class
-        end
-
-        # The rest of your method remains unchanged, handling cases where slug_scope isn't defined.
-        # This is your existing logic for embedded models or deeper superclass retrieval.
-        if embedded?
-          parent_metadata = reflect_on_all_association(:embedded_in)[0]
-          return model._parent.send(parent_metadata.inverse_of || self.metadata.name)
         end
 
         # Unless embedded or slug scope, return the deepest document superclass.
