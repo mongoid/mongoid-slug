@@ -1,5 +1,6 @@
 ## 7.1.1 (Next)
 
+* Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * Your contribution here.
 
 ## 7.1.0 (2026/08/04)
