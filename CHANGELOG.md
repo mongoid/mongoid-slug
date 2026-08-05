@@ -1,3 +1,7 @@
+## 7.1.1 (Next)
+
+* Your contribution here.
+
 ## 7.1.0 (2026/08/04)
 
 * [#277](https://github.com/mongoid/mongoid-slug/pull/277): Migrate Danger to use danger-pr-comment workflow - [@dblock](https://github.com/dblock).

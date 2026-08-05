@@ -12,7 +12,7 @@ bundle install
 bundle exec rake
 ```
 
-Check that the last build succeeded in [Travis CI](https://travis-ci.org/mongoid/mongoid-slug) for all supported platforms.
+Check that the last build succeeded in [GitHub Actions](https://github.com/mongoid/mongoid-slug/actions) for all supported platforms.
 
 Increment the version, modify [lib/mongoid/slug/version.rb](lib/mongoid/slug/version.rb).
 
@@ -45,6 +45,8 @@ Tagged v0.4.0.
 Pushed git commits and tags.
 Pushed mongoid-slug 0.4.0 to rubygems.org.
 ```
+
+Note: `rake release` requires RubyGems credentials configured in `~/.gem/credentials`. If they aren't available, run `rake build`, then manually `git tag vX.Y.Z`, `git push origin master --tags`, and `gem push pkg/mongoid-slug-X.Y.Z.gem` once credentials are available.
 
 ### Prepare for the Next Version
 
