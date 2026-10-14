@@ -4,8 +4,11 @@ Mongoid Slug
 Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model.
 It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?query=branch%3Amaster)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.ym?query=branch%3Amaster)
+[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml?query=branch%3Amaster)
+[![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid-slug/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid-slug?branch=master)
 [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
+
+CI collects SimpleCov coverage on Ruby 3.4 with Mongoid 9 and MongoDB 8.0 and submits one report to Coveralls using GitHub's workflow token. To generate a local report, run `COVERAGE=true MONGOID_VERSION=9 bundle install` followed by `COVERAGE=true MONGOID_VERSION=9 bundle exec rake spec`. Reports are written to `coverage/`.
 
 ### Version Support
 

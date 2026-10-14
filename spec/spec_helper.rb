@@ -2,6 +2,14 @@
 
 require 'bundler/setup'
 
+if ENV['COVERAGE'] == 'true'
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter '/spec/'
+    track_files 'lib/**/*.rb'
+  end
+end
+
 require 'logger'
 require 'rspec'
 require 'rspec/its'
