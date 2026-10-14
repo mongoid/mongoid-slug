@@ -8,79 +8,67 @@ jobs:
     env:
       CI: true
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Ruby 3.4
+      - uses: actions/checkout@v6
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4
+          ruby-version: '3.4'
           bundler-cache: true
       - name: Run RuboCop
         run: bundle exec rubocop --parallel
 
   build:
-    name: "${{ matrix.ruby }} mongoid-${{ matrix.mongoid }}"
+    name: Ruby ${{ matrix.entry.ruby }} / Mongoid ${{ matrix.entry.mongoid }} / MongoDB ${{ matrix.entry.mongodb }}
     env:
       CI: true
-      TESTOPTS: -v
+      MONGOID_VERSION: ${{ matrix.entry.mongoid }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.entry.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
-        ruby:
-          - ruby-2.7
-          - ruby-3.0
-          - ruby-3.1
-          - ruby-3.2
-          - ruby-3.3
-          - ruby-3.4
-          - ruby-4.0
-        mongoid: [8, 9]
-        experimental: [false]
-        include:
-          - ruby: ruby-3.2
-            mongoid: HEAD
-            experimental: true
-          - ruby: ruby-head
-            mongoid: 7
-            experimental: true
-          - ruby: ruby-head
-            mongoid: HEAD
-            experimental: true
-          - ruby: jruby
-            mongoid: 8
-            experimental: true
-          - ruby: jruby-head
-            mongoid: 8
-            experimental: true
-          - ruby: truffleruby-head
-            mongoid: 7
-            experimental: true
-
+        entry:
+          - { ruby: '2.7', mongoid: '8', mongodb: '4.4' }
+          - { ruby: '2.7', mongoid: '9', mongodb: '4.4' }
+          - { ruby: '3.0', mongoid: '8', mongodb: '5.0' }
+          - { ruby: '3.1', mongoid: '8', mongodb: '6.0' }
+          - { ruby: '3.2', mongoid: '9', mongodb: '7.0' }
+          - { ruby: '3.3', mongoid: '9', mongodb: '7.0' }
+          - { ruby: '3.4', mongoid: '9', mongodb: '8.0' }
+          - { ruby: '4.0', mongoid: '9', mongodb: '8.0' }
+          - { ruby: '4.0', mongoid: '8', mongodb: '8.0' }
+          - { ruby: '3.2', mongoid: 'HEAD', mongodb: '8.0', experimental: true }
+          - { ruby: ruby-head, mongoid: '7', mongodb: '4.4', experimental: true }
+          - { ruby: ruby-head, mongoid: 'HEAD', mongodb: '8.0', experimental: true }
+          - { ruby: jruby, mongoid: '8', mongodb: '6.0', experimental: true }
+          - { ruby: jruby-head, mongoid: '8', mongodb: '6.0', experimental: true }
+          - { ruby: truffleruby-head, mongoid: '7', mongodb: '4.4', experimental: true }
     steps:
-      - name: repo checkout
-        uses: actions/checkout@v2
-
-      - name: start mongodb
-        uses: supercharge/mongodb-github-action@1.6.0
+      - uses: actions/checkout@v6
+      - name: Set up MongoDB
+        uses: supercharge/mongodb-github-action@1.12.1
         with:
-          mongodb-version: 4.4
+          mongodb-version: ${{ matrix.entry.mongodb }}
           mongodb-replica-set: rs0
-
-      - name: load ruby
+      - name: Set up Java
+        if: startsWith(matrix.entry.ruby, 'jruby')
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler: 2
-
-      - name: bundle install
-        run:  bundle install --jobs 4 --retry 3
-        env:
-          MONGOID_VERSION: ${{ matrix.mongoid }}
-
-      - name: test
+          ruby-version: ${{ matrix.entry.ruby }}
+          bundler-cache: true
+      - name: Compile BSON Java extension
+        if: startsWith(matrix.entry.ruby, 'jruby')
+        run: |
+          bson_path="$(bundle show bson)"
+          jruby_jar="$(ruby -rrbconfig -e 'puts File.join(RbConfig::CONFIG.fetch("libdir"), "jruby.jar")')"
+          mkdir -p .bson-classes
+          javac --release 17 -cp "$jruby_jar" -d .bson-classes "$bson_path"/src/main/org/bson_ruby/*.java
+          jar cf "$bson_path/lib/bson-ruby.jar" -C .bson-classes .
+      - name: Run tests
         timeout-minutes: 10
         run: bundle exec rake spec
-        continue-on-error: ${{ matrix.experimental }}
-        env:
-          MONGOID_VERSION: ${{ matrix.mongoid }}
