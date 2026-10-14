@@ -2,6 +2,7 @@
 
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * Your contribution here.
+* [#282](https://github.com/mongoid/mongoid-slug/pull/282): Modernize CI with representative Ruby 2.7–4.0, Mongoid 8–9, and MongoDB 4.4–8.0 coverage, retaining experimental jobs and replica sets, and use upstream BSON fixes for JRuby and TruffleRuby - [@dblock](https://github.com/dblock).
 
 ## 7.1.0 (2026/08/04)
 

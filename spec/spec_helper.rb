@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 
+require 'logger'
 require 'rspec'
 require 'rspec/its'
 require 'uuid'
@@ -26,6 +27,8 @@ def database_id
 end
 
 Mongoid.configure do |config|
+  # Avoid resolving Logger's inherited severity constants through ActiveSupport on JRuby.
+  config.log_level = Logger::INFO
   config.connect_to database_id
 end
 

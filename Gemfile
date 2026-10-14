@@ -13,6 +13,12 @@ else
   gem 'mongoid', version
 end
 
+if %w[jruby truffleruby].include?(RUBY_ENGINE)
+  # BSON 5.2.0 constructs the now-abstract JRuby RubyFixnum and retains unsafe native array pointers.
+  # Pin the upstream fixes until they are released: mongodb/bson-ruby#377 and #371.
+  gem 'bson', github: 'mongodb/bson-ruby', ref: 'e6e788b3f88d81b219da7daf67577f8372081ebe'
+end
+
 gem 'danger', require: false
 gem 'danger-changelog', require: false
 gem 'danger-pr-comment', require: false
