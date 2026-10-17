@@ -22,7 +22,7 @@ jobs:
     env:
       CI: true
       MONGOID_VERSION: ${{ matrix.entry.mongoid }}
-      COVERAGE: ${{ matrix.entry.ruby == '3.4' }}
+      COVERAGE: ${{ matrix.entry.ruby == '3.4' || (matrix.entry.ruby == '4.0' && matrix.entry.mongoid == '8') }}
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.entry.experimental == true }}
     strategy:
@@ -74,9 +74,21 @@ jobs:
         timeout-minutes: 10
         run: bundle exec rake spec
       - name: Coveralls
-        if: matrix.entry.ruby == '3.4'
+        if: matrix.entry.ruby == '3.4' || (matrix.entry.ruby == '4.0' && matrix.entry.mongoid == '8')
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage/.resultset.json
           format: simplecov
+          parallel: true
+          flag-name: mongoid-${{ matrix.entry.mongoid }}
+
+  coverage:
+    needs: build
+    if: ${{ always() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
