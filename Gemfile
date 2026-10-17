@@ -23,10 +23,12 @@ gem 'danger', require: false
 gem 'danger-changelog', require: false
 gem 'danger-pr-comment', require: false
 gem 'ostruct'
+gem 'railties', '>= 6.1', '< 7.3'
 gem 'rake'
 gem 'rspec'
 gem 'rspec-its'
 gem 'rubocop'
 gem 'rubocop-rspec'
 gem 'simplecov', '~> 0.22' if ENV['COVERAGE'] == 'true'
+gem 'tsort'
 gem 'uuid'
