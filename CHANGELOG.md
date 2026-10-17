@@ -1,5 +1,6 @@
 ## 7.1.1 (Next)
 
+* [#284](https://github.com/mongoid/mongoid-slug/pull/284): Cover saved slug mutation, suggestions, history-state reporting, require aliases and real Rails task registration; combine supported-version coverage - [@dblock](https://github.com/dblock).
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * Your contribution here.
 * [#283](https://github.com/mongoid/mongoid-slug/pull/283): Add SimpleCov and Coveralls reporting in CI and fix status badges - [@dblock](https://github.com/dblock).

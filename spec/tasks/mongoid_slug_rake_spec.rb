@@ -4,6 +4,10 @@ require 'spec_helper'
 require 'rake'
 
 describe 'mongoid_slug:set' do
+  before do
+    hide_const('Rails')
+  end
+
   before :all do
     load File.expand_path('../../lib/tasks/mongoid_slug.rake', __dir__)
     Rake::Task.define_task(:environment)
