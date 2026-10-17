@@ -22,7 +22,7 @@ jobs:
     env:
       CI: true
       MONGOID_VERSION: ${{ matrix.entry.mongoid }}
-      COVERAGE: ${{ matrix.entry.ruby == '3.4' }}
+      COVERAGE: ${{ matrix.entry.coverage }}
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.entry.experimental == true }}
     strategy:
@@ -35,9 +35,9 @@ jobs:
           - { ruby: '3.1', mongoid: '8', mongodb: '6.0' }
           - { ruby: '3.2', mongoid: '9', mongodb: '7.0' }
           - { ruby: '3.3', mongoid: '9', mongodb: '7.0' }
-          - { ruby: '3.4', mongoid: '9', mongodb: '8.0' }
+          - { ruby: '3.4', mongoid: '9', mongodb: '8.0', coverage: true }
           - { ruby: '4.0', mongoid: '9', mongodb: '8.0' }
-          - { ruby: '4.0', mongoid: '8', mongodb: '8.0' }
+          - { ruby: '4.0', mongoid: '8', mongodb: '8.0', coverage: true }
           - { ruby: '3.2', mongoid: 'HEAD', mongodb: '8.0', experimental: true }
           - { ruby: ruby-head, mongoid: '7', mongodb: '4.4', experimental: true }
           - { ruby: ruby-head, mongoid: 'HEAD', mongodb: '8.0', experimental: true }
@@ -74,9 +74,21 @@ jobs:
         timeout-minutes: 10
         run: bundle exec rake spec
       - name: Coveralls
-        if: matrix.entry.ruby == '3.4'
+        if: matrix.entry.coverage
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage/.resultset.json
           format: simplecov
+          parallel: true
+          flag-name: mongoid-${{ matrix.entry.mongoid }}
+
+  coverage:
+    needs: build
+    if: ${{ always() && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
