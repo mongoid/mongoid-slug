@@ -149,9 +149,11 @@ class Employee
 
   field :name
 
-  slug :name, index: :false
+  slug :name, index: false
 end
 ```
+
+With automatic declaration disabled, declare your own Mongoid index with `index(...)`. Changing a declaration does not replace an existing database index: inspect the deployed indexes, check for conflicting data, and explicitly migrate the affected index before recreating it. Do not drop unrelated application indexes.
 
 ### Scoping
 
@@ -161,7 +163,7 @@ To scope a slug by a reference association, pass `:scope`:
 class Company
   include Mongoid::Document
 
-  references_many :employees
+  has_many :employees
 end
 
 class Employee
@@ -169,7 +171,7 @@ class Employee
   include Mongoid::Slug
 
   field :name
-  referenced_in :company
+  belongs_to :company, optional: true
 
   slug :name, scope: :company
 end
@@ -181,7 +183,7 @@ Currently, if you have an irregular association name, you **must** specify the `
 
 Embedded objects are automatically scoped by their parent.
 
-Note that the unique index on the `Employee` collection in this example is derived from the `scope` value and is `{ _slugs: 1, company_id: 1}`. Therefore `:company` must be `referenced_in` above the definition of `slug` or it will not be able to resolve the association and mistakenly create a `{ _slugs: 1, company: 1}` index. An alternative is to scope to the field itself as follows:
+The index on `Employee` is derived from the scope and uses `{ company_id: 1, _slugs: 1 }`. Scoped indexes are not declared unique by default. Declare `belongs_to :company` before `slug` so the association resolves to `company_id` rather than `company`. Use `optional: true` only when employees without a company are allowed. An alternative is to scope to the field itself as follows:
 
 ```ruby
 class Employee
@@ -194,6 +196,8 @@ class Employee
   slug :name, scope: :company_id
 end
 ```
+
+Scoped slugs are not globally unique. Routes must carry the scope as well as the slug, for example nested company/employee routes, and controllers must look up the employee through that scope (`company.employees.find(params[:id])`), not `Employee.find(params[:id])`. If the route cannot carry the scope, pass the database ID to the route helper instead.
 
 You may scope slugs using multiple fields as per the following example:
 
@@ -280,6 +284,8 @@ comic_book.slugs.should eql(book.slugs)
 ### History
 
 Enable slug history tracking by setting `history: true`.
+
+History retains previous slugs for lookup; it does not generate multiple independent slugs from different source fields. The most recent slug is used for URLs. To switch new URLs back to database IDs while keeping historical lookup, retain `Mongoid::Slug`, its slug declaration, and the stored history, but override the model's `to_param` to return `id.to_s`. Existing slug URLs can still resolve through `find`; your controller can redirect them to the canonical ID URL. Do not change the slug source to `:id`, which generates slugs instead of changing URL selection.
 
 ```ruby
 class Page
