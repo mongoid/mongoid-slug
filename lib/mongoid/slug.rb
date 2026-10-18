@@ -197,9 +197,6 @@ module Mongoid
       # to find document instead
       return true if new_slug.empty?
 
-      # avoid duplicate slugs
-      _slugs&.delete(new_slug)
-
       if !!slug_history && _slugs.is_a?(Array)
         append_slug(new_slug)
       else
@@ -284,10 +281,12 @@ module Mongoid
         # This is necessary for the scenario in which the slugged locale is not yet present
         # but the default locale is. In this situation, self._slugs falls back to the default
         # which is undesired
-        current_slugs = _slugs_translations.fetch(I18n.locale.to_s, [])
+        current_slugs = _slugs_translations.fetch(I18n.locale.to_s, []).dup
+        current_slugs.delete(value)
         current_slugs << value
         self._slugs_translations = _slugs_translations.merge(I18n.locale.to_s => current_slugs)
       else
+        _slugs.delete(value)
         _slugs << value
       end
     end
