@@ -1,6 +1,7 @@
 ## 7.1.1 (Next)
 
 * [#184](https://github.com/mongoid/mongoid-slug/issues/184): Preserve default-locale slug history when another locale uses the same title through I18n fallbacks - [@dblock](https://github.com/dblock).
+* [#286](https://github.com/mongoid/mongoid-slug/pull/286): Correct the `index: false` example and document modern associations, scoped routes, index migrations, and retaining slug history with ID-based URLs - [@dblock](https://github.com/dblock).
 * [#284](https://github.com/mongoid/mongoid-slug/pull/284): Cover saved slug mutation, suggestions, history-state reporting, require aliases and real Rails task registration; combine supported-version coverage - [@dblock](https://github.com/dblock).
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * [#291](https://github.com/mongoid/mongoid-slug/pull/291): Upgrade danger-pr-comment to 0.3.0 from the `danger` organization and skip empty Danger report comments - [@dblock](https://github.com/dblock).
