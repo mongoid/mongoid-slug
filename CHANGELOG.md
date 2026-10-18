@@ -1,5 +1,6 @@
 ## 7.1.1 (Next)
 
+* [#184](https://github.com/mongoid/mongoid-slug/issues/184): Preserve default-locale slug history when another locale uses the same title through I18n fallbacks - [@dblock](https://github.com/dblock).
 * [#284](https://github.com/mongoid/mongoid-slug/pull/284): Cover saved slug mutation, suggestions, history-state reporting, require aliases and real Rails task registration; combine supported-version coverage - [@dblock](https://github.com/dblock).
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * Your contribution here.
