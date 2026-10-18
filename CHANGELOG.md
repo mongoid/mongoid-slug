@@ -1,5 +1,6 @@
 ## 7.1.1 (Next)
 
+* [#286](https://github.com/mongoid/mongoid-slug/pull/286): Correct the `index: false` example and document modern associations, scoped routes, index migrations, and retaining slug history with ID-based URLs - [@dblock](https://github.com/dblock).
 * [#284](https://github.com/mongoid/mongoid-slug/pull/284): Cover saved slug mutation, suggestions, history-state reporting, require aliases and real Rails task registration; combine supported-version coverage - [@dblock](https://github.com/dblock).
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
 * Your contribution here.
