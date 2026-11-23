@@ -27,8 +27,18 @@ gem 'railties', '>= 6.1', '< 7.3'
 gem 'rake'
 gem 'rspec'
 gem 'rspec-its'
-gem 'rubocop'
-gem 'rubocop-rspec'
 gem 'simplecov', '~> 0.22' if ENV['COVERAGE'] == 'true'
 gem 'tsort'
 gem 'uuid'
+
+group :development, :test do
+  if RUBY_ENGINE == 'ruby' && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.3')
+    gem 'rubocop', '~> 1.92'
+    gem 'rubocop-md', '~> 3.0', require: false
+    gem 'rubocop-prose', '~> 0.2', require: false
+    gem 'rubocop-rake', '~> 0.7', require: false
+    gem 'rubocop-rspec', '~> 3.10', require: false
+    gem 'rubocop-spellcheck', '~> 0.2', require: false
+    gem 'rubocop-yaml', '~> 0.1.0', require: false
+  end
+end

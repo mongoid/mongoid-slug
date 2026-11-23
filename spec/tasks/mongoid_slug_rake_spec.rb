@@ -29,7 +29,7 @@ describe 'mongoid_slug:set' do
       end
     end
 
-    it 'goes though all documents of passed models and sets slug if not already set' do
+    it 'goes through all documents of passed models and sets slug if not already set' do
       uninitalized_slug1 = UninitalizedSlugFirst.create(name: 'uninitalized-slug1')
       uninitalized_slug2 = UninitalizedSlugSecond.create(name: 'uninitalized-slug2')
 
@@ -65,7 +65,7 @@ describe 'mongoid_slug:set' do
       end
     end
 
-    it 'goes though all documents and sets slug if not already set' do
+    it 'goes through all documents and sets slug if not already set' do
       uninitalized_slug3 = UninitalizedSlugThird.create(name: 'uninitalized-slug3')
 
       UninitalizedSlugThird.class_eval do

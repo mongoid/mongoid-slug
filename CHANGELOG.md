@@ -5,6 +5,7 @@
 * Your contribution here.
 * [#283](https://github.com/mongoid/mongoid-slug/pull/283): Add SimpleCov and Coveralls reporting in CI and fix status badges - [@dblock](https://github.com/dblock).
 * [#282](https://github.com/mongoid/mongoid-slug/pull/282): Modernize CI with representative Ruby 2.7–4.0, Mongoid 8–9, and MongoDB 4.4–8.0 coverage, retaining experimental jobs and replica sets, and use upstream BSON fixes for JRuby and TruffleRuby - [@dblock](https://github.com/dblock).
+* [#287](https://github.com/mongoid/mongoid-slug/pull/287): Lint Markdown, YAML, and spelling with rubocop-md, rubocop-prose, rubocop-spellcheck, and rubocop-yaml in a separate Lint workflow, and clean up documentation - [@dblock](https://github.com/dblock).
 
 ## 7.1.0 (2026/08/04)
 
@@ -203,6 +204,7 @@
 * Corrected index creation on scoped slugs - [@DouweM](https://github.com/DouweM).
 
 ## 0.10.0
+
 * Fixed Slug history should only apply if history is set to true - [@tomaswitek](https://github.com/tomaswitek).
 * Fixed Model.slug should alias to to_param - [@tomaswitek](https://github.com/tomaswitek).
 * Added .find_unique_slug_for and #find_unique_slug_for methods - [@DouweM](https://github.com/DouweM).

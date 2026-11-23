@@ -35,7 +35,7 @@ module Mongoid
         super
       end
 
-      # Find the matchind document(s) in the criteria for the provided slugs.
+      # Find the matching document(s) in the criteria for the provided slugs.
       #
       # @example Find by a slug.
       #   criteria.find('some-slug')
