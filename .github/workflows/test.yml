@@ -1,10 +1,17 @@
 name: CI RSpec Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   rubocop:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       CI: true
     steps:
@@ -87,6 +94,7 @@ jobs:
     needs: build
     if: ${{ always() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: coverallsapp/github-action@v2
         with:
