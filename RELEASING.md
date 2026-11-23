@@ -1,13 +1,12 @@
-Releasing Mongoid::Slug
-========================
+# Releasing Mongoid::Slug
 
 There are no particular rules about when to release mongoid-slug. Release bug fixes frequently, features not so frequently and breaking API changes rarely.
 
-### Release
+## Release
 
 Run tests, check that all tests succeed locally.
 
-```
+```sh
 bundle install
 bundle exec rake
 ```
@@ -16,12 +15,12 @@ Check that the last build succeeded in [GitHub Actions](https://github.com/mongo
 
 Increment the version, modify [lib/mongoid/slug/version.rb](lib/mongoid/slug/version.rb).
 
-*  Increment the third number if the release has bug fixes and/or very minor features, only (eg. change `0.5.1` to `0.5.2`).
-*  Increment the second number if the release contains major features or breaking API changes (eg. change `0.5.1` to `0.4.0`).
+* Increment the third number if the release has bug fixes and/or very minor features, only (eg. change `0.5.1` to `0.5.2`).
+* Increment the second number if the release contains major features or breaking API changes (eg. change `0.5.1` to `0.4.0`).
 
 Change "Next Release" in [CHANGELOG.md](CHANGELOG.md) to the new version.
 
-```
+```ruby
 ### 0.4.0 (2014-01-27)
 ```
 
@@ -29,7 +28,7 @@ Remove the line with "Your contribution here.", since there will be no more cont
 
 Commit your changes.
 
-```
+```sh
 git add CHANGELOG.md lib/mongoid/slug/version.rb
 git commit -m "Preparing for release, 0.4.0."
 git push origin master
@@ -37,7 +36,7 @@ git push origin master
 
 Release.
 
-```
+```sh
 $ rake release
 
 mongoid-slug 0.4.0 built to pkg/mongoid-slug-0.4.0.gem.
@@ -52,7 +51,7 @@ Note: `rake release` requires RubyGems credentials configured in `~/.gem/credent
 
 Add the next release to [CHANGELOG.md](CHANGELOG.md).
 
-```
+```markdown
 ### 0.4.1 (Next)
 
 * Your contribution here.
@@ -62,7 +61,7 @@ Increment the minor version, modify [lib/mongoid/slug/version.rb](lib/mongoid/sl
 
 Commit your changes.
 
-```
+```sh
 git add CHANGELOG.md lib/mongoid/slug/version.rb
 git commit -m "Preparing for next release, 0.4.1."
 git push origin master

@@ -1,15 +1,38 @@
-inherit_from: .rubocop_todo.yml
+plugins:
+- rubocop-md
+- rubocop-prose
+- rubocop-rake
+- rubocop-rspec
+- rubocop-spellcheck
+- rubocop-yaml
+
+inherit_from: ".rubocop_todo.yml"
 
 AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
   SuggestExtensions: false
+  inherit_mode:
+    merge:
+    - Include
+  Include:
+  - ".github/**/*.yml"
+  - ".rubocop.yml"
+  Exclude:
+  - coverage/**/*
+  - pkg/**/*
+  - vendor/**/*
 
 Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
   Enabled: false
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - Gemfile
 
 Metrics/CyclomaticComplexity:
   Enabled: false
@@ -25,6 +48,11 @@ Metrics/PerceivedComplexity:
 
 Style/Documentation:
   Enabled: false
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
 
 Style/DoubleNegation:
   Enabled: false
@@ -37,4 +65,96 @@ Style/OptionalBooleanParameter:
 
 Style/Semicolon:
   Exclude:
-    - 'spec/**/*.rb'
+  - spec/**/*.rb
+
+YAML/Lint/InvalidSyntax:
+  Include:
+  - "**/*.yml"
+  - "**/*.yaml"
+
+YAML/Lint/DuplicateKey:
+  Include:
+  - "**/*.yml"
+  - "**/*.yaml"
+
+Naming/FileName:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+  - ".github/workflows/*.yml"
+
+Style/OneClassPerFile:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+
+Lint/UselessAssignment:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+
+Style/MultilineBlockChain:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+
+Style/SymbolProc:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+
+Lint/Void:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - "**/*.md"
+
+Layout/LineLength:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - ".github/workflows/*.yml"
+
+Markdown/HeadingCapitalization:
+  inherit_mode:
+    merge:
+    - Exclude
+  Enabled: true
+  Style: title_case
+  Exclude:
+  - CHANGELOG.md
+
+Prose/MaxLength:
+  Max: false
+  Exclude:
+  - LICENSE
+
+Spellcheck:
+  DictionaryFiles:
+    en:
+    - gem:rubocop-spellcheck/data/en/en.dic
+    - ".spellcheck.txt"
+
+Spellcheck/Spelling:
+  Exclude:
+  - LICENSE
+
+# The suite sets the Mongoid logger level once before all examples.
+RSpec/BeforeAfterAll:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - spec/spec_helper.rb

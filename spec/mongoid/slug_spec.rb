@@ -938,7 +938,7 @@ module Mongoid
         expect(page._slugs_translations).to eq('en' => ['title-on-english'], 'nl' => ['title-on-netherlands'])
       end
 
-      it 'exact same title multiple langauges' do
+      it 'exact same title multiple languages' do
         page = PageSlugLocalized.new
         page.title_translations = { 'en' => 'Title on English', 'nl' => 'Title on English' }
         page.save

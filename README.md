@@ -1,22 +1,18 @@
-Mongoid Slug
-============
+# Mongoid Slug
 
-Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model.
-It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
+Mongoid Slug generates a URL slug or permalink based on one or more fields in a Mongoid model. It sits idly on top of [stringex](https://github.com/rsl/stringex), supporting non-Latin characters.
 
-[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml?query=branch%3Amaster)
-[![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid-slug/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid-slug?branch=master)
-[![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](http://badge.fury.io/rb/mongoid-slug)
+[![Build Status](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid-slug/actions/workflows/test.yml?query=branch%3Amaster) [![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid-slug/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid-slug?branch=master) [![Gem Version](https://badge.fury.io/rb/mongoid-slug.svg)](https://badge.fury.io/rb/mongoid-slug)
 
 CI collects SimpleCov coverage on Ruby 3.4 with Mongoid 9 and MongoDB 8.0 and submits one report to Coveralls using GitHub's workflow token. To generate a local report, run `COVERAGE=true MONGOID_VERSION=9 bundle install` followed by `COVERAGE=true MONGOID_VERSION=9 bundle exec rake spec`. Reports are written to `coverage/`.
 
-### Version Support
+## Version Support
 
 Mongoid Slug 7.x requires at least Mongoid 7.0.0 and Ruby 2.7.0. For earlier Mongoid and Ruby version support, please use an earlier version of Mongoid Slug.
 
 Mongoid Slug is compatible with all MongoDB versions which Mongoid supports, however, please see "Slug Max Length" section below for MongoDB 4.0 and earlier.
 
-### Installation
+## Installation
 
 Add to your Gemfile:
 
@@ -24,7 +20,7 @@ Add to your Gemfile:
 gem 'mongoid-slug'
 ```
 
-### Usage
+## Usage
 
 ### Set Up a Slug
 
@@ -38,7 +34,7 @@ class Book
 end
 ```
 
-### Find a Document by its Slug
+### Find a Document by Its Slug
 
 ```ruby
 # GET /books/a-thousand-plateaus
@@ -50,14 +46,14 @@ Mongoid Slug will attempt to determine whether you want to find using the `slugs
 * Mongoid Slug will perform a find based on `slugs` only if all arguments passed to `find` are of the type `String`.
 * If your document uses `BSON::ObjectId` identifiers, and all arguments look like valid `BSON::ObjectId`, then Mongoid Slug will perform a find based on `_id`.
 * If your document uses any other type of identifiers, and all arguments passed to `find` are of the same type, then Mongoid Slug will perform a find based on `_id`.
-* If your document uses `String` identifiers and you want to be able find by slugs or ids, to get the correct behaviour, you should add a `slug_id_strategy` option to your `_id` field definition. This option should return something that responds to `call` (a callable) and takes one string argument, e.g. a lambda.  This callable must return true if the string looks like one of your ids.
+* If your document uses `String` identifiers and you want to be able find by slugs or ids, to get the correct behavior, you should add a `slug_id_strategy` option to your `_id` field definition. This option should return something that responds to `call` (a callable) and takes one string argument, e.g. a lambda.  This callable must return true if the string looks like one of your ids.
 
 ```ruby
 Book.fields['_id'].type
-=> String
+# => String
 
 book = Book.find 'a-thousand-plateaus' # Finds by slugs
-=> ...
+# => ...
 
 class Post
   include Mongoid::Document
@@ -70,13 +66,13 @@ class Post
 end
 
 Post.fields['_id'].type
-=> String
+# => String
 
 post = Post.find 'a-thousand-plateaus' # Finds by slugs
-=> ...
+# => ...
 
 post = Post.find '50b1386a0482939864000001' # Finds by bson ids
-=> ...
+# => ...
 ```
 
 [Examine slug.rb](lib/mongoid/slug.rb) for all available options.
@@ -149,7 +145,7 @@ class Employee
 
   field :name
 
-  slug :name, index: :false
+  slug :name, index: false
 end
 ```
 
@@ -177,7 +173,7 @@ end
 
 In this example, if you create an employee without associating it with any company, the scope will fall back to the root employees collection.
 
-Currently, if you have an irregular association name, you **must** specify the `:inverse_of` option on the other side of the assocation.
+Currently, if you have an irregular association name, you **must** specify the `:inverse_of` option on the other side of the association.
 
 Embedded objects are automatically scoped by their parent.
 
@@ -213,14 +209,7 @@ end
 
 ### Slug Max Length
 
-MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv)
-"4.0" and earlier applies an [Index Key Limit](https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Index-Key-Limit)
-which limits the total size of an index entry to around 1KB and will raise error,
-`17280 - key too large to index` when trying to create a record that causes an index key to exceed that limit.
-By default slugs are of the form `text[-number]` and the text portion is limited in size
-to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes.
-You can change this limit with `max_length` or set it to `nil` if you're running MongoDB
-with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
+MongoDB [featureCompatibilityVersion](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/#std-label-view-fcv) "4.0" and earlier applies an [Index Key Limit](https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Index-Key-Limit) which limits the total size of an index entry to around 1KB and will raise error, `17280 - key too large to index` when trying to create a record that causes an index key to exceed that limit. By default slugs are of the form `text[-number]` and the text portion is limited in size to `Mongoid::Slug::MONGO_INDEX_KEY_LIMIT_BYTES - 32` bytes. You can change this limit with `max_length` or set it to `nil` if you're running MongoDB with [failIndexKeyTooLong](https://docs.mongodb.org/manual/reference/parameters/#param.failIndexKeyTooLong) set to `false`.
 
 ```ruby
 class Company
@@ -319,13 +308,11 @@ Friend.find('admin') # => nil
 friend.slug # => 'admin-1'
 ```
 
-When reserved words are not specified, the words 'new' and 'edit' are considered reserved by default.
-Specifying an array of custom reserved words will overwrite these defaults.
+When reserved words are not specified, the words 'new' and 'edit' are considered reserved by default. Specifying an array of custom reserved words will overwrite these defaults.
 
 ### Localize Slugs
 
-The slugs can be localized. This feature is built upon Mongoid localized fields,
-so fallbacks and localization works as documented in the Mongoid manual.
+The slugs can be localized. This feature is built upon Mongoid localized fields, so fallbacks and localization works as documented in the Mongoid manual.
 
 ```ruby
 class PageSlugLocalize
@@ -337,9 +324,7 @@ class PageSlugLocalize
 end
 ```
 
-By specifying `localize: true`, the slug index will be created on the
-[I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) field only.
-For example, if `I18n.default_locale` is `:en`, the index will be generated as follows:
+By specifying `localize: true`, the slug index will be created on the [I18n.default_locale](http://guides.rubyonrails.org/i18n.html#the-public-i18n-api) field only. For example, if `I18n.default_locale` is `:en`, the index will be generated as follows:
 
 ```ruby
 slug :title, localize: true
@@ -348,8 +333,7 @@ slug :title, localize: true
 index({ '_slugs.en' => 1 }, { unique: true, sparse: true })
 ```
 
-If you are supporting multiple locales, you may specify the list of locales on which
-to create indexes as an `Array`.
+If you are supporting multiple locales, you may specify the list of locales on which to create indexes as an `Array`.
 
 ```ruby
 slug :title, localize: [:fr, :es, :de]
@@ -362,7 +346,7 @@ index({ '_slugs.de' => 1 }, { unique: true, sparse: true })
 
 ### Custom Find Strategies
 
-By default find will search for the document by the id field if the provided id looks like a `BSON::ObjectId`, and it will otherwise find by the _slugs field. However, custom strategies can ovveride the default behavior, like e.g:
+By default find will search for the document by the id field if the provided id looks like a `BSON::ObjectId`, and it will otherwise find by the _slugs field. However, custom strategies can override the default behavior, like e.g:
 
 ```ruby
 module Mongoid::Slug::UuidIdStrategy
@@ -386,7 +370,7 @@ class Entity
 end
 ```
 
-### Adhoc Checking Whether a Slug is Unique
+### Adhoc Checking Whether a Slug Is Unique
 
 Lets say you want to have a auto-suggest function on your GUI that could provide a preview of what the url or slug could be before the form to create the record was submitted.
 
@@ -395,16 +379,14 @@ You can use the UniqueSlug class in your server side code to do this, e.g.
 ```ruby
 title = params[:title]
 unique = Mongoid::Slug::UniqueSlug.new(Book.new).find_unique(title)
-...
+# ...
 # return some representation of unique
 ```
 
-Contributing
-------------
+## Contributing
 
-Mongoid-slug is work of [many of contributors](https://github.com/mongoid/mongoid-slug/graphs/contributors). You're encouraged to submit [pull requests](https://github.com/mongoid/mongoid-slug/pulls), [propose features, ask questions and discuss issues](https://github.com/mongoid/mongoid-slug/issues). See [CONTRIBUTING](CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md), [UPGRADING.md](UPGRADING.md), and [RELEASING.md](RELEASING.md).
 
-Copyright & License
--------------------
+## Copyright & License
 
 Copyright (c) 2010-2017 Hakan Ensari & Contributors, see [LICENSE](LICENSE) for details.
