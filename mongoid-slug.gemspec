@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.push File.expand_path('lib', __dir__)
-require 'mongoid/slug/version'
+require_relative 'lib/mongoid/slug/version'
 
 Gem::Specification.new do |s|
   s.name        = 'mongoid-slug'

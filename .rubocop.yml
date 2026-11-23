@@ -158,3 +158,19 @@ RSpec/BeforeAfterAll:
     - Exclude
   Exclude:
   - spec/spec_helper.rb
+
+# One release example verifies the tag, the next development commit, and their files together.
+RSpec/MultipleExpectations:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - spec/release/release_spec.rb
+
+# One release example verifies the tag, the next development commit, and their files together.
+RSpec/ExampleLength:
+  inherit_mode:
+    merge:
+    - Exclude
+  Exclude:
+  - spec/release/release_spec.rb

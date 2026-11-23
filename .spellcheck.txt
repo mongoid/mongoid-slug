@@ -22,6 +22,7 @@ bleu
 BSON
 bson
 Bugfixes
+Bundler
 byscripts
 cezanne
 CHANGELOG
@@ -96,6 +97,7 @@ mongodb
 MONGOID
 Mongoid
 mongoid
+MongoidSlugRelease
 moodlemags
 multiline
 mzikherman
@@ -117,11 +119,13 @@ Pelham
 pelham
 permalink
 polymorphics
+Rakefile
 rb
 README
 Rebase
 rebase
 refactorings
+RSpec
 RuboCop
 RubyFixnum
 RubyGems
