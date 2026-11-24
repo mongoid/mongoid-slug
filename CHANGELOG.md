@@ -1,4 +1,4 @@
-## 7.1.1 (Next)
+## 7.2.0 (Next)
 
 * [#184](https://github.com/mongoid/mongoid-slug/issues/184): Preserve default-locale slug history when another locale uses the same title through I18n fallbacks - [@dblock](https://github.com/dblock).
 * [#286](https://github.com/mongoid/mongoid-slug/pull/286): Correct the `index: false` example and document modern associations, scoped routes, index migrations, and retaining slug history with ID-based URLs - [@dblock](https://github.com/dblock).
