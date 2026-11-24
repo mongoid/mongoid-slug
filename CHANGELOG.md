@@ -2,6 +2,7 @@
 
 * [#284](https://github.com/mongoid/mongoid-slug/pull/284): Cover saved slug mutation, suggestions, history-state reporting, require aliases and real Rails task registration; combine supported-version coverage - [@dblock](https://github.com/dblock).
 * Removed Code Climate badge from README - [@dblock](https://github.com/dblock).
+* [#291](https://github.com/mongoid/mongoid-slug/pull/291): Upgrade danger-pr-comment to 0.3.0 from the `danger` organization and skip empty Danger report comments - [@dblock](https://github.com/dblock).
 * Your contribution here.
 * [#283](https://github.com/mongoid/mongoid-slug/pull/283): Add SimpleCov and Coveralls reporting in CI and fix status badges - [@dblock](https://github.com/dblock).
 * [#282](https://github.com/mongoid/mongoid-slug/pull/282): Modernize CI with representative Ruby 2.7–4.0, Mongoid 8–9, and MongoDB 4.4–8.0 coverage, retaining experimental jobs and replica sets, and use upstream BSON fixes for JRuby and TruffleRuby - [@dblock](https://github.com/dblock).
