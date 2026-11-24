@@ -10,6 +10,7 @@
 * [#287](https://github.com/mongoid/mongoid-slug/pull/287): Lint Markdown, YAML, and spelling with rubocop-md, rubocop-prose, rubocop-spellcheck, and rubocop-yaml in a separate Lint workflow, and clean up documentation - [@dblock](https://github.com/dblock).
 * [#288](https://github.com/mongoid/mongoid-slug/pull/288): Run CI pushes only on the default branch, cancel superseded pull request runs, skip duplicate lint in the test matrix, and bound job times - [@dblock](https://github.com/dblock).
 * [#289](https://github.com/mongoid/mongoid-slug/pull/289): Release with ruby-gem-release from a manually dispatched GitHub Actions workflow using RubyGems Trusted Publishing, with dry runs - [@dblock](https://github.com/dblock).
+* [#292](https://github.com/mongoid/mongoid-slug/pull/292): Fix lint on `master` by describing `Mongoid::Slug` in the localized fallback spec, renamed to `slug_localized_fallback_spec.rb` - [@dblock](https://github.com/dblock).
 
 ## 7.1.0 (2026/08/04)
 
