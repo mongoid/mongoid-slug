@@ -1,3 +1,7 @@
+## 7.2.1 (Next)
+
+* Your contribution here.
+
 ## 7.2.0 (2026/11/24)
 
 * [#184](https://github.com/mongoid/mongoid-slug/issues/184): Preserve default-locale slug history when another locale uses the same title through I18n fallbacks - [@dblock](https://github.com/dblock).
