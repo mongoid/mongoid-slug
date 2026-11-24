@@ -25,11 +25,12 @@ jobs:
         run: bundle exec rubocop --parallel
 
   build:
-    name: Ruby ${{ matrix.entry.ruby }} / Mongoid ${{ matrix.entry.mongoid }} / MongoDB ${{ matrix.entry.mongodb }}
+    name: Ruby ${{ matrix.entry.ruby }} / Mongoid ${{ matrix.entry.mongoid }} / MongoDB ${{ matrix.entry.mongodb }}${{ matrix.entry.paranoia && ' / Paranoia' || '' }}
     env:
       CI: true
       MONGOID_VERSION: ${{ matrix.entry.mongoid }}
       COVERAGE: ${{ matrix.entry.coverage }}
+      MONGOID_PARANOIA: ${{ matrix.entry.paranoia }}
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.entry.experimental == true }}
     strategy:
@@ -45,6 +46,8 @@ jobs:
           - { ruby: '3.4', mongoid: '9', mongodb: '8.0', coverage: true }
           - { ruby: '4.0', mongoid: '9', mongodb: '8.0' }
           - { ruby: '4.0', mongoid: '8', mongodb: '8.0', coverage: true }
+          - { ruby: '3.4', mongoid: '8', mongodb: '8.0', paranoia: true }
+          - { ruby: '4.0', mongoid: '9', mongodb: '8.0', paranoia: true }
           - { ruby: '3.2', mongoid: 'HEAD', mongodb: '8.0', experimental: true }
           - { ruby: ruby-head, mongoid: '7', mongodb: '4.4', experimental: true }
           - { ruby: ruby-head, mongoid: 'HEAD', mongodb: '8.0', experimental: true }

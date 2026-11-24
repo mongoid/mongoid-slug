@@ -1,6 +1,7 @@
-## 7.2.1 (Next)
+## 7.3.0 (Next)
 
 * Your contribution here.
+* [#296](https://github.com/mongoid/mongoid-slug/pull/296): Add `Mongoid::Slug::Paranoia`, which releases the slugs of soft-deleted Mongoid::Paranoia documents and rebuilds a unique slug on restore, per model or for every paranoid model via `Mongoid::Paranoia.include Mongoid::Slug::Paranoia`; supersedes [#273](https://github.com/mongoid/mongoid-slug/pull/273) - [@johnnyshields](https://github.com/johnnyshields), [@dblock](https://github.com/dblock).
 
 ## 7.2.0 (2026/11/24)
 

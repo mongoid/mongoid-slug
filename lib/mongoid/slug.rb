@@ -6,6 +6,7 @@ require 'mongoid/slug/criteria'
 require 'mongoid/slug/index_builder'
 require 'mongoid/slug/unique_slug'
 require 'mongoid/slug/slug_id_strategy'
+require 'mongoid/slug/paranoia'
 require 'mongoid/slug/railtie' if defined?(Rails)
 
 module Mongoid
@@ -99,10 +100,17 @@ module Mongoid
         #-- always create slug on create
         #-- do not create new slug on update if the slug is permanent
         if options[:permanent]
-          set_callback :create, :before, :build_slug
+          set_callback :create, :before, :build_slug, unless: :slug_paranoid_deleted?
         else
           set_callback :save, :before, :build_slug, if: :slug_should_be_rebuilt?
         end
+
+        define_slug_paranoia_callbacks if slug_paranoia?
+      end
+
+      # @return [Boolean] Whether soft-deleted documents release their slugs, see Mongoid::Slug::Paranoia.
+      def slug_paranoia?
+        include?(Mongoid::Slug::Paranoia)
       end
 
       def default_slug_url_builder
@@ -244,7 +252,7 @@ module Mongoid
 
     # @return [Boolean] Whether the slug requires to be rebuilt
     def slug_should_be_rebuilt?
-      new_record? || _slugs_changed? || slugged_attributes_changed?
+      (new_record? || _slugs_changed? || slugged_attributes_changed?) && !slug_paranoid_deleted?
     end
 
     def slugged_attributes_changed?
@@ -275,6 +283,11 @@ module Mongoid
     end
 
     private
+
+    # @return [Boolean] Whether this document is soft-deleted and releases its slug, see Mongoid::Slug::Paranoia.
+    def slug_paranoid_deleted?
+      self.class.slug_paranoia? && !deleted_at.nil?
+    end
 
     def append_slug(value)
       if localized?

@@ -376,6 +376,41 @@ class Entity
 end
 ```
 
+### Soft-Deleted Documents with Mongoid::Paranoia
+
+With [mongoid_paranoia](https://github.com/simi/mongoid_paranoia), `destroy` only marks a document deleted, so by default it keeps its slug and the unique slug index keeps that slug reserved. Include `Mongoid::Slug::Paranoia` to release the slugs of soft-deleted documents instead.
+
+```ruby
+class Agent
+  include Mongoid::Document
+  include Mongoid::Paranoia
+  include Mongoid::Slug
+  include Mongoid::Slug::Paranoia
+
+  field :name
+  slug :name
+end
+```
+
+Include `Mongoid::Paranoia` before calling `slug`; including `Mongoid::Slug::Paranoia` in a model without it raises an `ArgumentError`. In a model that includes `Mongoid::Slug::Paranoia`:
+
+* `destroy` removes the slug field of the soft-deleted document, so another document can take the slug.
+* Saving a soft-deleted document keeps its slug removed.
+* `restore`, or clearing `deleted_at` and saving, builds a slug again from the slugged fields. If another document took the old slug meanwhile, the restored document gets the next unique one, for example `spy-1`. Previous slugs kept by `history: true` are not restored.
+* `delete` and `remove` soft-delete without running callbacks, so they keep the slug. `destroy!` removes the document and its slug.
+
+To enable it for every paranoid model, include it into `Mongoid::Paranoia` before any model includes `Mongoid::Paranoia`, for example in an initializer. Models defined earlier are not affected.
+
+```ruby
+Mongoid::Paranoia.include Mongoid::Slug::Paranoia
+```
+
+Documents soft-deleted before a model included `Mongoid::Slug::Paranoia` still hold their slugs. Release them once, for example before running `rake db:mongoid:create_indexes`:
+
+```ruby
+Agent.unscoped.where(:deleted_at.ne => nil).each(&:unset_slug!)
+```
+
 ### Adhoc Checking Whether a Slug Is Unique
 
 Lets say you want to have a auto-suggest function on your GUI that could provide a preview of what the url or slug could be before the form to create the record was submitted.

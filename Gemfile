@@ -22,6 +22,7 @@ end
 gem 'danger', require: false
 gem 'danger-changelog', require: false
 gem 'danger-pr-comment', require: false
+gem 'mongoid_paranoia', '>= 0.6' if ENV['MONGOID_PARANOIA'] == 'true'
 gem 'ostruct'
 gem 'railties', '>= 6.1', '< 7.3'
 gem 'rake'
